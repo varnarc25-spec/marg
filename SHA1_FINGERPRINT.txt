@@ -1,0 +1,52 @@
+SHA-1 and SHA-256 Fingerprints for Firebase Google Sign-In
+===========================================================
+
+Your SHA-1 Fingerprint (Debug) - REQUIRED for Google Sign-In:
+A3:0C:A1:C5:78:8E:33:71:38:C8:56:69:E2:8D:43:9C:5C:13:D9:BB
+
+Your SHA-256 Fingerprint (Debug) - Optional but recommended:
+AE:D4:D0:0E:99:82:28:B2:38:23:E0:A3:EF:C5:26:D5:B6:F4:AD:4A:BC:8B:1E:CD:0E:41:CE:CF:70:0A:FA:BC
+
+==============================================
+Next Steps:
+==============================================
+
+1. Go to Firebase Console:
+   https://console.firebase.google.com/project/marg-af127/settings/general
+
+2. Find your Android app: com.varnarc.marg
+
+3. Scroll to "SHA certificate fingerprints" section
+
+4. Click "Add fingerprint"
+
+5. Paste this SHA-1 (REQUIRED):
+   A3:0C:A1:C5:78:8E:33:71:38:C8:56:69:E2:8D:43:9C:5C:13:D9:BB
+
+6. (Optional) Also add SHA-256 for better security:
+   AE:D4:D0:0E:99:82:28:B2:38:23:E0:A3:EF:C5:26:D5:B6:F4:AD:4A:BC:8B:1E:CD:0E:41:CE:CF:70:0A:FA:BC
+
+7. Click "Save"
+
+8. Update Firebase configuration files:
+
+   Option A (Recommended - Using FlutterFire CLI):
+   ```bash
+   cd /Users/saiporala/Documents/sai/marg
+   flutterfire configure
+   ```
+   Select project: marg-af127
+   Select platforms: Android (and others)
+   This automatically updates google-services.json with OAuth client info
+
+   Option B (Manual Download):
+   - Download updated google-services.json from Firebase Console
+   - Replace: android/app/google-services.json
+
+==============================================
+Quick Links:
+==============================================
+
+- Firebase Console: https://console.firebase.google.com/project/marg-af127
+- Project Settings: https://console.firebase.google.com/project/marg-af127/settings/general
+- Authentication: https://console.firebase.google.com/project/marg-af127/authentication
