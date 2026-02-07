@@ -1,77 +1,145 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../shared/widgets/progress_indicator_widget.dart';
+import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
+import '../../data/datasources/languages_asset_datasource.dart';
+import '../../data/models/language_option.dart';
 import 'user_goal_selection_screen.dart';
 
 /// Language Selection Screen
-/// Users choose their preferred language
-class LanguageSelectionScreen extends ConsumerWidget {
+/// Grid of pastel language buttons with native script and English name; green checkmark for selected.
+/// Languages are loaded from onboarding/data (assets/onboarding/data/languages.json).
+class LanguageSelectionScreen extends ConsumerStatefulWidget {
   const LanguageSelectionScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LanguageSelectionScreen> createState() => _LanguageSelectionScreenState();
+}
+
+class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScreen> {
+  List<LanguageOption> _options = [];
+  bool _loading = true;
+  String _selectedCode = 'en';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguages();
+  }
+
+  Future<void> _loadLanguages() async {
+    try {
+      final options = await LanguagesAssetDatasource.loadLanguages();
+      if (mounted) {
+        setState(() {
+          _options = options;
+          _loading = false;
+        });
+        _syncSelectedFromProvider();
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  void _syncSelectedFromProvider() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        final current = ref.read(languageProvider);
+        if (current.isNotEmpty && _options.any((o) => o.code == current)) {
+          setState(() => _selectedCode = current);
+        }
+      } catch (_) {}
+    });
+  }
+
+  void _onLanguageSelected(String code) {
+    setState(() => _selectedCode = code);
+    ref.read(languageProvider.notifier).setLanguage(code);
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const UserGoalSelectionScreen()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = ref.watch(l10nProvider);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Choose Language'),
-      ),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const ProgressIndicatorWidget(
-                currentStep: 1,
-                totalSteps: 6,
-              ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 24),
               Text(
-                'Select your preferred language',
-                style: Theme.of(context).textTheme.headlineMedium,
+                l10n.selectLanguage,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'You can change this later in settings',
-                style: Theme.of(context).textTheme.bodyMedium,
+                l10n.changeLanguageLater,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 28),
               Expanded(
-                child: ListView(
-                  children: [
-                    _LanguageCard(
-                      language: 'English',
-                      languageCode: 'en',
-                      icon: Icons.language,
-                      onTap: () => _onLanguageSelected(context, ref, 'en'),
-                    ),
-                    const SizedBox(height: 16),
-                    _LanguageCard(
-                      language: AppStrings.languageHindi,
-                      languageCode: 'hi',
-                      icon: Icons.language,
-                      onTap: () => _onLanguageSelected(context, ref, 'hi'),
-                    ),
-                    const SizedBox(height: 16),
-                    _LanguageCard(
-                      language: AppStrings.languageTelugu,
-                      languageCode: 'te',
-                      icon: Icons.language,
-                      onTap: () => _onLanguageSelected(context, ref, 'te'),
-                    ),
-                    const SizedBox(height: 16),
-                    _LanguageCard(
-                      language: AppStrings.languageTamil,
-                      languageCode: 'ta',
-                      icon: Icons.language,
-                      onTap: () => _onLanguageSelected(context, ref, 'ta'),
-                    ),
-                  ],
-                ),
+                child: _loading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView(
+                        padding: const EdgeInsets.only(bottom: 24),
+                        children: [
+                          for (var i = 0; i < _options.length; i += 2) ...[
+                            IntrinsicHeight(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        right: 7,
+                                        bottom: i + 2 < _options.length ? 14 : 0,
+                                      ),
+                                      child: LanguageGridTile(
+                                        option: _options[i],
+                                        selected: _selectedCode == _options[i].code,
+                                        onTap: () => _onLanguageSelected(_options[i].code),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 7,
+                                        bottom: i + 2 < _options.length ? 14 : 0,
+                                      ),
+                                      child: i + 1 < _options.length
+                                          ? LanguageGridTile(
+                                              option: _options[i + 1],
+                                              selected: _selectedCode == _options[i + 1].code,
+                                              onTap: () => _onLanguageSelected(_options[i + 1].code),
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
               ),
             ],
           ),
@@ -79,67 +147,74 @@ class LanguageSelectionScreen extends ConsumerWidget {
       ),
     );
   }
-
-  void _onLanguageSelected(
-    BuildContext context,
-    WidgetRef ref,
-    String languageCode,
-  ) {
-    ref.read(languageProvider.notifier).setLanguage(languageCode);
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const UserGoalSelectionScreen(),
-      ),
-    );
-  }
 }
 
-class _LanguageCard extends StatelessWidget {
-  final String language;
-  final String languageCode;
-  final IconData icon;
+class LanguageGridTile extends StatelessWidget {
+  final LanguageOption option;
+  final bool selected;
   final VoidCallback onTap;
 
-  const _LanguageCard({
-    required this.language,
-    required this.languageCode,
-    required this.icon,
+  const LanguageGridTile({
+    super.key,
+    required this.option,
+    required this.selected,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
+    return Material(
+      color: option.color,
+      borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryBlue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    option.nativeName,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                      height: 1.2,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    option.englishName,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textSecondary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            if (selected)
+              Positioned(
+                top: 10,
+                right: 10,
                 child: Icon(
-                  icon,
-                  color: AppColors.primaryBlue,
+                  Icons.check_circle_rounded,
+                  color: AppColors.accentGreen,
+                  size: 26,
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  language,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-              ),
-              const Icon(Icons.chevron_right),
-            ],
-          ),
+          ],
         ),
       ),
     );

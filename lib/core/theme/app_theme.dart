@@ -27,6 +27,9 @@ class AppColors {
   static const Color riskLow = Color(0xFF00C853);
   static const Color riskMedium = Color(0xFFFF6F00);
   static const Color riskHigh = Color(0xFFE53935);
+
+  /// Light pastel blue for icon tiles (rounded square with white icon + label)
+  static const Color iconTileBackground = Color(0xFFA7D9F8);
 }
 
 class AppTheme {

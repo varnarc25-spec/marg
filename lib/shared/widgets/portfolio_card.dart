@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/constants/app_strings.dart';
+import '../../core/l10n/app_localizations.dart';
 import '../../data/models/portfolio.dart';
 
 /// Portfolio Card Widget
 /// Displays portfolio snapshot with P&L
-class PortfolioCard extends StatelessWidget {
+class PortfolioCard extends ConsumerWidget {
   final PortfolioSnapshot portfolio;
 
   const PortfolioCard({super.key, required this.portfolio});
@@ -15,7 +16,8 @@ class PortfolioCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = ref.watch(l10nProvider);
     return Card(
       elevation: 4,
       child: Container(
@@ -35,7 +37,7 @@ class PortfolioCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppStrings.homePortfolio,
+              l10n.homePortfolio,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 8),
@@ -51,7 +53,7 @@ class PortfolioCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _PnlItem(
-                    label: AppStrings.homeTodayPnl,
+                    label: l10n.homeTodayPnl,
                     value: portfolio.todayPnl,
                     isPositive: portfolio.isTodayPnlPositive,
                   ),
@@ -59,7 +61,7 @@ class PortfolioCard extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: _PnlItem(
-                    label: AppStrings.homeOverallPnl,
+                    label: l10n.homeOverallPnl,
                     value: portfolio.overallPnl,
                     isPositive: portfolio.isOverallPnlPositive,
                   ),

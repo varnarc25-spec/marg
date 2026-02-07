@@ -1,100 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/progress_indicator_widget.dart';
+import '../../../../shared/widgets/app_icon_tile.dart';
+import '../../../../shared/widgets/risk_profile_gauge.dart';
+import '../../../../shared/providers/app_providers.dart';
+import '../../../../core/l10n/app_localizations.dart';
 import 'account_mode_screen.dart';
 
 /// Risk Appetite Quiz Screen
-/// 5 questions to assess user's risk tolerance
-class RiskQuizScreen extends StatefulWidget {
+/// 5 questions to assess user's risk tolerance — same layout as goal/experience screens
+class RiskQuizScreen extends ConsumerStatefulWidget {
   const RiskQuizScreen({super.key});
 
   @override
-  State<RiskQuizScreen> createState() => _RiskQuizScreenState();
+  ConsumerState<RiskQuizScreen> createState() => _RiskQuizScreenState();
 }
 
-class _RiskQuizScreenState extends State<RiskQuizScreen> {
+class _RiskQuizScreenState extends ConsumerState<RiskQuizScreen> {
   int currentQuestion = 0;
   final List<int> answers = List.filled(5, -1);
 
-  final List<Map<String, dynamic>> questions = [
-    {
-      'question': 'How do you react to market volatility?',
-      'options': [
-        'I stay calm and stick to my strategy',
-        'I get slightly nervous but continue',
-        'I panic and want to exit immediately',
-      ],
-    },
-    {
-      'question': 'What percentage of your portfolio are you willing to risk?',
-      'options': [
-        'Less than 5%',
-        '5-15%',
-        'More than 15%',
-      ],
-    },
-    {
-      'question': 'How long do you plan to hold your trades?',
-      'options': [
-        'Long-term (months/years)',
-        'Medium-term (weeks)',
-        'Short-term (days)',
-      ],
-    },
-    {
-      'question': 'What\'s your primary trading goal?',
-      'options': [
-        'Steady growth with low risk',
-        'Balanced growth and risk',
-        'Maximum returns, high risk',
-      ],
-    },
-    {
-      'question': 'How do you handle losses?',
-      'options': [
-        'I accept it as part of trading',
-        'I review and learn from it',
-        'I get emotional and make impulsive decisions',
-      ],
-    },
-  ];
+  static const int _numQuestions = 5;
 
   @override
   Widget build(BuildContext context) {
-    if (currentQuestion >= questions.length) {
-      return _buildResultScreen();
+    final l10n = ref.watch(l10nProvider);
+    if (currentQuestion >= _numQuestions) {
+      return _buildResultScreen(l10n);
     }
 
+    final theme = Theme.of(context);
+    final questionText = l10n.riskQuizQuestionAt(currentQuestion);
+    final subtitle = l10n.riskQuizSubtitleAt(currentQuestion);
+    final options = l10n.riskQuizOptionsAt(currentQuestion);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Risk Assessment (${currentQuestion + 1}/5)'),
-      ),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const ProgressIndicatorWidget(
-                currentStep: 4,
-                totalSteps: 6,
-              ),
-              const SizedBox(height: 48),
+              const ProgressIndicatorWidget(currentStep: 4, totalSteps: 6),
+              const SizedBox(height: 24),
+              const AppIconTile(icon: Icons.psychology_outlined, size: 64),
+              const SizedBox(height: 20),
               Text(
-                questions[currentQuestion]['question'] as String,
-                style: Theme.of(context).textTheme.headlineMedium,
+                questionText,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 12),
+              if (subtitle != null && subtitle.isNotEmpty)
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              if (subtitle != null && subtitle.isNotEmpty)
+                const SizedBox(height: 28)
+              else
+                const SizedBox(height: 28),
               Expanded(
-                child: ListView(
-                  children: List.generate(
-                    (questions[currentQuestion]['options'] as List).length,
-                    (index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
+                child: ListView.builder(
+                  itemCount: options.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 14),
                       child: _OptionCard(
-                        text: (questions[currentQuestion]['options']
-                            as List)[index] as String,
+                        text: options[index],
                         isSelected: answers[currentQuestion] == index,
                         onTap: () {
                           setState(() {
@@ -102,31 +84,59 @@ class _RiskQuizScreenState extends State<RiskQuizScreen> {
                           });
                         },
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: answers[currentQuestion] == -1
-                    ? null
-                    : () {
-                        if (currentQuestion < questions.length - 1) {
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: answers[currentQuestion] == -1
+                      ? null
+                      :                       () async {
+                          if (currentQuestion == _numQuestions - 1) {
+                            final totalScore =
+                                answers.fold<int>(0, (sum, a) => sum + a);
+                            String riskProfile;
+                            if (totalScore <= 3) {
+                              riskProfile = 'low';
+                            } else if (totalScore <= 7) {
+                              riskProfile = 'medium';
+                            } else {
+                              riskProfile = 'high';
+                            }
+                            await ref
+                                .read(onboardingRiskProfileProvider.notifier)
+                                .setRiskProfile(riskProfile);
+                          }
                           setState(() {
-                            currentQuestion++;
+                            if (currentQuestion < _numQuestions - 1) {
+                              currentQuestion++;
+                            } else {
+                              currentQuestion++;
+                            }
                           });
-                        } else {
-                          setState(() {
-                            currentQuestion++;
-                          });
-                        }
-                      },
-                child: Text(
-                  currentQuestion < questions.length - 1
-                      ? 'Next'
-                      : 'Finish',
+                        },
+                  style: TextButton.styleFrom(
+                    backgroundColor: answers[currentQuestion] != -1
+                        ? AppColors.primaryBlue.withOpacity(0.9)
+                        : AppColors.textSecondary.withOpacity(0.3),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    currentQuestion < _numQuestions - 1 ? l10n.next : l10n.finish,
+                  ),
                 ),
               ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -134,9 +144,7 @@ class _RiskQuizScreenState extends State<RiskQuizScreen> {
     );
   }
 
-  Widget _buildResultScreen() {
-    // Calculate risk profile based on answers
-    // Simple scoring: 0 = low risk, 1 = medium, 2 = high risk
+  Widget _buildResultScreen(AppLocalizations l10n) {
     int totalScore = answers.fold(0, (sum, answer) => sum + answer);
     String riskProfile;
     if (totalScore <= 3) {
@@ -148,68 +156,97 @@ class _RiskQuizScreenState extends State<RiskQuizScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Risk Assessment Complete'),
-      ),
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const ProgressIndicatorWidget(
-                currentStep: 5,
-                totalSteps: 6,
-              ),
-              const SizedBox(height: 48),
-              Icon(
-                Icons.check_circle,
-                size: 80,
-                color: AppColors.accentGreen,
-              ),
-              const SizedBox(height: 24),
+              const ProgressIndicatorWidget(currentStep: 5, totalSteps: 6),
+              const SizedBox(height: 20),
               Text(
-                'Your Risk Profile',
-                style: Theme.of(context).textTheme.headlineLarge,
+                l10n.yourRiskProfile,
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 16),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        riskProfile.toUpperCase(),
-                        style: Theme.of(context)
-                            .textTheme
-                            .displaySmall
-                            ?.copyWith(
-                              color: _getRiskColor(riskProfile),
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        _getRiskDescription(riskProfile),
-                        style: Theme.of(context).textTheme.bodyLarge,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+              const SizedBox(height: 24),
+              Center(
+                child: RiskProfileGauge(
+                  riskProfile: riskProfile,
+                  size: 240,
+                  centerLabel: l10n.riskLabel,
                 ),
               ),
-              const Spacer(),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const AccountModeScreen(),
+              const SizedBox(height: 28),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 24,
+                      offset: const Offset(0, 4),
                     ),
-                  );
-                },
-                child: const Text('Continue'),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 12,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      riskProfile.toUpperCase(),
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        color: _getRiskColor(riskProfile),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      l10n.riskDescription(riskProfile),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppColors.textSecondary,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(height: 32),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const AccountModeScreen(),
+                      ),
+                    );
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: AppColors.primaryBlue.withOpacity(0.9),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(l10n.continueLabel),
+                ),
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -230,18 +267,6 @@ class _RiskQuizScreenState extends State<RiskQuizScreen> {
     }
   }
 
-  String _getRiskDescription(String risk) {
-    switch (risk) {
-      case 'low':
-        return 'You prefer conservative strategies with lower risk. We\'ll suggest safer trading approaches.';
-      case 'medium':
-        return 'You\'re comfortable with balanced risk. We\'ll provide a mix of strategies.';
-      case 'high':
-        return 'You\'re willing to take higher risks for potential returns. We\'ll show advanced strategies.';
-      default:
-        return '';
-    }
-  }
 }
 
 class _OptionCard extends StatelessWidget {
@@ -255,40 +280,60 @@ class _OptionCard extends StatelessWidget {
     required this.onTap,
   });
 
+  static List<BoxShadow> get _cardShadow => [
+    BoxShadow(
+      color: Colors.black.withOpacity(0.06),
+      blurRadius: 24,
+      spreadRadius: 0,
+      offset: const Offset(0, 4),
+    ),
+    BoxShadow(
+      color: Colors.black.withOpacity(0.03),
+      blurRadius: 12,
+      spreadRadius: 0,
+      offset: const Offset(0, 2),
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: isSelected ? 4 : 2,
-      color: isSelected
-          ? AppColors.primaryBlue.withOpacity(0.1)
-          : AppColors.surfaceLight,
+    final theme = Theme.of(context);
+    return Material(
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: Border.all(
-              color: isSelected
-                  ? AppColors.primaryBlue
-                  : Colors.transparent,
-              width: 2,
-            ),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
+            boxShadow: _cardShadow,
+            border: Border(
+              left: BorderSide(
+                color: isSelected ? AppColors.primaryBlue : Colors.transparent,
+                width: 4,
+              ),
+            ),
           ),
-          padding: const EdgeInsets.all(20.0),
           child: Row(
             children: [
               Expanded(
                 child: Text(
                   text,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
-              if (isSelected)
-                const Icon(
-                  Icons.check_circle,
-                  color: AppColors.primaryBlue,
-                ),
+              const SizedBox(width: 8),
+              Icon(
+                isSelected ? Icons.check_circle : Icons.circle_outlined,
+                size: 28,
+                color: isSelected
+                    ? AppColors.primaryBlue
+                    : Colors.grey.shade300,
+              ),
             ],
           ),
         ),

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/constants/app_strings.dart';
+import '../../core/l10n/app_localizations.dart';
 
 /// Risk Meter Widget
 /// Visual indicator of current risk level
-class RiskMeterWidget extends StatelessWidget {
+class RiskMeterWidget extends ConsumerWidget {
   final String riskLevel; // 'low', 'medium', 'high'
 
   const RiskMeterWidget({super.key, required this.riskLevel});
@@ -22,14 +23,14 @@ class RiskMeterWidget extends StatelessWidget {
     }
   }
 
-  String _getRiskLabel() {
+  String _getRiskLabel(AppLocalizations l10n) {
     switch (riskLevel.toLowerCase()) {
       case 'low':
-        return AppStrings.riskLow;
+        return l10n.riskLow;
       case 'medium':
-        return AppStrings.riskMedium;
+        return l10n.riskMedium;
       case 'high':
-        return AppStrings.riskHigh;
+        return l10n.riskHigh;
       default:
         return riskLevel;
     }
@@ -49,7 +50,8 @@ class RiskMeterWidget extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = ref.watch(l10nProvider);
     final riskColor = _getRiskColor();
     final riskPercentage = _getRiskPercentage();
 
@@ -63,7 +65,7 @@ class RiskMeterWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  AppStrings.homeRiskMeter,
+                  l10n.homeRiskMeter,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -75,7 +77,7 @@ class RiskMeterWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    _getRiskLabel(),
+                    _getRiskLabel(l10n),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: riskColor,
                           fontWeight: FontWeight.w600,

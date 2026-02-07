@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../../../home/presentation/screens/home_screen.dart';
 
@@ -63,6 +64,7 @@ class _OnboardingSuccessScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = ref.watch(l10nProvider);
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -92,13 +94,13 @@ class _OnboardingSuccessScreenState
                 child: Column(
                   children: [
                     Text(
-                      'You\'re all set!',
+                      l10n.youAreAllSet,
                       style: Theme.of(context).textTheme.headlineLarge,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Welcome to Marg. Let\'s start your trading journey.',
+                      l10n.welcomeToMarg,
                       style: Theme.of(context).textTheme.bodyLarge,
                       textAlign: TextAlign.center,
                     ),

@@ -1,0 +1,70 @@
+{
+  "languages": [
+    {
+      "code": "en",
+      "nativeName": "English",
+      "englishName": "English",
+      "color": "#F5C6C6"
+    },
+    {
+      "code": "kn",
+      "nativeName": "ಕನ್ನಡ",
+      "englishName": "Kannada",
+      "color": "#E8E8E8"
+    },
+    {
+      "code": "te",
+      "nativeName": "తెలుగు",
+      "englishName": "Telugu",
+      "color": "#E6D5F5"
+    },
+    {
+      "code": "hinglish",
+      "nativeName": "Hinglish",
+      "englishName": "Hindi in English",
+      "color": "#C8F0E8"
+    },
+    {
+      "code": "hi",
+      "nativeName": "हिंदी",
+      "englishName": "Hindi",
+      "color": "#C5D9F5"
+    },
+    {
+      "code": "mr",
+      "nativeName": "मराठी",
+      "englishName": "Marathi",
+      "color": "#C5D9F5"
+    },
+    {
+      "code": "gu",
+      "nativeName": "ગુજરાતી",
+      "englishName": "Gujarati",
+      "color": "#C8E6C9"
+    },
+    {
+      "code": "ta",
+      "nativeName": "தமிழ்",
+      "englishName": "Tamil",
+      "color": "#FFF9C4"
+    },
+    {
+      "code": "pa",
+      "nativeName": "ਪੰਜਾਬੀ",
+      "englishName": "Punjabi",
+      "color": "#F8C8D8"
+    },
+    {
+      "code": "ml",
+      "nativeName": "മലയാളം",
+      "englishName": "Malayalam",
+      "color": "#E1D5F0"
+    },
+    {
+      "code": "bn",
+      "nativeName": "বাংলা",
+      "englishName": "Bangla",
+      "color": "#F5F0E1"
+    }
+  ]
+}

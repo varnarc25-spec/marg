@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/constants/app_strings.dart';
+import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
 
 /// Settings Screen
@@ -21,10 +21,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = ref.watch(themeModeProvider);
     final language = ref.watch(languageProvider);
+    final l10n = ref.watch(l10nProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.settingsTitle),
+        title: Text(l10n.settingsTitle),
         elevation: 0,
       ),
       body: ListView(
@@ -32,11 +33,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         children: [
           // Preferences Section
           _SettingsSection(
-            title: 'Preferences',
+            title: l10n.settingsSectionPreferences,
             icon: Icons.tune,
             children: [
               // Language Selection with Inline Options
               _LanguageSelectorTile(
+                l10n: l10n,
                 currentLanguage: language,
                 showOptions: _showLanguageOptions,
                 onToggle: () {
@@ -51,7 +53,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Language changed to ${_getLanguageName(langCode)}'),
+                      content: Text(l10n.languageChangedTo.replaceAll('%s', l10n.languageDisplayName(langCode))),
                       duration: const Duration(seconds: 2),
                     ),
                   );
@@ -60,6 +62,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               if (_showLanguageOptions) ...[
                 const SizedBox(height: 8),
                 _LanguageOptionsList(
+                  l10n: l10n,
                   currentLanguage: language,
                   onLanguageSelected: (langCode) {
                     ref.read(languageProvider.notifier).setLanguage(langCode);
@@ -68,7 +71,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Language changed to ${_getLanguageName(langCode)}'),
+                        content: Text(l10n.languageChangedTo.replaceAll('%s', l10n.languageDisplayName(langCode))),
                         duration: const Duration(seconds: 2),
                       ),
                     );
@@ -79,6 +82,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const Divider(height: 32),
               // Theme Toggle with Enhanced UI
               _ThemeToggleTile(
+                l10n: l10n,
                 isDarkMode: isDarkMode,
                 onToggle: () {
                   ref.read(themeModeProvider.notifier).toggleTheme();
@@ -89,15 +93,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 24),
           // Account Section
           _SettingsSection(
-            title: 'Account',
+            title: l10n.settingsSectionAccount,
             icon: Icons.account_circle,
             children: [
               _SettingsTile(
                 leading: const Icon(Icons.refresh, color: AppColors.primaryBlue),
-                title: AppStrings.settingsResetOnboarding,
-                subtitle: 'Start onboarding again',
+                title: l10n.settingsResetOnboarding,
+                subtitle: l10n.settingsResetSubtitle,
                 onTap: () {
-                  _showResetOnboardingDialog(context, ref);
+                  _showResetOnboardingDialog(context, ref, l10n);
                 },
               ),
             ],
@@ -105,15 +109,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 24),
           // About Section
           _SettingsSection(
-            title: 'About',
+            title: l10n.settingsSectionAbout,
             icon: Icons.info_outline,
             children: [
               _SettingsTile(
                 leading: const Icon(Icons.info, color: AppColors.primaryBlue),
-                title: AppStrings.settingsAppInfo,
-                subtitle: 'Version 1.0.0',
+                title: l10n.settingsAppInfo,
+                subtitle: l10n.settingsVersionSubtitle,
                 onTap: () {
-                  _showAppInfoDialog(context);
+                  _showAppInfoDialog(context, l10n);
                 },
               ),
             ],
@@ -123,71 +127,52 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  String _getLanguageName(String code) {
-    switch (code) {
-      case 'en':
-        return AppStrings.languageEnglish;
-      case 'hi':
-        return AppStrings.languageHindi;
-      case 'te':
-        return AppStrings.languageTelugu;
-      case 'ta':
-        return AppStrings.languageTamil;
-      default:
-        return AppStrings.languageEnglish;
-    }
-  }
-
-  void _showResetOnboardingDialog(BuildContext context, WidgetRef ref) {
+  void _showResetOnboardingDialog(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reset Onboarding'),
-        content: const Text(
-          'This will reset your onboarding preferences. You\'ll need to go through the onboarding flow again.',
-        ),
+        title: Text(l10n.resetOnboardingTitle),
+        content: Text(l10n.resetOnboardingMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
               ref.read(onboardingCompleteProvider.notifier).resetOnboarding();
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Onboarding reset. Please restart the app.'),
-                ),
+                SnackBar(content: Text(l10n.onboardingResetDone)),
               );
             },
-            child: const Text('Reset'),
+            child: Text(l10n.reset),
           ),
         ],
       ),
     );
   }
 
-  void _showAppInfoDialog(BuildContext context) {
+  void _showAppInfoDialog(BuildContext context, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('App Info'),
-        content: const Column(
+        title: Text(l10n.appInfoTitle),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Marg - Trading App'),
-            SizedBox(height: 8),
-            Text('Version: 1.0.0'),
-            SizedBox(height: 8),
-            Text('A guided, beginner-friendly trading experience.'),
+            Text(l10n.appName),
+            const SizedBox(height: 8),
+            Text(l10n.settingsVersionSubtitle),
+            const SizedBox(height: 8),
+            Text(l10n.appInfoDescription),
           ],
         ),
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+            child: Text(l10n.ok),
           ),
         ],
       ),
@@ -277,32 +262,19 @@ class _SettingsTile extends StatelessWidget {
 
 /// Language Selector Tile with Expandable Options
 class _LanguageSelectorTile extends StatelessWidget {
+  final AppLocalizations l10n;
   final String currentLanguage;
   final bool showOptions;
   final VoidCallback onToggle;
   final Function(String) onLanguageSelected;
 
   const _LanguageSelectorTile({
+    required this.l10n,
     required this.currentLanguage,
     required this.showOptions,
     required this.onToggle,
     required this.onLanguageSelected,
   });
-
-  String _getLanguageName(String code) {
-    switch (code) {
-      case 'en':
-        return AppStrings.languageEnglish;
-      case 'hi':
-        return AppStrings.languageHindi;
-      case 'te':
-        return AppStrings.languageTelugu;
-      case 'ta':
-        return AppStrings.languageTamil;
-      default:
-        return AppStrings.languageEnglish;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -320,13 +292,13 @@ class _LanguageSelectorTile extends StatelessWidget {
         ),
       ),
       title: Text(
-        AppStrings.settingsLanguage,
+        l10n.settingsLanguage,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w500,
             ),
       ),
       subtitle: Text(
-        _getLanguageName(currentLanguage),
+        l10n.languageDisplayName(currentLanguage),
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: AppColors.primaryBlue,
               fontWeight: FontWeight.w600,
@@ -346,22 +318,38 @@ class _LanguageSelectorTile extends StatelessWidget {
 
 /// Language Options List
 class _LanguageOptionsList extends StatelessWidget {
+  final AppLocalizations l10n;
   final String currentLanguage;
   final Function(String) onLanguageSelected;
 
   const _LanguageOptionsList({
+    required this.l10n,
     required this.currentLanguage,
     required this.onLanguageSelected,
   });
 
+  static const List<Map<String, String>> _languageCodes = [
+    {'code': 'en', 'flag': '\u{1F1EC}\u{1F1E7}'},
+    {'code': 'hi', 'flag': '\u{1F1EE}\u{1F1F3}'},
+    {'code': 'te', 'flag': '\u{1F1EE}\u{1F1F3}'},
+    {'code': 'ta', 'flag': '\u{1F1EE}\u{1F1F3}'},
+    {'code': 'kn', 'flag': '\u{1F1EE}\u{1F1F3}'},
+    {'code': 'mr', 'flag': '\u{1F1EE}\u{1F1F3}'},
+    {'code': 'gu', 'flag': '\u{1F1EE}\u{1F1F3}'},
+    {'code': 'pa', 'flag': '\u{1F1EE}\u{1F1F3}'},
+    {'code': 'ml', 'flag': '\u{1F1EE}\u{1F1F3}'},
+    {'code': 'bn', 'flag': '\u{1F1EE}\u{1F1F3}'},
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final languages = [
-      {'code': 'en', 'name': AppStrings.languageEnglish, 'flag': '\u{1F1EC}\u{1F1E7}'},
-      {'code': 'hi', 'name': AppStrings.languageHindi, 'flag': '\u{1F1EE}\u{1F1F3}'},
-      {'code': 'te', 'name': AppStrings.languageTelugu, 'flag': '\u{1F1EE}\u{1F1F3}'},
-      {'code': 'ta', 'name': AppStrings.languageTamil, 'flag': '\u{1F1EE}\u{1F1F3}'},
-    ];
+    final languages = _languageCodes
+        .map((e) => {
+              'code': e['code']!,
+              'name': l10n.languageDisplayName(e['code']!),
+              'flag': e['flag']!,
+            })
+        .toList();
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -423,10 +411,12 @@ class _LanguageOptionsList extends StatelessWidget {
 
 /// Enhanced Theme Toggle Tile
 class _ThemeToggleTile extends StatelessWidget {
+  final AppLocalizations l10n;
   final bool isDarkMode;
   final VoidCallback onToggle;
 
   const _ThemeToggleTile({
+    required this.l10n,
     required this.isDarkMode,
     required this.onToggle,
   });
@@ -474,13 +464,13 @@ class _ThemeToggleTile extends StatelessWidget {
           ),
         ),
         title: Text(
-          AppStrings.settingsDarkMode,
+          l10n.settingsDarkMode,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
         ),
         subtitle: Text(
-          isDarkMode ? 'Dark theme enabled' : 'Light theme enabled',
+          isDarkMode ? l10n.settingsDarkThemeEnabled : l10n.settingsLightThemeEnabled,
           style: Theme.of(context).textTheme.bodySmall,
         ),
         trailing: Switch(

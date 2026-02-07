@@ -69,9 +69,10 @@ class ThemeModeNotifier extends StateNotifier<bool> {
 }
 
 /// Onboarding Complete Provider
-final onboardingCompleteProvider = StateNotifierProvider<OnboardingNotifier, bool>((ref) {
-  return OnboardingNotifier();
-});
+final onboardingCompleteProvider =
+    StateNotifierProvider<OnboardingNotifier, bool>((ref) {
+      return OnboardingNotifier();
+    });
 
 class OnboardingNotifier extends StateNotifier<bool> {
   OnboardingNotifier() : super(false) {
@@ -93,6 +94,94 @@ class OnboardingNotifier extends StateNotifier<bool> {
     state = false;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboardingComplete', false);
+    await prefs.remove('onboarding_user_goal');
+    await prefs.remove('onboarding_experience');
+    await prefs.remove('onboarding_risk_profile');
+    await prefs.remove('onboarding_trading_mode');
+  }
+}
+
+/// Onboarding user goal (beginner, active, options) — persisted locally
+final onboardingUserGoalProvider =
+    StateNotifierProvider<OnboardingUserGoalNotifier, String?>((ref) {
+  return OnboardingUserGoalNotifier();
+});
+
+class OnboardingUserGoalNotifier extends StateNotifier<String?> {
+  OnboardingUserGoalNotifier() : super(null) {
+    _load();
+  }
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = prefs.getString('onboarding_user_goal');
+  }
+  Future<void> setGoal(String value) async {
+    state = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('onboarding_user_goal', value);
+  }
+}
+
+/// Onboarding experience level (new, intermediate, pro) — persisted locally
+final onboardingExperienceProvider =
+    StateNotifierProvider<OnboardingExperienceNotifier, String?>((ref) {
+  return OnboardingExperienceNotifier();
+});
+
+class OnboardingExperienceNotifier extends StateNotifier<String?> {
+  OnboardingExperienceNotifier() : super(null) {
+    _load();
+  }
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = prefs.getString('onboarding_experience');
+  }
+  Future<void> setExperience(String value) async {
+    state = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('onboarding_experience', value);
+  }
+}
+
+/// Onboarding risk profile (low, medium, high) — persisted locally
+final onboardingRiskProfileProvider =
+    StateNotifierProvider<OnboardingRiskProfileNotifier, String?>((ref) {
+  return OnboardingRiskProfileNotifier();
+});
+
+class OnboardingRiskProfileNotifier extends StateNotifier<String?> {
+  OnboardingRiskProfileNotifier() : super(null) {
+    _load();
+  }
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = prefs.getString('onboarding_risk_profile');
+  }
+  Future<void> setRiskProfile(String value) async {
+    state = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('onboarding_risk_profile', value);
+  }
+}
+
+/// Onboarding trading mode (paper, real) — persisted locally
+final onboardingTradingModeProvider =
+    StateNotifierProvider<OnboardingTradingModeNotifier, String?>((ref) {
+  return OnboardingTradingModeNotifier();
+});
+
+class OnboardingTradingModeNotifier extends StateNotifier<String?> {
+  OnboardingTradingModeNotifier() : super(null) {
+    _load();
+  }
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = prefs.getString('onboarding_trading_mode');
+  }
+  Future<void> setTradingMode(String value) async {
+    state = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('onboarding_trading_mode', value);
   }
 }
 
@@ -135,9 +224,10 @@ final mockMpinServiceProvider = Provider<MockMpinService>((ref) {
 
 /// User Session Provider
 /// Manages authenticated user session state
-final userSessionProvider = StateNotifierProvider<UserSessionNotifier, UserSession?>((ref) {
-  return UserSessionNotifier();
-});
+final userSessionProvider =
+    StateNotifierProvider<UserSessionNotifier, UserSession?>((ref) {
+      return UserSessionNotifier();
+    });
 
 class UserSessionNotifier extends StateNotifier<UserSession?> {
   UserSessionNotifier() : super(null) {
@@ -153,15 +243,17 @@ class UserSessionNotifier extends StateNotifier<UserSession?> {
         // Try to load saved session
         final prefs = await SharedPreferences.getInstance();
         final savedUid = prefs.getString('user_session_uid');
-        
+
         if (savedUid != null && savedUid.isNotEmpty) {
           try {
             // Load saved session data
             final sessionMap = <String, dynamic>{
               'firebase_uid': savedUid,
               'is_logged_in': prefs.getBool('user_session_logged_in') ?? false,
-              'paper_trading_enabled': prefs.getBool('user_session_paper') ?? false,
-              'real_trading_enabled': prefs.getBool('user_session_real') ?? false,
+              'paper_trading_enabled':
+                  prefs.getBool('user_session_paper') ?? false,
+              'real_trading_enabled':
+                  prefs.getBool('user_session_real') ?? false,
               'kyc_status': prefs.getString('user_session_kyc') ?? 'notStarted',
               'device_trusted': prefs.getBool('user_session_device') ?? true,
               'email': prefs.getString('user_session_email'),
@@ -169,7 +261,7 @@ class UserSessionNotifier extends StateNotifier<UserSession?> {
               'mpin_set': prefs.getBool('user_session_mpin_set') ?? false,
               'mpin_hash': prefs.getString('user_session_mpin_hash'),
             };
-            
+
             state = UserSession.fromJson(sessionMap);
           } catch (e) {
             // If parsing fails, create new session
@@ -198,16 +290,43 @@ class UserSessionNotifier extends StateNotifier<UserSession?> {
     // Store individual fields for simplicity
     // In production, use proper JSON encoding with dart:convert
     final json = session.toJson();
-    await prefs.setString('user_session_uid', json['firebase_uid'] as String? ?? '');
-    await prefs.setBool('user_session_logged_in', json['is_logged_in'] as bool? ?? false);
-    await prefs.setBool('user_session_paper', json['paper_trading_enabled'] as bool? ?? false);
-    await prefs.setBool('user_session_real', json['real_trading_enabled'] as bool? ?? false);
-    await prefs.setString('user_session_kyc', json['kyc_status'] as String? ?? 'notStarted');
-    await prefs.setBool('user_session_device', json['device_trusted'] as bool? ?? true);
+    await prefs.setString(
+      'user_session_uid',
+      json['firebase_uid'] as String? ?? '',
+    );
+    await prefs.setBool(
+      'user_session_logged_in',
+      json['is_logged_in'] as bool? ?? false,
+    );
+    await prefs.setBool(
+      'user_session_paper',
+      json['paper_trading_enabled'] as bool? ?? false,
+    );
+    await prefs.setBool(
+      'user_session_real',
+      json['real_trading_enabled'] as bool? ?? false,
+    );
+    await prefs.setString(
+      'user_session_kyc',
+      json['kyc_status'] as String? ?? 'notStarted',
+    );
+    await prefs.setBool(
+      'user_session_device',
+      json['device_trusted'] as bool? ?? true,
+    );
     await prefs.setString('user_session_email', json['email'] as String? ?? '');
-    await prefs.setString('user_session_phone', json['phone_number'] as String? ?? '');
-    await prefs.setBool('user_session_mpin_set', json['mpin_set'] as bool? ?? false);
-    await prefs.setString('user_session_mpin_hash', json['mpin_hash'] as String? ?? '');
+    await prefs.setString(
+      'user_session_phone',
+      json['phone_number'] as String? ?? '',
+    );
+    await prefs.setBool(
+      'user_session_mpin_set',
+      json['mpin_set'] as bool? ?? false,
+    );
+    await prefs.setString(
+      'user_session_mpin_hash',
+      json['mpin_hash'] as String? ?? '',
+    );
   }
 
   /// Create session after successful login
@@ -228,9 +347,9 @@ class UserSessionNotifier extends StateNotifier<UserSession?> {
   /// Update KYC status
   Future<void> updateKycStatus(KycStatus status) async {
     if (state == null) return;
-    
+
     final updatedSession = state!.copyWith(kycStatus: status);
-    
+
     // If KYC is completed, enable real trading
     if (status == KycStatus.completed) {
       final finalSession = updatedSession.copyWith(realTradingEnabled: true);
@@ -245,7 +364,7 @@ class UserSessionNotifier extends StateNotifier<UserSession?> {
   /// Enable real trading
   Future<void> enableRealTrading() async {
     if (state == null) return;
-    
+
     final updatedSession = state!.copyWith(realTradingEnabled: true);
     state = updatedSession;
     await _saveSession(updatedSession);
@@ -254,7 +373,7 @@ class UserSessionNotifier extends StateNotifier<UserSession?> {
   /// Set MPIN
   Future<void> setMpin(String mpinHash) async {
     if (state == null) return;
-    
+
     final updatedSession = state!.copyWith(mpinSet: true, mpinHash: mpinHash);
     state = updatedSession;
     await _saveSession(updatedSession);
@@ -264,7 +383,7 @@ class UserSessionNotifier extends StateNotifier<UserSession?> {
   Future<void> signOut() async {
     final authService = FirebaseAuthService();
     await authService.signOut();
-    
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('user_session_uid');
     await prefs.remove('user_session_logged_in');
@@ -276,7 +395,7 @@ class UserSessionNotifier extends StateNotifier<UserSession?> {
     await prefs.remove('user_session_phone');
     await prefs.remove('user_session_mpin_set');
     await prefs.remove('user_session_mpin_hash');
-    
+
     state = null;
   }
 }

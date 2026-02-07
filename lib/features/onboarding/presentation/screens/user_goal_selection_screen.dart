@@ -1,93 +1,130 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/constants/app_strings.dart';
 import '../../../../shared/widgets/progress_indicator_widget.dart';
+import '../../../../shared/widgets/app_icon_tile.dart';
+import '../../../../shared/providers/app_providers.dart';
+import '../../../../core/l10n/app_localizations.dart';
 import 'experience_level_screen.dart';
 
 /// User Goal Selection Screen
-/// Users select their trading goal
-class UserGoalSelectionScreen extends StatefulWidget {
+/// Users select their trading goal — layout inspired by search engine choice pattern
+class UserGoalSelectionScreen extends ConsumerStatefulWidget {
   const UserGoalSelectionScreen({super.key});
 
   @override
-  State<UserGoalSelectionScreen> createState() =>
+  ConsumerState<UserGoalSelectionScreen> createState() =>
       _UserGoalSelectionScreenState();
 }
 
-class _UserGoalSelectionScreenState extends State<UserGoalSelectionScreen> {
+class _UserGoalSelectionScreenState extends ConsumerState<UserGoalSelectionScreen> {
   String? selectedGoal;
+  int? expandedIndex;
+
+  static List<Map<String, dynamic>> _goals(AppLocalizations l10n) => [
+        {'id': 'beginner', 'title': l10n.goalBeginner, 'description': l10n.goalBeginnerDesc, 'icon': Icons.school},
+        {'id': 'active', 'title': l10n.goalActive, 'description': l10n.goalActiveDesc, 'icon': Icons.trending_up},
+        {'id': 'options', 'title': l10n.goalOptions, 'description': l10n.goalOptionsDesc, 'icon': Icons.show_chart},
+      ];
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = ref.watch(l10nProvider);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('What\'s your goal?'),
-      ),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const ProgressIndicatorWidget(
-                currentStep: 2,
-                totalSteps: 6,
-              ),
-              const SizedBox(height: 48),
+              const ProgressIndicatorWidget(currentStep: 2, totalSteps: 6),
+              const SizedBox(height: 24),
+              // Header icon
+              const AppIconTile(icon: Icons.flag_outlined, size: 64),
+              const SizedBox(height: 20),
+              // Title
               Text(
-                'Why are you here?',
-                style: Theme.of(context).textTheme.headlineMedium,
+                l10n.whyAreYouHere,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
+              // Descriptive paragraph
               Text(
-                'We\'ll personalize your experience',
-                style: Theme.of(context).textTheme.bodyMedium,
+                l10n.personalizeExperience,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 28),
+              // List of options
               Expanded(
-                child: ListView(
-                  children: [
-                    _GoalCard(
-                      title: AppStrings.goalBeginner,
-                      description: AppStrings.goalBeginnerDesc,
-                      icon: Icons.school,
-                      isSelected: selectedGoal == 'beginner',
-                      onTap: () => setState(() => selectedGoal = 'beginner'),
-                    ),
-                    const SizedBox(height: 16),
-                    _GoalCard(
-                      title: AppStrings.goalActive,
-                      description: AppStrings.goalActiveDesc,
-                      icon: Icons.trending_up,
-                      isSelected: selectedGoal == 'active',
-                      onTap: () => setState(() => selectedGoal = 'active'),
-                    ),
-                    const SizedBox(height: 16),
-                    _GoalCard(
-                      title: AppStrings.goalOptions,
-                      description: AppStrings.goalOptionsDesc,
-                      icon: Icons.show_chart,
-                      isSelected: selectedGoal == 'options',
-                      onTap: () => setState(() => selectedGoal = 'options'),
-                    ),
-                  ],
+                child: ListView.separated(
+                  itemCount: _goals(l10n).length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 0),
+                  itemBuilder: (context, index) {
+                    final goal = _goals(l10n)[index];
+                    final isExpanded = expandedIndex == index;
+                    return _GoalListTile(
+                      value: goal['id'] as String,
+                      title: goal['title'] as String,
+                      description: goal['description'] as String,
+                      icon: goal['icon'] as IconData,
+                      groupValue: selectedGoal,
+                      isExpanded: isExpanded,
+                      onTap: () =>
+                          setState(() => selectedGoal = goal['id'] as String),
+                      onExpandToggle: () => setState(() {
+                        expandedIndex = isExpanded ? null : index;
+                      }),
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: selectedGoal == null
-                    ? null
-                    : () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const ExperienceLevelScreen(),
-                          ),
-                        );
-                      },
-                child: const Text('Continue'),
+              // Next button — bottom right
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: selectedGoal == null
+                      ? null
+                      : () async {
+                          if (selectedGoal != null) {
+                            await ref
+                                .read(onboardingUserGoalProvider.notifier)
+                                .setGoal(selectedGoal!);
+                          }
+                          if (!context.mounted) return;
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const ExperienceLevelScreen(),
+                            ),
+                          );
+                        },
+                  style: TextButton.styleFrom(
+                    backgroundColor: selectedGoal != null
+                        ? AppColors.primaryBlue.withOpacity(0.9)
+                        : AppColors.textSecondary.withOpacity(0.3),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(l10n.next),
+                ),
               ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -96,87 +133,130 @@ class _UserGoalSelectionScreenState extends State<UserGoalSelectionScreen> {
   }
 }
 
-class _GoalCard extends StatelessWidget {
+class _GoalListTile extends StatelessWidget {
+  final String value;
   final String title;
   final String description;
   final IconData icon;
-  final bool isSelected;
+  final String? groupValue;
+  final bool isExpanded;
   final VoidCallback onTap;
+  final VoidCallback onExpandToggle;
 
-  const _GoalCard({
+  const _GoalListTile({
+    required this.value,
     required this.title,
     required this.description,
     required this.icon,
-    required this.isSelected,
+    required this.groupValue,
+    required this.isExpanded,
     required this.onTap,
+    required this.onExpandToggle,
   });
+
+  /// Soft, diffuse box shadow for lifted card effect (light grey, low opacity, large blur)
+  static List<BoxShadow> get _cardShadow => [
+    BoxShadow(
+      color: Colors.black.withOpacity(0.06),
+      blurRadius: 24,
+      spreadRadius: 0,
+      offset: const Offset(0, 4),
+    ),
+    BoxShadow(
+      color: Colors.black.withOpacity(0.03),
+      blurRadius: 12,
+      spreadRadius: 0,
+      offset: const Offset(0, 2),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: isSelected ? 4 : 2,
-      color: isSelected
-          ? AppColors.primaryBlue.withOpacity(0.1)
-          : AppColors.surfaceLight,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: isSelected
-                  ? AppColors.primaryBlue
-                  : Colors.transparent,
-              width: 2,
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: _cardShadow,
             ),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primaryBlue
-                      : AppColors.primaryBlue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Leading icon (styled tile)
+                AppIconTile(
+                  icon: icon,
+                  size: 40,
+                  iconColor: Colors.white,
+                  backgroundColor: AppColors.iconTileBackground,
                 ),
-                child: Icon(
-                  icon,
-                  color: isSelected ? Colors.white : AppColors.primaryBlue,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: isSelected
-                                ? AppColors.primaryBlue
-                                : null,
+                const SizedBox(width: 16),
+                // Title + optional description
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
                           ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
+                          GestureDetector(
+                            onTap: onExpandToggle,
+                            behavior: HitTestBehavior.opaque,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Icon(
+                                isExpanded
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                size: 24,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (isExpanded) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          description,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
-              if (isSelected)
-                const Icon(
-                  Icons.check_circle,
-                  color: AppColors.primaryBlue,
+                const SizedBox(width: 8),
+                // Tick when selected, grey circle when not
+                Icon(
+                  groupValue == value
+                      ? Icons.check_circle
+                      : Icons.circle_outlined,
+                  size: 28,
+                  color: groupValue == value
+                      ? AppColors.primaryBlue
+                      : Colors.grey.shade300,
                 ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

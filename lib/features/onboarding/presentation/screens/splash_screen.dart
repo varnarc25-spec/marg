@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/constants/app_strings.dart';
+import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../../../../data/models/user_session.dart';
 import 'language_selection_screen.dart';
+import 'splash_screen_links.dart';
 import '../../../home/presentation/screens/home_screen.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
 
 /// Splash Screen - First screen users see
-/// Shows brand and trust tagline
+/// Shows brand, trust tagline, and dropdown menu to open any screen
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -22,9 +23,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
 
+  late List<String> _menuCategories;
+  late List<SplashScreenLink> _allLinks;
+  String? _selectedMenu;
+  SplashScreenLink? _selectedLink;
+
   @override
   void initState() {
     super.initState();
+    _allLinks = splashScreenLinks;
+    _menuCategories = _allLinks.map((e) => e.category).toSet().toList()..sort();
+    _selectedMenu = _menuCategories.isNotEmpty ? _menuCategories.first : null;
+    _updateLinksForMenu();
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -33,61 +43,75 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
     _controller.forward();
-    _navigateToNext();
+  }
+
+  void _updateLinksForMenu() {
+    final links = _selectedMenu == null
+        ? <SplashScreenLink>[]
+        : _allLinks.where((e) => e.category == _selectedMenu).toList();
+    if (links.isEmpty) {
+      _selectedLink = null;
+    } else {
+      final currentLabel = _selectedLink?.label;
+      final stillValid = links.any((e) => e.label == currentLabel);
+      _selectedLink = stillValid
+          ? links.firstWhere((e) => e.label == currentLabel)
+          : links.first;
+    }
+  }
+
+  List<SplashScreenLink> get _linksInSelectedMenu =>
+      _selectedMenu == null
+          ? []
+          : _allLinks.where((e) => e.category == _selectedMenu).toList();
+
+  void _openScreen(Widget screen) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => screen),
+    );
+  }
+
+  void _openSelectedLink() {
+    final link = _selectedLink;
+    if (link != null) _openScreen(link.createScreen());
   }
 
   Future<void> _navigateToNext() async {
-    // Wait for splash animation
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    // Default navigation target - will be updated based on checks
     Widget? targetScreen;
     String? navigationReason;
 
     try {
-      // Wait a bit more for providers to initialize
       await Future.delayed(const Duration(milliseconds: 500));
       if (!mounted) return;
 
-      // Check auth state first - use try-catch to handle any provider errors
       bool isLoggedIn = false;
       UserSession? userSession;
-      
+
       try {
         final authService = ref.read(firebaseAuthServiceProvider);
         isLoggedIn = authService.isLoggedIn();
-        debugPrint('🔐 Auth check: isLoggedIn = $isLoggedIn');
       } catch (e) {
-        // If auth service fails, assume not logged in
-        debugPrint('⚠️ Auth service check failed: $e');
         isLoggedIn = false;
       }
-
-      // Check user session
       try {
         userSession = ref.read(userSessionProvider);
-        debugPrint('👤 User session: ${userSession != null ? "exists" : "null"}');
       } catch (e) {
-        debugPrint('⚠️ User session check failed: $e');
         userSession = null;
       }
 
-      // If not logged in, go to login screen
       if (!isLoggedIn && userSession == null) {
         targetScreen = const LoginScreen();
         navigationReason = 'User not logged in';
       } else {
-        // User is logged in - check onboarding
         bool onboardingComplete = false;
         try {
           onboardingComplete = ref.read(onboardingCompleteProvider);
-          debugPrint('📋 Onboarding complete: $onboardingComplete');
         } catch (e) {
-          debugPrint('⚠️ Onboarding check failed: $e');
           onboardingComplete = false;
         }
-
         if (onboardingComplete) {
           targetScreen = const HomeScreen();
           navigationReason = 'Onboarding complete, going to home';
@@ -97,26 +121,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         }
       }
     } catch (e, stackTrace) {
-      // Fallback: if anything fails, go to login screen
       debugPrint('❌ Navigation error: $e');
       debugPrint('Stack trace: $stackTrace');
       targetScreen = const LoginScreen();
       navigationReason = 'Error occurred, fallback to login';
     }
 
-    // Ensure navigation always happens
-    if (targetScreen != null && mounted) {
-      debugPrint('➡️ $navigationReason');
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => targetScreen!),
-      );
-    } else if (mounted) {
-      // Final safety fallback
-      debugPrint('⚠️ No target screen determined, defaulting to Login');
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-    }
+    if (!mounted) return;
+    debugPrint('➡️ $navigationReason');
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => targetScreen ?? const LoginScreen()),
+    );
   }
 
   @override
@@ -127,54 +142,204 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final linksInMenu = _linksInSelectedMenu;
+
     return Scaffold(
       backgroundColor: AppColors.primaryBlue,
-      body: Center(
+      body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // App Logo/Icon
+              const SizedBox(height: 16),
               Container(
-                width: 120,
-                height: 120,
+                width: 80,
+                height: 80,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
                 child: const Icon(
                   Icons.trending_up,
-                  size: 60,
+                  size: 40,
                   color: AppColors.primaryBlue,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 8),
               Text(
-                AppStrings.appName,
+                ref.watch(l10nProvider).appName,
                 style: const TextStyle(
-                  fontSize: 42,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
-                  letterSpacing: 2,
+                  letterSpacing: 1.2,
                 ),
               ),
-              const SizedBox(height: 16),
               Text(
-                AppStrings.appTagline,
+                ref.watch(l10nProvider).appTagline,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 11,
                   color: Colors.white.withValues(alpha: 0.9),
                   fontWeight: FontWeight.w300,
                 ),
                 textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: _navigateToNext,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.primaryBlue,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('Continue'),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Or open any screen:',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white.withValues(alpha: 0.9),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white24),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _selectedMenu,
+                                isExpanded: true,
+                                dropdownColor: AppColors.primaryBlue,
+                                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                                style: const TextStyle(color: Colors.white, fontSize: 14),
+                                items: _menuCategories
+                                    .map((c) => DropdownMenuItem<String>(
+                                          value: c,
+                                          child: Text(c),
+                                        ))
+                                    .toList(),
+                                onChanged: (v) {
+                                  setState(() {
+                                    _selectedMenu = v;
+                                    _updateLinksForMenu();
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 3,
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<SplashScreenLink>(
+                                value: _selectedLink != null && linksInMenu.contains(_selectedLink)
+                                    ? _selectedLink
+                                    : (linksInMenu.isEmpty ? null : linksInMenu.first),
+                                isExpanded: true,
+                                dropdownColor: AppColors.primaryBlue,
+                                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                                style: const TextStyle(color: Colors.white, fontSize: 14),
+                                items: linksInMenu
+                                    .map((link) => DropdownMenuItem<SplashScreenLink>(
+                                          value: link,
+                                          child: Text(
+                                            link.label,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ))
+                                    .toList(),
+                                onChanged: (v) {
+                                  setState(() {
+                                    _selectedLink = v;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: _selectedLink != null ? _openSelectedLink : null,
+                          icon: const Icon(Icons.open_in_new, size: 18),
+                          label: const Text('Go'),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.primaryBlue,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    itemCount: _allLinks.length,
+                    itemBuilder: (context, index) {
+                      final link = _allLinks[index];
+                      return ListTile(
+                        dense: true,
+                        title: Text(
+                          '${link.category} → ${link.label}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 10, color: Colors.white70),
+                        onTap: () => _openScreen(link.createScreen()),
+                      );
+                    },
+                  ),
+                ),
               ),
             ],
           ),
