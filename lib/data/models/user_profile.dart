@@ -7,6 +7,13 @@ class UserProfile {
   final String experienceLevel; // 'beginner', 'intermediate', 'pro'
   final String riskProfile; // 'low', 'medium', 'high'
   final String accountMode; // 'paper', 'real'
+  // Personal data (KYC / form)
+  final String? dateOfBirth;
+  final String? gender;
+  final String? fatherName;
+  final String? currentAddress;
+  final String? permanentAddress;
+  final String? nationality;
 
   UserProfile({
     required this.userId,
@@ -15,6 +22,12 @@ class UserProfile {
     required this.experienceLevel,
     required this.riskProfile,
     required this.accountMode,
+    this.dateOfBirth,
+    this.gender,
+    this.fatherName,
+    this.currentAddress,
+    this.permanentAddress,
+    this.nationality,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -25,6 +38,12 @@ class UserProfile {
       experienceLevel: json['experience_level'] as String,
       riskProfile: json['risk_profile'] as String,
       accountMode: json['account_mode'] as String,
+      dateOfBirth: json['date_of_birth'] as String?,
+      gender: json['gender'] as String?,
+      fatherName: json['father_name'] as String?,
+      currentAddress: json['current_address'] as String?,
+      permanentAddress: json['permanent_address'] as String?,
+      nationality: json['nationality'] as String?,
     );
   }
 
@@ -36,6 +55,12 @@ class UserProfile {
       'experience_level': experienceLevel,
       'risk_profile': riskProfile,
       'account_mode': accountMode,
+      'date_of_birth': dateOfBirth,
+      'gender': gender,
+      'father_name': fatherName,
+      'current_address': currentAddress,
+      'permanent_address': permanentAddress,
+      'nationality': nationality,
     };
   }
 
@@ -46,6 +71,12 @@ class UserProfile {
     String? experienceLevel,
     String? riskProfile,
     String? accountMode,
+    String? dateOfBirth,
+    String? gender,
+    String? fatherName,
+    String? currentAddress,
+    String? permanentAddress,
+    String? nationality,
   }) {
     return UserProfile(
       userId: userId ?? this.userId,
@@ -54,6 +85,12 @@ class UserProfile {
       experienceLevel: experienceLevel ?? this.experienceLevel,
       riskProfile: riskProfile ?? this.riskProfile,
       accountMode: accountMode ?? this.accountMode,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      gender: gender ?? this.gender,
+      fatherName: fatherName ?? this.fatherName,
+      currentAddress: currentAddress ?? this.currentAddress,
+      permanentAddress: permanentAddress ?? this.permanentAddress,
+      nationality: nationality ?? this.nationality,
     );
   }
 }

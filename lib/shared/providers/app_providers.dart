@@ -1,7 +1,10 @@
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/services/marg_api_service.dart';
 import '../../data/repositories/mock_data_repository.dart';
 import '../../data/models/user_profile.dart';
+import '../../data/models/personal_data.dart';
 import '../../data/models/market_data.dart';
 import '../../data/models/portfolio.dart';
 import '../../data/models/options_strategy.dart';
@@ -207,6 +210,25 @@ class LanguageNotifier extends StateNotifier<String> {
   }
 }
 
+/// Marg API base URL (change for production). Used by MargApiService.
+const String margApiBaseUrl = 'http://localhost:3000';
+
+/// Marg API Service Provider
+final margApiServiceProvider = Provider<MargApiService>((ref) {
+  return MargApiService(baseUrl: margApiBaseUrl);
+});
+
+/// Onboarding session ID for anonymous users (before login). Stored in prefs.
+final onboardingSessionIdProvider = FutureProvider<String>((ref) async {
+  final prefs = await SharedPreferences.getInstance();
+  var id = prefs.getString('onboarding_session_id');
+  if (id == null || id.isEmpty) {
+    id = '${DateTime.now().millisecondsSinceEpoch}_${Random().nextDouble()}';
+    await prefs.setString('onboarding_session_id', id);
+  }
+  return id;
+});
+
 /// Firebase Auth Service Provider
 final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {
   return FirebaseAuthService();
@@ -220,6 +242,24 @@ final mockKycServiceProvider = Provider<MockKycService>((ref) {
 /// Mock MPIN Service Provider
 final mockMpinServiceProvider = Provider<MockMpinService>((ref) {
   return MockMpinService();
+});
+
+/// Personal data from API (when logged in). Null when not logged in or API error.
+final personalDataFromApiProvider = FutureProvider<PersonalData?>((ref) async {
+  final authService = ref.watch(firebaseAuthServiceProvider);
+  if (!authService.isLoggedIn()) return null;
+  final user = authService.getCurrentUser();
+  if (user == null) return null;
+  try {
+    final idToken = await user.getIdToken();
+    if (idToken == null || idToken.isEmpty) return null;
+    final api = ref.watch(margApiServiceProvider);
+    final data = await api.getPersonalData(idToken: idToken);
+    if (data == null) return null;
+    return PersonalData.fromJson(data);
+  } catch (_) {
+    return null;
+  }
 });
 
 /// User Session Provider

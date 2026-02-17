@@ -4,13 +4,19 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/l10n/app_localizations.dart';
 
 /// Bottom navigation bar for home screen: Home, Wealth, Discover, Profile.
+/// Use [selectedIndex] to show which tab is active (0=Home, 1=Wealth, 2=Discover, 3=Profile).
 class HomeBottomNav extends ConsumerWidget {
+  /// Which tab is selected. 0=Home, 1=Wealth, 2=Discover, 3=Profile.
+  final int selectedIndex;
+  final VoidCallback? onHomeTap;
   final VoidCallback? onWealthTap;
   final VoidCallback? onDiscoverTap;
   final VoidCallback? onProfileTap;
 
   const HomeBottomNav({
     super.key,
+    this.selectedIndex = 0,
+    this.onHomeTap,
     this.onWealthTap,
     this.onDiscoverTap,
     this.onProfileTap,
@@ -42,22 +48,25 @@ class HomeBottomNav extends ConsumerWidget {
           HomeBottomNavItem(
             icon: Icons.home_rounded,
             label: l10n.homeNavHome,
-            isSelected: true,
-            onTap: () {},
+            isSelected: selectedIndex == 0,
+            onTap: onHomeTap ?? () {},
           ),
           HomeBottomNavItem(
             icon: Icons.trending_up_rounded,
             label: l10n.homeNavWealth,
+            isSelected: selectedIndex == 1,
             onTap: onWealthTap ?? () {},
           ),
           HomeBottomNavItem(
             icon: Icons.explore_rounded,
             label: l10n.homeNavDiscover,
+            isSelected: selectedIndex == 2,
             onTap: onDiscoverTap ?? () {},
           ),
           HomeBottomNavItem(
             icon: Icons.person_rounded,
             label: l10n.homeNavProfile,
+            isSelected: selectedIndex == 3,
             onTap: onProfileTap ?? () {},
           ),
         ],

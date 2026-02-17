@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera is used to scan PAN or Aadhaar card for auto-filling your details.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library is used to select a photo of your PAN or Aadhaar card for auto-filling.</string>
 </dict>
 </plist>

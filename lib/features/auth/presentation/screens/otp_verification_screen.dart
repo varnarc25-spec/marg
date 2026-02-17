@@ -1,10 +1,12 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../../../core/theme/app_theme.dart';
 import '../../../../../shared/providers/app_providers.dart';
 import '../../../../../core/services/firebase_auth_service.dart';
-import '../../../../../features/onboarding/presentation/screens/language_selection_screen.dart';
+import '../../../accounts/presentation/screens/my_account_screen.dart';
 
 /// Auth Method Enum
 enum AuthMethod {
@@ -36,7 +38,9 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
   final _otpController = TextEditingController();
   bool _isLoading = false;
   bool _isResending = false;
+  bool _didReplaceFromVerify = false;
   int _resendCountdown = 60;
+  Timer? _countdownTimer;
 
   @override
   void initState() {
@@ -46,16 +50,24 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
   @override
   void dispose() {
-    _otpController.dispose();
+    _countdownTimer?.cancel();
+    _countdownTimer = null;
     super.dispose();
+    _otpController.dispose();
   }
 
   void _startResendCountdown() {
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted && _resendCountdown > 0) {
-        setState(() => _resendCountdown--);
-        _startResendCountdown();
+    _countdownTimer?.cancel();
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) {
+        _countdownTimer?.cancel();
+        return;
       }
+      if (_resendCountdown <= 0) {
+        _countdownTimer?.cancel();
+        return;
+      }
+      setState(() => _resendCountdown--);
     });
   }
 
@@ -78,6 +90,10 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
           verificationId: widget.verificationId,
           smsCode: otp,
         );
+        debugPrint('📱 Phone OTP login response: $userData');
+        debugPrint('   uid: ${userData['uid']}');
+        debugPrint('   phoneNumber: ${userData['phoneNumber']}');
+        debugPrint('   email: ${userData['email']}');
       } else {
         // Email OTP verification is not directly supported
         throw Exception('Email OTP verification is not supported. Please use phone OTP or email/password.');
@@ -92,21 +108,58 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
         phoneNumber: userData['phoneNumber'] as String?,
       );
 
-      // Navigate to onboarding or home
+      // Register user in marg_api (POST /api/user/register) for phone sign-in/signup
+      debugPrint('MargApi REGISTER │ [Phone OTP] Attempting register after verify...');
+      try {
+        final authService = ref.read(firebaseAuthServiceProvider);
+        final idToken = await authService.getIdToken();
+        if (idToken == null) {
+          debugPrint('MargApi REGISTER │ [Phone OTP] Skipped: idToken is null');
+        } else {
+          debugPrint('MargApi REGISTER │ [Phone OTP] idToken (copy for Postman):');
+          debugPrint(idToken);
+          final api = ref.read(margApiServiceProvider);
+          await api.register(
+            idToken: idToken,
+            name: widget.phoneNumber,
+          );
+          debugPrint('MargApi REGISTER │ [Phone OTP] Register call completed');
+        }
+      } catch (e, st) {
+        debugPrint('MargApi REGISTER │ [Phone OTP] Error: $e');
+        debugPrint('MargApi REGISTER │ [Phone OTP] Full stack trace:');
+        for (final line in st.toString().split('\n')) {
+          if (line.isNotEmpty) debugPrint('MargApi REGISTER │   $line');
+        }
+        // "Failed to fetch" on web = usually CORS or API unreachable. Ensure marg_api is running and CORS allows your Flutter web origin (e.g. localhost).
+      }
+
+      // Claim anonymous onboarding if we have a session id
+      try {
+        final sessionId = await ref.read(onboardingSessionIdProvider.future);
+        final authService = ref.read(firebaseAuthServiceProvider);
+        final idToken = await authService.getIdToken();
+        if (idToken != null && sessionId.isNotEmpty) {
+          final api = ref.read(margApiServiceProvider);
+          await api.claimOnboarding(idToken: idToken, sessionId: sessionId);
+        }
+      } catch (_) {}
+
+      // Navigate to home or profile
       final onboardingComplete = ref.read(onboardingCompleteProvider);
       if (onboardingComplete) {
         Navigator.of(context).pushReplacementNamed('/home');
       } else {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => const LanguageSelectionScreen(),
-          ),
+          MaterialPageRoute(builder: (_) => const MyAccountScreen()),
         );
       }
+      _didReplaceFromVerify = true;
+      return;
     } catch (e) {
       _showError(e.toString());
     } finally {
-      if (mounted) {
+      if (mounted && !_didReplaceFromVerify) {
         setState(() => _isLoading = false);
       }
     }

@@ -130,6 +130,11 @@ class FirebaseAuthService {
 
   /// Send OTP to phone number with callback
   /// Returns verification ID via callback
+  ///
+  /// Note: You may see "Failed to initialize reCAPTCHA Enterprise config. Triggering the reCAPTCHA v2 verification."
+  /// in logs. This is expected when reCAPTCHA Enterprise is not set up in Firebase/Cloud Console.
+  /// Firebase falls back to reCAPTCHA v2 and phone auth works normally. To use Enterprise instead,
+  /// enable and configure it in Firebase Console (Authentication > Sign-in method > Phone).
   Future<String> sendPhoneOTPWithCallback(
     String phoneNumber,
     Function(String verificationId) onCodeSent,

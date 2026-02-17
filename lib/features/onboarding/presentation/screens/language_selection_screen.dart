@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../../data/datasources/languages_asset_datasource.dart';
 import '../../data/models/language_option.dart';
+import '../../../home/presentation/screens/home_screen.dart';
 import 'user_goal_selection_screen.dart';
 
 /// Language Selection Screen
@@ -64,6 +65,14 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
     );
   }
 
+  Future<void> _onSkip() async {
+    await ref.read(onboardingCompleteProvider.notifier).completeOnboarding();
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = ref.watch(l10nProvider);
@@ -75,7 +84,22 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: _onSkip,
+                  child: Text(
+                    'Skip',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
               Text(
                 l10n.selectLanguage,
                 style: const TextStyle(

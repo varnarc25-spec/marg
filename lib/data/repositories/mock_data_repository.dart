@@ -14,7 +14,13 @@ class MockDataRepository {
     "language": "te",
     "experience_level": "beginner",
     "risk_profile": "medium",
-    "account_mode": "paper"
+    "account_mode": "paper",
+    "date_of_birth": "1990-05-15",
+    "gender": "Male",
+    "father_name": "Rama Rao",
+    "current_address": "123 Main Street, Hyderabad, Telangana 500001",
+    "permanent_address": "123 Main Street, Hyderabad, Telangana 500001",
+    "nationality": "Indian",
   };
 
   // Market Data Mock

@@ -70,16 +70,21 @@ class HomeScreen extends ConsumerWidget {
                   MaterialPageRoute(builder: (_) => const LearningHubScreen()),
                 );
               },
-              onProfileTap: () {
+              onProfileTap: () async {
                 final authService = ref.read(firebaseAuthServiceProvider);
                 if (authService.isLoggedIn()) {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const MyAccountScreen()),
                   );
                 } else {
-                  Navigator.of(context).push(
+                  final loggedIn = await Navigator.of(context).push<bool>(
                     MaterialPageRoute(builder: (_) => const LoginScreen()),
                   );
+                  if (loggedIn == true && context.mounted) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const MyAccountScreen()),
+                    );
+                  }
                 }
               },
             ),

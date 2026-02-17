@@ -32,8 +32,10 @@ class WealthHomeScreen extends ConsumerWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                 children: [
-                  _buildTotalAssetCard(context, l10n),
-                  const SizedBox(height: 20),
+                  if (authService.isLoggedIn()) ...[
+                    _buildTotalAssetCard(context, l10n),
+                    const SizedBox(height: 20),
+                  ],
                   _buildAssetCategories(context, l10n),
                   const SizedBox(height: 24),
                   _buildWatchlistSection(context, l10n),
@@ -505,15 +507,20 @@ class WealthHomeScreen extends ConsumerWidget {
           _WealthNavItem(
             icon: Icons.person_rounded,
             label: l10n.wealthNavProfile,
-            onTap: () {
+            onTap: () async {
               if (authService.isLoggedIn()) {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const MyAccountScreen()),
                 );
               } else {
-                Navigator.of(context).push(
+                final loggedIn = await Navigator.of(context).push<bool>(
                   MaterialPageRoute(builder: (_) => const LoginScreen()),
                 );
+                if (loggedIn == true && context.mounted) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const MyAccountScreen()),
+                  );
+                }
               }
             },
           ),

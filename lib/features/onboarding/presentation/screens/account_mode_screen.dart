@@ -114,6 +114,35 @@ class _AccountModeScreenState extends ConsumerState<AccountModeScreen> {
                                 .setTradingMode(selectedMode!);
                           }
                           if (!context.mounted) return;
+                          // Save onboarding to backend (marg_api)
+                          try {
+                            final api = ref.read(margApiServiceProvider);
+                            final lang = ref.read(languageProvider);
+                            final goal = ref.read(onboardingUserGoalProvider);
+                            final experience = ref.read(onboardingExperienceProvider);
+                            final riskProfile = ref.read(onboardingRiskProfileProvider);
+                            final mode = ref.read(onboardingTradingModeProvider);
+                            final payload = <String, dynamic>{
+                              if (lang.isNotEmpty) 'selectedLanguage': lang,
+                              if (goal != null) 'whyAreYouHere': goal,
+                              if (experience != null) 'experienceLevel': experience,
+                              if (riskProfile != null) 'riskProfileStatus': riskProfile,
+                              if (mode != null) 'tradingMode': mode,
+                            };
+                            if (payload.isNotEmpty) {
+                              final auth = ref.read(firebaseAuthServiceProvider);
+                              final idToken = await auth.getIdToken();
+                              final sessionId = idToken == null
+                                  ? await ref.read(onboardingSessionIdProvider.future)
+                                  : null;
+                              await api.saveOnboarding(
+                                payload: payload,
+                                idToken: idToken,
+                                sessionId: sessionId,
+                              );
+                            }
+                          } catch (_) {}
+                          if (!context.mounted) return;
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => const OnboardingSuccessScreen(),
