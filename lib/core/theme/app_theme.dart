@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Indian Fintech Color Palette
 /// Trust-building, modern colors inspired by Zerodha, Groww, etc.
@@ -30,6 +31,18 @@ class AppColors {
 
   /// Light pastel blue for icon tiles (rounded square with white icon + label)
   static const Color iconTileBackground = Color(0xFFA7D9F8);
+
+  /// Pastel blue for icon box (alternating with pastel purple in grids)
+  static const Color iconTilePastelBlue = Color(0xFFADD8E6);
+
+  /// Pastel purple for icon box (alternating with pastel blue in grids)
+  static const Color iconTilePastelPurple = Color(0xFFE0BBE4);
+
+  /// Dark blue/indigo for input text and success icon (e.g. checkmark)
+  static const Color inputText = Color(0xFF2C3E50);
+
+  /// Accent for links (e.g. "Lost your password?") – vibrant pink/red
+  static const Color linkAccent = Color(0xFFE91E63);
 }
 
 /// Consistent dimensions used across the app
@@ -40,37 +53,8 @@ class AppDimensions {
 
 class AppTheme {
   static ThemeData get lightTheme {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primaryBlue,
-        brightness: Brightness.light,
-        primary: AppColors.primaryBlue,
-        secondary: AppColors.accentGreen,
-        error: AppColors.accentRed,
-        surface: AppColors.surfaceLight,
-        background: AppColors.backgroundLight,
-      ),
-      scaffoldBackgroundColor: AppColors.backgroundLight,
-      cardTheme: CardThemeData(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        color: AppColors.surfaceLight,
-      ),
-      appBarTheme: const AppBarTheme(
-        elevation: 0,
-        centerTitle: true,
-        backgroundColor: AppColors.surfaceLight,
-        foregroundColor: AppColors.textPrimary,
-        titleTextStyle: TextStyle(
-          color: AppColors.textPrimary,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      textTheme: const TextTheme(
+    final textTheme = GoogleFonts.mulishTextTheme(
+      const TextTheme(
         displayLarge: TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.bold,
@@ -100,6 +84,39 @@ class AppTheme {
           color: AppColors.textSecondary,
         ),
       ),
+    );
+    return ThemeData(
+      useMaterial3: true,
+      fontFamily: GoogleFonts.mulish().fontFamily,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primaryBlue,
+        brightness: Brightness.light,
+        primary: AppColors.primaryBlue,
+        secondary: AppColors.accentGreen,
+        error: AppColors.accentRed,
+        surface: AppColors.surfaceLight,
+        background: AppColors.backgroundLight,
+      ),
+      scaffoldBackgroundColor: AppColors.backgroundLight,
+      cardTheme: CardThemeData(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        color: AppColors.surfaceLight,
+      ),
+      appBarTheme: AppBarTheme(
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: AppColors.surfaceLight,
+        foregroundColor: AppColors.textPrimary,
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          color: AppColors.textPrimary,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      textTheme: textTheme,
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(0, AppDimensions.buttonHeight),
@@ -110,7 +127,7 @@ class AppTheme {
           ),
           backgroundColor: AppColors.primaryBlue,
           foregroundColor: Colors.white,
-          textStyle: const TextStyle(
+          textStyle: GoogleFonts.mulish(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -137,54 +154,46 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceLight,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        hintStyle: GoogleFonts.mulish(
+          fontSize: 16,
+          color: AppColors.textSecondary,
+        ),
+        labelStyle: GoogleFonts.mulish(
+          fontSize: 16,
+          color: AppColors.inputText,
+        ),
+        floatingLabelStyle: GoogleFonts.mulish(
+          fontSize: 16,
+          color: AppColors.inputText,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.textSecondary),
+          borderRadius: BorderRadius.circular(28),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.textSecondary),
+          borderRadius: BorderRadius.circular(28),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(28),
           borderSide: const BorderSide(color: AppColors.primaryBlue, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(28),
+          borderSide: const BorderSide(color: AppColors.accentRed),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(28),
+          borderSide: const BorderSide(color: AppColors.accentRed, width: 2),
         ),
       ),
     );
   }
 
   static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primaryBlue,
-        brightness: Brightness.dark,
-        primary: AppColors.primaryBlueLight,
-        secondary: AppColors.accentGreen,
-        error: AppColors.accentRed,
-        surface: AppColors.surfaceDark,
-        background: AppColors.backgroundDark,
-      ),
-      scaffoldBackgroundColor: AppColors.backgroundDark,
-      cardTheme: CardThemeData(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        color: AppColors.surfaceDark,
-      ),
-      appBarTheme: const AppBarTheme(
-        elevation: 0,
-        centerTitle: true,
-        backgroundColor: AppColors.surfaceDark,
-        foregroundColor: AppColors.textPrimaryDark,
-        titleTextStyle: TextStyle(
-          color: AppColors.textPrimaryDark,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      textTheme: const TextTheme(
+    final textTheme = GoogleFonts.mulishTextTheme(
+      const TextTheme(
         displayLarge: TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.bold,
@@ -214,6 +223,39 @@ class AppTheme {
           color: AppColors.textSecondaryDark,
         ),
       ),
+    );
+    return ThemeData(
+      useMaterial3: true,
+      fontFamily: GoogleFonts.mulish().fontFamily,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primaryBlue,
+        brightness: Brightness.dark,
+        primary: AppColors.primaryBlueLight,
+        secondary: AppColors.accentGreen,
+        error: AppColors.accentRed,
+        surface: AppColors.surfaceDark,
+        background: AppColors.backgroundDark,
+      ),
+      scaffoldBackgroundColor: AppColors.backgroundDark,
+      cardTheme: CardThemeData(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        color: AppColors.surfaceDark,
+      ),
+      appBarTheme: AppBarTheme(
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: AppColors.surfaceDark,
+        foregroundColor: AppColors.textPrimaryDark,
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          color: AppColors.textPrimaryDark,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      textTheme: textTheme,
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(0, AppDimensions.buttonHeight),
@@ -224,7 +266,7 @@ class AppTheme {
           ),
           backgroundColor: AppColors.primaryBlue,
           foregroundColor: Colors.white,
-          textStyle: const TextStyle(
+          textStyle: GoogleFonts.mulish(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -251,17 +293,38 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceDark,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        hintStyle: GoogleFonts.mulish(
+          fontSize: 16,
+          color: AppColors.textSecondaryDark,
+        ),
+        labelStyle: GoogleFonts.mulish(
+          fontSize: 16,
+          color: AppColors.inputText,
+        ),
+        floatingLabelStyle: GoogleFonts.mulish(
+          fontSize: 16,
+          color: AppColors.inputText,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.textSecondaryDark),
+          borderRadius: BorderRadius.circular(28),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.textSecondaryDark),
+          borderRadius: BorderRadius.circular(28),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(28),
           borderSide: const BorderSide(color: AppColors.primaryBlueLight, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(28),
+          borderSide: const BorderSide(color: AppColors.accentRed),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(28),
+          borderSide: const BorderSide(color: AppColors.accentRed, width: 2),
         ),
       ),
     );

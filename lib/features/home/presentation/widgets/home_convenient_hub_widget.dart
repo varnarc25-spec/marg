@@ -20,6 +20,6 @@ class HomeConvenientHub extends ConsumerWidget {
       HomeIconGridItem(Icons.eco_rounded, l10n.homeIconCreditLife),
       HomeIconGridItem(Icons.apps_rounded, l10n.homeIconMore),
     ];
-    return HomeIconGrid(items: items, columns: 4);
+    return HomeIconGrid(items: items, columns: 4, maxItems: 4);
   }
 }

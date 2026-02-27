@@ -49,5 +49,7 @@
 	<string>Camera is used to scan PAN or Aadhaar card for auto-filling your details.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Photo library is used to select a photo of your PAN or Aadhaar card for auto-filling.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Contacts are used to select a phone number for mobile recharge.</string>
 </dict>
 </plist>

@@ -43,21 +43,21 @@ class AppIconTile extends StatelessWidget {
     this.onTap,
   }) : assert(icon != null || child != null, 'Provide either icon or child');
 
-  /// Soft drop shadow for the icon container.
+  /// Soft drop shadow for the icon container (visible floating effect).
   static List<BoxShadow> get _containerShadow => [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.08),
-          blurRadius: 10,
-          spreadRadius: 0,
-          offset: const Offset(0, 2),
-        ),
-        BoxShadow(
-          color: Colors.black.withOpacity(0.04),
-          blurRadius: 4,
-          spreadRadius: 0,
-          offset: const Offset(0, 1),
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black.withOpacity(0.12),
+      blurRadius: 12,
+      spreadRadius: 0,
+      offset: const Offset(0, 4),
+    ),
+    BoxShadow(
+      color: Colors.black.withOpacity(0.06),
+      blurRadius: 6,
+      spreadRadius: 0,
+      offset: const Offset(0, 2),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,8 @@ class AppIconTile extends StatelessWidget {
     final radius = size * cornerRadiusFraction;
     final content = Column(
       mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: size,
@@ -76,11 +77,12 @@ class AppIconTile extends StatelessWidget {
             boxShadow: _containerShadow,
           ),
           child: Center(
-            child: child ??
+            child:
+                child ??
                 (icon != null
                     ? Icon(
                         icon,
-                        size: size * 0.5,
+                        size: size * 0.62,
                         color: iconColor ?? Colors.white,
                       )
                     : const SizedBox.shrink()),
@@ -91,12 +93,12 @@ class AppIconTile extends StatelessWidget {
           Text(
             label!,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
+              color: Colors.black,
             ),
             textAlign: TextAlign.center,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ],

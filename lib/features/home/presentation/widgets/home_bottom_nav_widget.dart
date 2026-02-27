@@ -3,13 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/l10n/app_localizations.dart';
 
-/// Bottom navigation bar for home screen: Home, Wealth, Discover, Profile.
+/// Bottom navigation bar for home screen: Home, Wealth, Scan (center), Discover, Profile.
 /// Use [selectedIndex] to show which tab is active (0=Home, 1=Wealth, 2=Discover, 3=Profile).
 class HomeBottomNav extends ConsumerWidget {
   /// Which tab is selected. 0=Home, 1=Wealth, 2=Discover, 3=Profile.
   final int selectedIndex;
   final VoidCallback? onHomeTap;
   final VoidCallback? onWealthTap;
+  final VoidCallback? onScanTap;
   final VoidCallback? onDiscoverTap;
   final VoidCallback? onProfileTap;
 
@@ -18,6 +19,7 @@ class HomeBottomNav extends ConsumerWidget {
     this.selectedIndex = 0,
     this.onHomeTap,
     this.onWealthTap,
+    this.onScanTap,
     this.onDiscoverTap,
     this.onProfileTap,
   });
@@ -57,6 +59,7 @@ class HomeBottomNav extends ConsumerWidget {
             isSelected: selectedIndex == 1,
             onTap: onWealthTap ?? () {},
           ),
+          _CenterScanButton(onTap: onScanTap ?? () {}),
           HomeBottomNavItem(
             icon: Icons.explore_rounded,
             label: l10n.homeNavDiscover,
@@ -70,6 +73,41 @@ class HomeBottomNav extends ConsumerWidget {
             onTap: onProfileTap ?? () {},
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Center scan button: elevated circle with QR scan icon.
+class _CenterScanButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _CenterScanButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Container(
+        width: 52,
+        height: 52,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.primaryBlue,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryBlue.withValues(alpha: 0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Icon(
+          Icons.qr_code_scanner_rounded,
+          color: Colors.white,
+          size: 28,
+        ),
       ),
     );
   }

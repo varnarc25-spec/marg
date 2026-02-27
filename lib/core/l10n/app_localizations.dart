@@ -133,10 +133,38 @@ class AppLocalizations {
     'riskDescLow': "You prefer conservative strategies with lower risk. We'll suggest safer trading approaches.",
     'riskDescMedium': "You're comfortable with balanced risk. We'll provide a mix of strategies.",
     'riskDescHigh': "You're willing to take higher risks for potential returns. We'll show advanced strategies.",
+    'homeViewAll': 'View All',
+    'homeHubRechargesBills': 'Recharges & Bills',
     'homeHubFinancial': 'Financial Hub',
     'homeHubConvenient': 'Convenient Hub',
     'homeHubService': 'Service Hub',
     'homeHubRewards': 'Rewards Hub',
+    'homeRechargeMobile': 'Mobile Recharge',
+    'homeRechargeDth': 'DTH Recharge',
+    'homeRechargeFastag': 'FASTag Recharge',
+    'homeRechargeElectricity': 'Electricity, Water & Gas',
+    'homeRechargeBroadband': 'Broadband & Internet',
+    'homeRechargeCreditCard': 'Credit Card Bill',
+    'homeRechargeSchoolFees': 'School & Fee Payment',
+    'homeRechargeMunicipal': 'Municipal/Water Tax',
+    'homeRechargeLoanEmi': 'Loan EMIs',
+    'homeHubGoldSilver': 'Gold & Silver',
+    'homeGoldBuyGold': 'Buy Gold',
+    'homeGoldDailyGoldSavings': 'Daily Gold Savings',
+    'homeGoldBuy999Silver': 'Buy 999 Silver',
+    'homeGoldDailySilverSavings': 'Daily Silver Savings',
+    'homeHubInsurance': 'Insurance',
+    'homeInsuranceBannerSubtitle': 'Did you know?',
+    'homeInsuranceBannerTitle': 'Health plans start at ₹224/mo*',
+    'homeInsuranceBike': 'Bike',
+    'homeInsuranceCar': 'Car',
+    'homeInsuranceHealth': 'Health',
+    'homeInsuranceLife': 'Life',
+    'homeHubTravel': 'Travel',
+    'homeTravelFlight': 'Flight',
+    'homeTravelBus': 'Bus',
+    'homeTravelTrain': 'Train',
+    'homeTravelHotel': 'Hotel',
     'homeIconCardRepay': 'Card Repay',
     'homeIconSavings': 'Savings',
     'homeIconInvest': 'Invest',
@@ -152,6 +180,11 @@ class AppLocalizations {
     'homeSearchHint': 'Search for products or services',
     'homeQuickScan': 'Scan',
     'homeQuickPay': 'Pay',
+    'homeQuickSend': 'Send',
+    'homeQuickReceive': 'Receive',
+    'homeQuickBalance': 'Balance',
+    'scanQrTitle': 'Scan QR Code',
+    'scanningProcess': 'Scanning process...',
     'homeQuickCollect': 'Collect',
     'homeQuickPocket': 'Pocket',
     'homeNavHome': 'Home',
@@ -1824,10 +1857,38 @@ class AppLocalizations {
   String get riskDescLow => _t('riskDescLow');
   String get riskDescMedium => _t('riskDescMedium');
   String get riskDescHigh => _t('riskDescHigh');
+  String get homeViewAll => _t('homeViewAll');
+  String get homeHubRechargesBills => _t('homeHubRechargesBills');
   String get homeHubFinancial => _t('homeHubFinancial');
   String get homeHubConvenient => _t('homeHubConvenient');
   String get homeHubService => _t('homeHubService');
   String get homeHubRewards => _t('homeHubRewards');
+  String get homeRechargeMobile => _t('homeRechargeMobile');
+  String get homeRechargeDth => _t('homeRechargeDth');
+  String get homeRechargeFastag => _t('homeRechargeFastag');
+  String get homeRechargeElectricity => _t('homeRechargeElectricity');
+  String get homeRechargeBroadband => _t('homeRechargeBroadband');
+  String get homeRechargeCreditCard => _t('homeRechargeCreditCard');
+  String get homeRechargeSchoolFees => _t('homeRechargeSchoolFees');
+  String get homeRechargeMunicipal => _t('homeRechargeMunicipal');
+  String get homeRechargeLoanEmi => _t('homeRechargeLoanEmi');
+  String get homeHubGoldSilver => _t('homeHubGoldSilver');
+  String get homeGoldBuyGold => _t('homeGoldBuyGold');
+  String get homeGoldDailyGoldSavings => _t('homeGoldDailyGoldSavings');
+  String get homeGoldBuy999Silver => _t('homeGoldBuy999Silver');
+  String get homeGoldDailySilverSavings => _t('homeGoldDailySilverSavings');
+  String get homeHubInsurance => _t('homeHubInsurance');
+  String get homeInsuranceBannerSubtitle => _t('homeInsuranceBannerSubtitle');
+  String get homeInsuranceBannerTitle => _t('homeInsuranceBannerTitle');
+  String get homeInsuranceBike => _t('homeInsuranceBike');
+  String get homeInsuranceCar => _t('homeInsuranceCar');
+  String get homeInsuranceHealth => _t('homeInsuranceHealth');
+  String get homeInsuranceLife => _t('homeInsuranceLife');
+  String get homeHubTravel => _t('homeHubTravel');
+  String get homeTravelFlight => _t('homeTravelFlight');
+  String get homeTravelBus => _t('homeTravelBus');
+  String get homeTravelTrain => _t('homeTravelTrain');
+  String get homeTravelHotel => _t('homeTravelHotel');
   String get homeIconCardRepay => _t('homeIconCardRepay');
   String get homeIconSavings => _t('homeIconSavings');
   String get homeIconInvest => _t('homeIconInvest');
@@ -1843,6 +1904,11 @@ class AppLocalizations {
   String get homeSearchHint => _t('homeSearchHint');
   String get homeQuickScan => _t('homeQuickScan');
   String get homeQuickPay => _t('homeQuickPay');
+  String get homeQuickSend => _t('homeQuickSend');
+  String get homeQuickReceive => _t('homeQuickReceive');
+  String get homeQuickBalance => _t('homeQuickBalance');
+  String get scanQrTitle => _t('scanQrTitle');
+  String get scanningProcess => _t('scanningProcess');
   String get homeQuickCollect => _t('homeQuickCollect');
   String get homeQuickPocket => _t('homeQuickPocket');
   String get homeNavHome => _t('homeNavHome');

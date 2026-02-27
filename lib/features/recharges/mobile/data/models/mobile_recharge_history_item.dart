@@ -1,0 +1,73 @@
+/// Single mobile recharge history entry.
+/// TODO: Replace with API model when history is fetched from backend.
+class MobileRechargeHistoryItem {
+  final String id;
+  final String number;
+  final String operatorName;
+  final String alias; // Display name e.g. "Krishna", "hema mam"
+  final double amount;
+  final DateTime date;
+  final String status;
+  final String planName;
+  /// Contact initials for avatar (e.g. "Kr"). Falls back to operator initials if null.
+  final String? contactInitials;
+  /// Masked number for secure display (e.g. "******2974").
+  final String? maskedNumber;
+
+  const MobileRechargeHistoryItem({
+    required this.id,
+    required this.number,
+    required this.operatorName,
+    this.alias = '',
+    required this.amount,
+    required this.date,
+    this.status = 'Success',
+    this.planName = '',
+    this.contactInitials,
+    this.maskedNumber,
+  });
+
+  String get displayName => alias.isNotEmpty ? alias : number;
+
+  /// Avatar text: contact initials if set, else first 2 chars of operator name.
+  String get avatarText =>
+      (contactInitials != null && contactInitials!.isNotEmpty)
+          ? contactInitials!
+          : (operatorName.length >= 2 ? operatorName.substring(0, 2) : operatorName);
+
+  factory MobileRechargeHistoryItem.fromJson(Map<String, dynamic> json) {
+    return MobileRechargeHistoryItem(
+      id: json['id'] as String? ?? '',
+      number: json['number'] as String? ?? '',
+      operatorName: json['operatorName'] as String? ?? '',
+      alias: json['alias'] as String? ?? '',
+      amount: (json['amount'] as num?)?.toDouble() ?? 0,
+      date: json['date'] != null
+          ? DateTime.tryParse(json['date'] as String) ?? DateTime.now()
+          : DateTime.now(),
+      status: json['status'] as String? ?? 'Success',
+      planName: json['planName'] as String? ?? '',
+      contactInitials: json['contactInitials'] as String?,
+      maskedNumber: json['maskedNumber'] as String?,
+    );
+  }
+
+  /// From sample/API transaction JSON (transactionId, contactDisplayName, lastRechargeDate, etc.).
+  factory MobileRechargeHistoryItem.fromTransactionJson(Map<String, dynamic> json) {
+    final dateStr = json['lastRechargeDate'] as String?;
+    return MobileRechargeHistoryItem(
+      id: json['transactionId'] as String? ?? '',
+      number: json['mobileNumber'] as String? ?? '',
+      operatorName: json['operatorName'] as String? ?? '',
+      alias: json['contactDisplayName'] as String? ?? '',
+      amount: (json['lastRechargeAmount'] as num?)?.toDouble() ?? 0,
+      date: dateStr != null
+          ? DateTime.tryParse(dateStr) ?? DateTime.now()
+          : DateTime.now(),
+      status: json['status'] as String? ?? 'Success',
+      planName: json['planName'] as String? ?? '',
+      contactInitials: json['contactInitials'] as String?,
+      maskedNumber: json['maskedNumber'] as String?,
+    );
+  }
+}
