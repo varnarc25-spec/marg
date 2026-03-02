@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../../core/theme/app_theme.dart';
-import '../../data/models/dth_plan.dart';
 import '../providers/dth_recharge_provider.dart';
+import '../widgets/dth_plan_tile.dart';
 import 'dth_payment_success_page.dart';
 
+/// Plan list for DTH recharge (mirrors [MobilePlanListPage] layout and tiles).
 class DthPlanListPage extends ConsumerWidget {
   const DthPlanListPage({super.key});
 
@@ -15,7 +16,11 @@ class DthPlanListPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(title: const Text('Select plan'), backgroundColor: AppColors.surfaceLight, foregroundColor: AppColors.textPrimary),
+      appBar: AppBar(
+        title: const Text('Select plan'),
+        backgroundColor: AppColors.surfaceLight,
+        foregroundColor: AppColors.textPrimary,
+      ),
       body: plansAsync == null
           ? const Center(child: Text('Select operator first'))
           : plansAsync.when(
@@ -24,20 +29,24 @@ class DthPlanListPage extends ConsumerWidget {
                 itemCount: plans.length,
                 itemBuilder: (_, i) {
                   final plan = plans[i];
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    color: plan.isBestValue ? AppColors.primaryBlueLight.withValues(alpha: 0.15) : null,
-                    child: ListTile(
-                      title: Text(plan.name),
-                      subtitle: plan.validity.isNotEmpty ? Text(plan.validity) : null,
-                      trailing: Text('₹${plan.amount}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryBlue)),
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: DthPlanTile(
+                      plan: plan,
                       onTap: () async {
                         ref.read(selectedDthPlanProvider.notifier).state = plan;
                         final repo = ref.read(dthRechargeRepositoryProvider);
                         final sid = ref.read(dthSubscriberIdProvider);
-                        final ok = await repo.performRecharge(operatorId: op!.id, subscriberId: sid, amount: plan.amount);
+                        final ok = await repo.performRecharge(
+                          operatorId: op!.id,
+                          subscriberId: sid,
+                          amount: plan.amount,
+                        );
                         if (context.mounted && ok) {
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DthPaymentSuccessPage()));
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => const DthPaymentSuccessPage()),
+                          );
                         }
                       },
                     ),

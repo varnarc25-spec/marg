@@ -1,5 +1,6 @@
 import '../models/dth_operator.dart';
 import '../models/dth_plan.dart';
+import '../models/dth_recharge_history_item.dart';
 
 /// DTH recharge repository. TODO: BBPS/recharge API integration.
 class DthRechargeRepository {
@@ -12,6 +13,11 @@ class DthRechargeRepository {
       const DthOperator(id: 'sun_direct', name: 'Sun Direct'),
       const DthOperator(id: 'tatasky', name: 'Tata Sky'),
     ];
+  }
+
+  Future<List<DthRechargeHistoryItem>> getRecentHistory() async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    return [];
   }
 
   Future<List<DthPlan>> getPlans(String operatorId) async {

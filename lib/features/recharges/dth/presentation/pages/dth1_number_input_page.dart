@@ -4,17 +4,31 @@ import '../../../../../../core/theme/app_theme.dart';
 import '../providers/dth_recharge_provider.dart';
 import 'dth_plan_list_page.dart';
 
-/// Subscriber ID / VC number input for DTH recharge (mirrors [MobileNumberInputPage]).
-class DthNumberInputPage extends ConsumerStatefulWidget {
-  const DthNumberInputPage({super.key});
+/// Number / subscriber ID input for DTH recharge.
+class Dth1NumberInputPage extends ConsumerStatefulWidget {
+  const Dth1NumberInputPage({super.key});
 
   @override
-  ConsumerState<DthNumberInputPage> createState() => _DthNumberInputPageState();
+  ConsumerState<Dth1NumberInputPage> createState() => _Dth1NumberInputPageState();
 }
 
-class _DthNumberInputPageState extends ConsumerState<DthNumberInputPage> {
+class _Dth1NumberInputPageState extends ConsumerState<Dth1NumberInputPage> {
   final _controller = TextEditingController();
   final _focus = FocusNode();
+  bool _prefilled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_prefilled || !mounted) return;
+      final number = ref.read(dthSubscriberIdProvider);
+      if (number.isNotEmpty && _controller.text.isEmpty) {
+        _controller.text = number;
+        _prefilled = true;
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -24,45 +38,44 @@ class _DthNumberInputPageState extends ConsumerState<DthNumberInputPage> {
   }
 
   void _proceed() {
-    final id = _controller.text.trim();
-    if (id.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter subscriber ID / VC number')),
+    final number = _controller.text.trim().replaceAll(RegExp(r'\D'), '');
+    if (number.length >= 10) {
+      ref.read(dthSubscriberIdProvider.notifier).state = number;
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const DthPlanListPage()),
       );
-      return;
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a valid 10-digit subscriber ID')),
+      );
     }
-    ref.read(dthSubscriberIdProvider.notifier).state = id;
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const DthPlanListPage()),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final op = ref.watch(selectedDthOperatorProvider);
+    final operator = ref.watch(selectedDthOperatorProvider);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('Enter subscriber ID'),
+        title: const Text('Enter number'),
         backgroundColor: AppColors.surfaceLight,
         foregroundColor: AppColors.textPrimary,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (op != null)
+          if (operator != null)
             Card(
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundColor: AppColors.primaryBlueLight,
                   child: Text(
-                    op.name.isNotEmpty ? op.name.substring(0, 1).toUpperCase() : 'D',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                    operator.name.substring(0, 1).toUpperCase(),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
-                title: Text(op.name),
-                subtitle: const Text('DTH'),
+                title: Text(operator.name),
               ),
             ),
           const SizedBox(height: 24),
@@ -78,10 +91,11 @@ class _DthNumberInputPageState extends ConsumerState<DthNumberInputPage> {
           TextField(
             controller: _controller,
             focusNode: _focus,
-            keyboardType: TextInputType.text,
+            keyboardType: TextInputType.phone,
+            maxLength: 10,
             decoration: const InputDecoration(
-              hintText: 'Enter subscriber ID or VC number',
-              prefixIcon: Icon(Icons.tv_rounded),
+              hintText: '10-digit mobile number',
+              prefixIcon: Icon(Icons.phone_android_rounded),
             ),
           ),
           const SizedBox(height: 24),

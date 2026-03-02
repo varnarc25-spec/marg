@@ -64,9 +64,11 @@ class AppLocalizations {
     'selectLanguage': 'Select your Language',
     'changeLanguageLater': 'You can change this later in settings',
     'whyAreYouHere': 'Why are you here?',
-    'personalizeExperience': "We'll personalize your experience based on your goal. You can change this later in settings.",
+    'personalizeExperience':
+        "We'll personalize your experience based on your goal. You can change this later in settings.",
     'howExperienced': 'How experienced are you?',
-    'experienceGuidance': 'This helps us provide appropriate guidance. You can change this later in settings.',
+    'experienceGuidance':
+        'This helps us provide appropriate guidance. You can change this later in settings.',
     'chooseTradingMode': 'Choose your trading mode',
     'switchLaterSettings': 'You can switch later in settings.',
     'next': 'Next',
@@ -92,7 +94,8 @@ class AppLocalizations {
     'settingsVersionSubtitle': 'Version 1.0.0',
     'languageChangedTo': 'Language changed to %s',
     'resetOnboardingTitle': 'Reset Onboarding',
-    'resetOnboardingMessage': 'This will reset your onboarding preferences. You\'ll need to go through the onboarding flow again.',
+    'resetOnboardingMessage':
+        'This will reset your onboarding preferences. You\'ll need to go through the onboarding flow again.',
     'cancel': 'Cancel',
     'reset': 'Reset',
     'onboardingResetDone': 'Onboarding reset. Please restart the app.',
@@ -110,7 +113,8 @@ class AppLocalizations {
     'riskQuizQ1Opt1': 'I stay calm and stick to my strategy',
     'riskQuizQ1Opt2': 'I get slightly nervous but continue',
     'riskQuizQ1Opt3': 'I panic and want to exit immediately',
-    'riskQuizQ2Question': 'What percentage of your portfolio are you willing to risk?',
+    'riskQuizQ2Question':
+        'What percentage of your portfolio are you willing to risk?',
     'riskQuizQ2Subtitle': 'We use this to suggest position sizes.',
     'riskQuizQ2Opt1': 'Less than 5%',
     'riskQuizQ2Opt2': '5-15%',
@@ -130,9 +134,12 @@ class AppLocalizations {
     'riskQuizQ5Opt1': 'I accept it as part of trading',
     'riskQuizQ5Opt2': 'I review and learn from it',
     'riskQuizQ5Opt3': 'I get emotional and make impulsive decisions',
-    'riskDescLow': "You prefer conservative strategies with lower risk. We'll suggest safer trading approaches.",
-    'riskDescMedium': "You're comfortable with balanced risk. We'll provide a mix of strategies.",
-    'riskDescHigh': "You're willing to take higher risks for potential returns. We'll show advanced strategies.",
+    'riskDescLow':
+        "You prefer conservative strategies with lower risk. We'll suggest safer trading approaches.",
+    'riskDescMedium':
+        "You're comfortable with balanced risk. We'll provide a mix of strategies.",
+    'riskDescHigh':
+        "You're willing to take higher risks for potential returns. We'll show advanced strategies.",
     'homeViewAll': 'View All',
     'homeHubRechargesBills': 'Recharges & Bills',
     'homeHubFinancial': 'Financial Hub',
@@ -197,6 +204,7 @@ class AppLocalizations {
     'wealthCrypto': 'Crypto',
     'wealthNFTs': 'NFTs',
     'wealthGold': 'Gold',
+    'wealthMutualFunds': 'Mutual Funds',
     'wealthWatchlist': 'Watchlist',
     'wealthEditWatchlist': 'Edit watchlist',
     'wealthCryptoAssets': 'Crypto Assets',
@@ -211,6 +219,13 @@ class AppLocalizations {
     'wealthNavPortfolio': 'Portfolio',
     'wealthNavWallet': 'Wallet',
     'wealthNavProfile': 'Profile',
+    'wealthNifty50': 'NIFTY 50',
+    'wealthNiftyBank': 'NIFTY BANK',
+    'wealthDigitalGold': 'Gold',
+    'wealthSilver': 'Silver',
+    'wealthInvested': 'Invested',
+    'wealthCurrent': 'Current',
+    'wealthPnL': 'P&L',
   };
 
   static const Map<String, String> _hi = {
@@ -264,9 +279,11 @@ class AppLocalizations {
     'selectLanguage': 'अपनी भाषा चुनें',
     'changeLanguageLater': 'आप इसे बाद में सेटिंग्स में बदल सकते हैं',
     'whyAreYouHere': 'आप यहाँ क्यों हैं?',
-    'personalizeExperience': 'हम आपके लक्ष्य के हिसाब से अनुभव देंगे। आप इसे बाद में बदल सकते हैं।',
+    'personalizeExperience':
+        'हम आपके लक्ष्य के हिसाब से अनुभव देंगे। आप इसे बाद में बदल सकते हैं।',
     'howExperienced': 'आप कितने अनुभवी हैं?',
-    'experienceGuidance': 'इससे हम सही मार्गदर्शन दे पाएंगे। बाद में सेटिंग्स में बदल सकते हैं।',
+    'experienceGuidance':
+        'इससे हम सही मार्गदर्शन दे पाएंगे। बाद में सेटिंग्स में बदल सकते हैं।',
     'chooseTradingMode': 'अपना ट्रेडिंग मोड चुनें',
     'switchLaterSettings': 'आप बाद में सेटिंग्स में बदल सकते हैं।',
     'next': 'आगे',
@@ -292,10 +309,12 @@ class AppLocalizations {
     'settingsVersionSubtitle': 'संस्करण 1.0.0',
     'languageChangedTo': 'भाषा बदलकर %s कर दी गई',
     'resetOnboardingTitle': 'ऑनबोर्डिंग रीसेट करें',
-    'resetOnboardingMessage': 'इससे आपकी ऑनबोर्डिंग प्राथमिकताएं रीसेट हो जाएंगी। आपको ऑनबोर्डिंग फिर से करनी होगी।',
+    'resetOnboardingMessage':
+        'इससे आपकी ऑनबोर्डिंग प्राथमिकताएं रीसेट हो जाएंगी। आपको ऑनबोर्डिंग फिर से करनी होगी।',
     'cancel': 'रद्द करें',
     'reset': 'रीसेट',
-    'onboardingResetDone': 'ऑनबोर्डिंग रीसेट हो गई। कृपया ऐप को दोबारा शुरू करें।',
+    'onboardingResetDone':
+        'ऑनबोर्डिंग रीसेट हो गई। कृपया ऐप को दोबारा शुरू करें।',
     'appInfoTitle': 'ऐप जानकारी',
     'appInfoDescription': 'मार्गदर्शित, शुरुआत-अनुकूल ट्रेडिंग अनुभव।',
     'ok': 'ठीक है',
@@ -310,7 +329,8 @@ class AppLocalizations {
     'riskQuizQ1Opt1': 'मैं शांत रहता हूं और अपनी रणनीति पर टिका रहता हूं',
     'riskQuizQ1Opt2': 'मैं थोड़ा घबराता हूं लेकिन जारी रखता हूं',
     'riskQuizQ1Opt3': 'मैं घबरा जाता हूं और तुरंत बाहर निकलना चाहता हूं',
-    'riskQuizQ2Question': 'आप अपने पोर्टफोलियो का कितना प्रतिशत जोखिम में लेने को तैयार हैं?',
+    'riskQuizQ2Question':
+        'आप अपने पोर्टफोलियो का कितना प्रतिशत जोखिम में लेने को तैयार हैं?',
     'riskQuizQ2Subtitle': 'हम इससे पोजिशन साइज सुझाते हैं।',
     'riskQuizQ2Opt1': '5% से कम',
     'riskQuizQ2Opt2': '5-15%',
@@ -330,9 +350,12 @@ class AppLocalizations {
     'riskQuizQ5Opt1': 'मैं इसे ट्रेडिंग का हिस्सा मानता हूं',
     'riskQuizQ5Opt2': 'मैं समीक्षा करता हूं और सीखता हूं',
     'riskQuizQ5Opt3': 'मैं भावुक हो जाता हूं और जल्दबाजी में फैसले लेता हूं',
-    'riskDescLow': 'आप कम जोखिम वाली रूढ़िवादी रणनीतियां पसंद करते हैं। हम सुरक्षित ट्रेडिंग सुझाएंगे।',
-    'riskDescMedium': 'आप संतुलित जोखिम के साथ सहज हैं। हम रणनीतियों का मिश्रण देंगे।',
-    'riskDescHigh': 'आप संभावित रिटर्न के लिए अधिक जोखिम लेने को तैयार हैं। हम उन्नत रणनीतियां दिखाएंगे।',
+    'riskDescLow':
+        'आप कम जोखिम वाली रूढ़िवादी रणनीतियां पसंद करते हैं। हम सुरक्षित ट्रेडिंग सुझाएंगे।',
+    'riskDescMedium':
+        'आप संतुलित जोखिम के साथ सहज हैं। हम रणनीतियों का मिश्रण देंगे।',
+    'riskDescHigh':
+        'आप संभावित रिटर्न के लिए अधिक जोखिम लेने को तैयार हैं। हम उन्नत रणनीतियां दिखाएंगे।',
     'homeHubFinancial': 'फाइनेंशियल हब',
     'homeHubConvenient': 'कन्वीनियंट हब',
     'homeHubService': 'सर्विस हब',
@@ -431,9 +454,11 @@ class AppLocalizations {
     'selectLanguage': 'మీ భాషను ఎంచుకోండి',
     'changeLanguageLater': 'మీరు తర్వాత సెట్టింగ్‌లలో మార్చవచ్చు',
     'whyAreYouHere': 'మీరు ఇక్కడ ఎందుకు ఉన్నారు?',
-    'personalizeExperience': 'మీ లక్ష్యం ప్రకారం అనుభవాన్ని అనుగొన్నాము. తర్వాత మార్చవచ్చు.',
+    'personalizeExperience':
+        'మీ లక్ష్యం ప్రకారం అనుభవాన్ని అనుగొన్నాము. తర్వాత మార్చవచ్చు.',
     'howExperienced': 'మీకు ఎంత అనుభవం ఉంది?',
-    'experienceGuidance': 'ఇది మాకు సరైన మార్గదర్శన ఇవ్వడానికి సహాయపడుతుంది. తర్వాత సెట్టింగ్‌లలో మార్చవచ్చు.',
+    'experienceGuidance':
+        'ఇది మాకు సరైన మార్గదర్శన ఇవ్వడానికి సహాయపడుతుంది. తర్వాత సెట్టింగ్‌లలో మార్చవచ్చు.',
     'chooseTradingMode': 'మీ ట్రేడింగ్ మోడ్ ఎంచుకోండి',
     'switchLaterSettings': 'మీరు తర్వాత సెట్టింగ్‌లలో మార్చవచ్చు.',
     'next': 'తదుపరి',
@@ -459,12 +484,15 @@ class AppLocalizations {
     'settingsVersionSubtitle': 'వెర్షన్ 1.0.0',
     'languageChangedTo': 'భాష %s కు మార్చబడింది',
     'resetOnboardingTitle': 'ఓన్‌బోర్డింగ్ రీసెట్ చేయండి',
-    'resetOnboardingMessage': 'ఇది మీ ఓన్‌బోర్డింగ్ ప్రాధాన్యతలను రీసెట్ చేస్తుంది. మీరు ఓన్‌బోర్డింగ్ ప్రవాహాన్ని మళ్లీ చేయాలి.',
+    'resetOnboardingMessage':
+        'ఇది మీ ఓన్‌బోర్డింగ్ ప్రాధాన్యతలను రీసెట్ చేస్తుంది. మీరు ఓన్‌బోర్డింగ్ ప్రవాహాన్ని మళ్లీ చేయాలి.',
     'cancel': 'రద్దు',
     'reset': 'రీసెట్',
-    'onboardingResetDone': 'ఓన్‌బోర్డింగ్ రీసెట్ అయింది. దయచేసి యాప్‌ను మళ్లీ ప్రారంభించండి.',
+    'onboardingResetDone':
+        'ఓన్‌బోర్డింగ్ రీసెట్ అయింది. దయచేసి యాప్‌ను మళ్లీ ప్రారంభించండి.',
     'appInfoTitle': 'యాప్ సమాచారం',
-    'appInfoDescription': 'మార్గదర్శిత, ప్రారంభికులకు అనుకూలమైన ట్రేడింగ్ అనుభవం.',
+    'appInfoDescription':
+        'మార్గదర్శిత, ప్రారంభికులకు అనుకూలమైన ట్రేడింగ్ అనుభవం.',
     'ok': 'సరే',
     'authWelcomeBack': 'తిరిగి స్వాగతం',
     'authCreateAccount': 'ఖాతా సృష్టించండి',
@@ -473,16 +501,19 @@ class AppLocalizations {
     'settingsDarkThemeEnabled': 'డార్క్ థీమ్ చాలుస్తుంది',
     'settingsLightThemeEnabled': 'లైట్ థీమ్ చాలుస్తుంది',
     'riskQuizQ1Question': 'మార్కెట్ హెచ్చరికకు మీరు ఎలా ప్రతిస్పందిస్తారు?',
-    'riskQuizQ1Subtitle': 'ఇది రిస్క్ మార్గదర్శనను అనుగుణంగా చేయడానికి సహాయపడుతుంది.',
+    'riskQuizQ1Subtitle':
+        'ఇది రిస్క్ మార్గదర్శనను అనుగుణంగా చేయడానికి సహాయపడుతుంది.',
     'riskQuizQ1Opt1': 'నేను శాంతంగా ఉండి నా వ్యూహానికి అంటిపెట్టుకుంటాను',
     'riskQuizQ1Opt2': 'నేను కొంచెం ఉద్వేగపడతాను కానీ కొనసాగిస్తాను',
     'riskQuizQ1Opt3': 'నేను భయపడి వెంటనే నిష్క్రమించాలనుకుంటాను',
-    'riskQuizQ2Question': 'మీ పోర్ట్‌ఫోలియోలో ఎంత శాతం రిస్క్ చేయడానికి సిద్ధంగా ఉన్నారు?',
+    'riskQuizQ2Question':
+        'మీ పోర్ట్‌ఫోలియోలో ఎంత శాతం రిస్క్ చేయడానికి సిద్ధంగా ఉన్నారు?',
     'riskQuizQ2Subtitle': 'పొజిషన్ సైజ్‌లను సూచించడానికి ఉపయోగిస్తాము.',
     'riskQuizQ2Opt1': '5% కంటే తక్కువ',
     'riskQuizQ2Opt2': '5-15%',
     'riskQuizQ2Opt3': '15% కంటే ఎక్కువ',
-    'riskQuizQ3Question': 'మీరు మీ ట్రేడ్‌లను ఎంతకాలం పట్టుకోవాలని ప్లాన్ చేస్తున్నారు?',
+    'riskQuizQ3Question':
+        'మీరు మీ ట్రేడ్‌లను ఎంతకాలం పట్టుకోవాలని ప్లాన్ చేస్తున్నారు?',
     'riskQuizQ3Subtitle': 'అనువైన వ్యూహాలను సిఫార్సు చేయడానికి సహాయపడుతుంది.',
     'riskQuizQ3Opt1': 'దీర్ఘకాలం (నెలలు/సంవత్సరాలు)',
     'riskQuizQ3Opt2': 'మధ్యకాలం (వారాలు)',
@@ -497,9 +528,12 @@ class AppLocalizations {
     'riskQuizQ5Opt1': 'నేను దీన్ని ట్రేడింగ్ భాగంగా అంగీకరిస్తాను',
     'riskQuizQ5Opt2': 'నేను సమీక్షించి నేర్చుకుంటాను',
     'riskQuizQ5Opt3': 'నేను భావోద్వేగంతో ప్రేరేపిత నిర్ణయాలు తీసుకుంటాను',
-    'riskDescLow': 'మీరు తక్కువ రిస్క్‌తో రూఢివాద వ్యూహాలను ప్రాధాన్యత ఇస్తారు. సురక్షిత ట్రేడింగ్ సూచిస్తాము.',
-    'riskDescMedium': 'మీరు సమతుల్య రిస్క్‌తో సౌకర్యంగా ఉన్నారు. వ్యూహాల మిశ్రమం ఇస్తాము.',
-    'riskDescHigh': 'సంభావ్య రాబడుల కోసం అధిక రిస్క్ తీసుకోవడానికి సిద్ధంగా ఉన్నారు. అధునాతన వ్యూహాలు చూపిస్తాము.',
+    'riskDescLow':
+        'మీరు తక్కువ రిస్క్‌తో రూఢివాద వ్యూహాలను ప్రాధాన్యత ఇస్తారు. సురక్షిత ట్రేడింగ్ సూచిస్తాము.',
+    'riskDescMedium':
+        'మీరు సమతుల్య రిస్క్‌తో సౌకర్యంగా ఉన్నారు. వ్యూహాల మిశ్రమం ఇస్తాము.',
+    'riskDescHigh':
+        'సంభావ్య రాబడుల కోసం అధిక రిస్క్ తీసుకోవడానికి సిద్ధంగా ఉన్నారు. అధునాతన వ్యూహాలు చూపిస్తాము.',
     'homeHubFinancial': 'ఫైనాన్షియల్ హబ్',
     'homeHubConvenient': 'కన్వీనియంట్ హబ్',
     'homeHubService': 'సర్వీస్ హబ్',
@@ -538,7 +572,8 @@ class AppLocalizations {
     'wealthTopGainers': 'టాప్ గెయినర్స్',
     'wealthSeeAll': 'అన్నీ చూడండి',
     'wealthEarnApr': '5% APR వరకు సంపాదించండి',
-    'wealthEarnRewardsDesc': 'మీ బ్యాలెన్స్‌పై రివార్డ్లు ఎలా సంపాదించాలో తెలుసుకోండి',
+    'wealthEarnRewardsDesc':
+        'మీ బ్యాలెన్స్‌పై రివార్డ్లు ఎలా సంపాదించాలో తెలుసుకోండి',
     'wealthLatestNews': 'తాజా వార్తలు',
     'wealthNavHome': 'హోమ్',
     'wealthNavMarket': 'మార్కెట్',
@@ -549,7 +584,8 @@ class AppLocalizations {
 
   static const Map<String, String> _ta = {
     'appName': 'Marg',
-    'appTagline': 'நம்பிக்கையுடன் வர்த்தகம், வழிகாட்டுதலுடன் கற்றுக்கொள்ளுங்கள்',
+    'appTagline':
+        'நம்பிக்கையுடன் வர்த்தகம், வழிகாட்டுதலுடன் கற்றுக்கொள்ளுங்கள்',
     'onboardingWelcome': 'Marg க்கு வரவேற்கிறோம்',
     'onboardingSubtitle': 'உங்கள் நம்பகமான வர்த்தக துணை',
     'languageEnglish': 'ஆங்கிலம்',
@@ -598,9 +634,11 @@ class AppLocalizations {
     'selectLanguage': 'உங்கள் மொழியை தேர்ந்தெடுக்கவும்',
     'changeLanguageLater': 'பின்னர் அமைப்புகளில் மாற்றலாம்.',
     'whyAreYouHere': 'நீங்கள் ஏன் இங்கே இருக்கிறீர்கள்?',
-    'personalizeExperience': 'உங்கள் இலக்கு அடிப்படையில் அனுபவத்தை தனிப்பயனாக்குவோம். பின்னர் மாற்றலாம்.',
+    'personalizeExperience':
+        'உங்கள் இலக்கு அடிப்படையில் அனுபவத்தை தனிப்பயனாக்குவோம். பின்னர் மாற்றலாம்.',
     'howExperienced': 'உங்களுக்கு எவ்வளவு அனுபவம் உள்ளது?',
-    'experienceGuidance': 'சரியான வழிகாட்டுதலை தர இது உதவும். பின்னர் அமைப்புகளில் மாற்றலாம்.',
+    'experienceGuidance':
+        'சரியான வழிகாட்டுதலை தர இது உதவும். பின்னர் அமைப்புகளில் மாற்றலாம்.',
     'chooseTradingMode': 'உங்கள் வர்த்தக மோட் தேர்ந்தெடுக்கவும்',
     'switchLaterSettings': 'பின்னர் அமைப்புகளில் மாற்றலாம்.',
     'next': 'அடுத்தது',
@@ -626,10 +664,12 @@ class AppLocalizations {
     'settingsVersionSubtitle': 'பதிப்பு 1.0.0',
     'languageChangedTo': 'மொழி %s ஆக மாற்றப்பட்டது',
     'resetOnboardingTitle': 'ஓன்போர்டிங் மீட்டமை',
-    'resetOnboardingMessage': 'இது உங்கள் ஓன்போர்டிங் விருப்பங்களை மீட்டமைக்கும். ஓன்போர்டிங் ஓட்டத்தை மீண்டும் செய்ய வேண்டும்.',
+    'resetOnboardingMessage':
+        'இது உங்கள் ஓன்போர்டிங் விருப்பங்களை மீட்டமைக்கும். ஓன்போர்டிங் ஓட்டத்தை மீண்டும் செய்ய வேண்டும்.',
     'cancel': 'ரத்து',
     'reset': 'மீட்டமை',
-    'onboardingResetDone': 'ஓன்போர்டிங் மீட்டமைக்கப்பட்டது. அப்ளிகேஷனை மீண்டும் தொடங்கவும்.',
+    'onboardingResetDone':
+        'ஓன்போர்டிங் மீட்டமைக்கப்பட்டது. அப்ளிகேஷனை மீண்டும் தொடங்கவும்.',
     'appInfoTitle': 'ஆப் தகவல்',
     'appInfoDescription': 'வழிகாட்டப்பட்ட, தொடக்கநிலை-நட்பு வர்த்தக அனுபவம்.',
     'ok': 'சரி',
@@ -639,17 +679,21 @@ class AppLocalizations {
     'authSignInToContinue': 'தொடர உள்நுழையுங்கள்',
     'settingsDarkThemeEnabled': 'டார்க் தீம் இயக்கப்பட்டது',
     'settingsLightThemeEnabled': 'லைட் தீம் இயக்கப்பட்டது',
-    'riskQuizQ1Question': 'சந்தை ஏற்ற இறக்கங்களுக்கு நீங்கள் எவ்வாறு வினைபுரிகிறீர்கள்?',
+    'riskQuizQ1Question':
+        'சந்தை ஏற்ற இறக்கங்களுக்கு நீங்கள் எவ்வாறு வினைபுரிகிறீர்கள்?',
     'riskQuizQ1Subtitle': 'இது ஆபத்து வழிகாட்டுதலை தனிப்பயனாக்க உதவுகிறது.',
     'riskQuizQ1Opt1': 'நான் அமைதியாக இருந்து என் மூலோபாயத்தை பின்பற்றுகிறேன்',
     'riskQuizQ1Opt2': 'சற்று பதட்டமாக இருந்தாலும் தொடர்கிறேன்',
     'riskQuizQ1Opt3': 'பயந்து உடனடியாக வெளியேற விரும்புகிறேன்',
-    'riskQuizQ2Question': 'உங்கள் போர்ட்ஃபோலியோவின் எத்தனை சதவீதத்தை ஆபத்தில் ஈடுபடுத்த தயாராக உள்ளீர்கள்?',
-    'riskQuizQ2Subtitle': 'போசிஷன் அளவுகளை பரிந்துரைக்க இதைப் பயன்படுத்துகிறோம்.',
+    'riskQuizQ2Question':
+        'உங்கள் போர்ட்ஃபோலியோவின் எத்தனை சதவீதத்தை ஆபத்தில் ஈடுபடுத்த தயாராக உள்ளீர்கள்?',
+    'riskQuizQ2Subtitle':
+        'போசிஷன் அளவுகளை பரிந்துரைக்க இதைப் பயன்படுத்துகிறோம்.',
     'riskQuizQ2Opt1': '5% க்கும் குறைவு',
     'riskQuizQ2Opt2': '5-15%',
     'riskQuizQ2Opt3': '15% க்கும் அதிகம்',
-    'riskQuizQ3Question': 'உங்கள் வர்த்தகங்களை எத்தனை காலம் வைத்திருக்க திட்டமிடுகிறீர்கள்?',
+    'riskQuizQ3Question':
+        'உங்கள் வர்த்தகங்களை எத்தனை காலம் வைத்திருக்க திட்டமிடுகிறீர்கள்?',
     'riskQuizQ3Subtitle': 'பொருத்தமான மூலோபாயங்களை பரிந்துரைக்க உதவுகிறது.',
     'riskQuizQ3Opt1': 'நீண்ட காலம் (மாதங்கள்/ஆண்டுகள்)',
     'riskQuizQ3Opt2': 'நடுத்தர காலம் (வாரங்கள்)',
@@ -660,13 +704,17 @@ class AppLocalizations {
     'riskQuizQ4Opt2': 'சமநிலை வளர்ச்சி மற்றும் ஆபத்து',
     'riskQuizQ4Opt3': 'அதிகபட்ச வருமானம், அதிக ஆபத்து',
     'riskQuizQ5Question': 'நட்டங்களை எவ்வாறு சமாளிக்கிறீர்கள்?',
-    'riskQuizQ5Subtitle': 'இதைப் புரிந்துகொள்வது எங்கள் வழிகாட்டுதலை மேம்படுத்துகிறது.',
+    'riskQuizQ5Subtitle':
+        'இதைப் புரிந்துகொள்வது எங்கள் வழிகாட்டுதலை மேம்படுத்துகிறது.',
     'riskQuizQ5Opt1': 'வர்த்தகத்தின் ஒரு பகுதியாக ஏற்றுக்கொள்கிறேன்',
     'riskQuizQ5Opt2': 'சோதனை செய்து கற்றுக்கொள்கிறேன்',
     'riskQuizQ5Opt3': 'உணர்வுபூர்வமாக இருந்து திடீர் முடிவுகள் எடுக்கிறேன்',
-    'riskDescLow': 'குறைந்த ஆபத்துள்ள பழமைவாத மூலோபாயங்களை விரும்புகிறீர்கள். பாதுகாப்பான வர்த்தக அணுகுமுறைகளை பரிந்துரைப்போம்.',
-    'riskDescMedium': 'சமநிலை ஆபத்தில் வசதியாக உள்ளீர்கள். மூலோபாயங்களின் கலவையை வழங்குவோம்.',
-    'riskDescHigh': 'சாத்தியமான வருமானத்திற்காக அதிக ஆபத்து எடுக்க தயாராக உள்ளீர்கள். மேம்பட்ட மூலோபாயங்களை காண்பிப்போம்.',
+    'riskDescLow':
+        'குறைந்த ஆபத்துள்ள பழமைவாத மூலோபாயங்களை விரும்புகிறீர்கள். பாதுகாப்பான வர்த்தக அணுகுமுறைகளை பரிந்துரைப்போம்.',
+    'riskDescMedium':
+        'சமநிலை ஆபத்தில் வசதியாக உள்ளீர்கள். மூலோபாயங்களின் கலவையை வழங்குவோம்.',
+    'riskDescHigh':
+        'சாத்தியமான வருமானத்திற்காக அதிக ஆபத்து எடுக்க தயாராக உள்ளீர்கள். மேம்பட்ட மூலோபாயங்களை காண்பிப்போம்.',
     'homeHubFinancial': 'நிதி மையம்',
     'homeHubConvenient': 'வசதி மையம்',
     'homeHubService': 'சேவை மையம்',
@@ -705,7 +753,8 @@ class AppLocalizations {
     'wealthTopGainers': 'சிறந்த லாபம்',
     'wealthSeeAll': 'அனைத்தையும் பார்',
     'wealthEarnApr': '5% APR வரை சம்பாதிக்கவும்',
-    'wealthEarnRewardsDesc': 'உங்கள் இருப்பில் வெகுமதிகள் எவ்வாறு சம்பாதிப்பது என அறிக',
+    'wealthEarnRewardsDesc':
+        'உங்கள் இருப்பில் வெகுமதிகள் எவ்வாறு சம்பாதிப்பது என அறிக',
     'wealthLatestNews': 'சமீபத்திய செய்திகள்',
     'wealthNavHome': 'முகப்பு',
     'wealthNavMarket': 'சந்தை',
@@ -766,9 +815,11 @@ class AppLocalizations {
     'selectLanguage': 'ನಿಮ್ಮ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ',
     'changeLanguageLater': 'ನೀವು ನಂತರ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಬದಲಾಯಿಸಬಹುದು',
     'whyAreYouHere': 'ನೀವು ಇಲ್ಲಿ ಏಕೆ ಇದ್ದೀರಿ?',
-    'personalizeExperience': 'ನಿಮ್ಮ ಗುರಿಯ ಪ್ರಕಾರ ಅನುಭವವನ್ನು ವೈಯಕ್ತೀಕರಿಸುತ್ತೇವೆ. ನಂತರ ಬದಲಾಯಿಸಬಹುದು.',
+    'personalizeExperience':
+        'ನಿಮ್ಮ ಗುರಿಯ ಪ್ರಕಾರ ಅನುಭವವನ್ನು ವೈಯಕ್ತೀಕರಿಸುತ್ತೇವೆ. ನಂತರ ಬದಲಾಯಿಸಬಹುದು.',
     'howExperienced': 'ನಿಮಗೆ ಎಷ್ಟು ಅನುಭವ ಉಂಟು?',
-    'experienceGuidance': 'ಸರಿಯಾದ ಮಾರ್ಗದರ್ಶನ ನೀಡಲು ಇದು ಸಹಾಯ ಮಾಡುತ್ತದೆ. ನಂತರ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಬದಲಾಯಿಸಬಹುದು.',
+    'experienceGuidance':
+        'ಸರಿಯಾದ ಮಾರ್ಗದರ್ಶನ ನೀಡಲು ಇದು ಸಹಾಯ ಮಾಡುತ್ತದೆ. ನಂತರ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಬದಲಾಯಿಸಬಹುದು.',
     'chooseTradingMode': 'ನಿಮ್ಮ ಟ್ರೇಡಿಂಗ್ ಮೋಡ್ ಆಯ್ಕೆಮಾಡಿ',
     'switchLaterSettings': 'ನೀವು ನಂತರ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಬದಲಾಯಿಸಬಹುದು.',
     'next': 'ಮುಂದೆ',
@@ -794,10 +845,12 @@ class AppLocalizations {
     'settingsVersionSubtitle': 'ಆವೃತ್ತಿ 1.0.0',
     'languageChangedTo': 'ಭಾಷೆ %s ಗೆ ಬದಲಾಯಿಸಲಾಗಿದೆ',
     'resetOnboardingTitle': 'ಓನ್‌ಬೋರ್ಡಿಂಗ್ ರೀಸೆಟ್ ಮಾಡಿ',
-    'resetOnboardingMessage': 'ಇದು ನಿಮ್ಮ ಓನ್‌ಬೋರ್ಡಿಂಗ್ ಆದ್ಯತೆಗಳನ್ನು ರೀಸೆಟ್ ಮಾಡುತ್ತದೆ. ಓನ್‌ಬೋರ್ಡಿಂಗ್ ಹರಿವನ್ನು ಮತ್ತೆ ಮಾಡಬೇಕಾಗುತ್ತದೆ.',
+    'resetOnboardingMessage':
+        'ಇದು ನಿಮ್ಮ ಓನ್‌ಬೋರ್ಡಿಂಗ್ ಆದ್ಯತೆಗಳನ್ನು ರೀಸೆಟ್ ಮಾಡುತ್ತದೆ. ಓನ್‌ಬೋರ್ಡಿಂಗ್ ಹರಿವನ್ನು ಮತ್ತೆ ಮಾಡಬೇಕಾಗುತ್ತದೆ.',
     'cancel': 'ರದ್ದುಮಾಡಿ',
     'reset': 'ರೀಸೆಟ್',
-    'onboardingResetDone': 'ಓನ್‌ಬೋರ್ಡಿಂಗ್ ರೀಸೆಟ್ ಆಯಿತು. ದಯವಿಟ್ಟು ಅಪ್ಲಿಕೇಶನ್ ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ.',
+    'onboardingResetDone':
+        'ಓನ್‌ಬೋರ್ಡಿಂಗ್ ರೀಸೆಟ್ ಆಯಿತು. ದಯವಿಟ್ಟು ಅಪ್ಲಿಕೇಶನ್ ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ.',
     'appInfoTitle': 'ಆ್ಯಪ್ ಮಾಹಿತಿ',
     'appInfoDescription': 'ಮಾರ್ಗದರ್ಶಿತ, ಆರಂಭಿಕ-ಸ್ನೇಹಿ ಟ್ರೇಡಿಂಗ್ ಅನುಭವ.',
     'ok': 'ಸರಿ',
@@ -812,29 +865,36 @@ class AppLocalizations {
     'riskQuizQ1Opt1': 'ನಾನು ಶಾಂತವಾಗಿ ಉಳಿದು ನನ್ನ ತಂತ್ರವನ್ನು ಅನುಸರಿಸುತ್ತೇನೆ',
     'riskQuizQ1Opt2': 'ನಾನು ಸ್ವಲ್ಪ ಉದ್ವಿಗ್ನನಾಗುತ್ತೇನೆ ಆದರೆ ಮುಂದುವರಿಯುತ್ತೇನೆ',
     'riskQuizQ1Opt3': 'ನಾನು ಭಯಗೊಂಡು ತಕ್ಷಣ ನಿರ್ಗಮಿಸಲು ಬಯಸುತ್ತೇನೆ',
-    'riskQuizQ2Question': 'ನಿಮ್ಮ ಪೋರ್ಟ್‌ಫೋಲಿಯೋದ ಎಷ್ಟು ಶೇಕಡಾ ರಿಸ್ಕ್ ಮಾಡಲು ಸಿದ್ಧರಿದ್ದೀರಿ?',
+    'riskQuizQ2Question':
+        'ನಿಮ್ಮ ಪೋರ್ಟ್‌ಫೋಲಿಯೋದ ಎಷ್ಟು ಶೇಕಡಾ ರಿಸ್ಕ್ ಮಾಡಲು ಸಿದ್ಧರಿದ್ದೀರಿ?',
     'riskQuizQ2Subtitle': 'ಸ್ಥಾನ ಗಾತ್ರಗಳನ್ನು ಸೂಚಿಸಲು ಇದನ್ನು ಬಳಸುತ್ತೇವೆ.',
     'riskQuizQ2Opt1': '5% ಕ್ಕಿಂತ ಕಡಿಮೆ',
     'riskQuizQ2Opt2': '5-15%',
     'riskQuizQ2Opt3': '15% ಕ್ಕಿಂತ ಹೆಚ್ಚು',
-    'riskQuizQ3Question': 'ನಿಮ್ಮ ಟ್ರೇಡ್‌ಗಳನ್ನು ಎಷ್ಟು ಕಾಲ ಹಿಡಿದಿಡಲು ಯೋಜಿಸುತ್ತೀರಿ?',
+    'riskQuizQ3Question':
+        'ನಿಮ್ಮ ಟ್ರೇಡ್‌ಗಳನ್ನು ಎಷ್ಟು ಕಾಲ ಹಿಡಿದಿಡಲು ಯೋಜಿಸುತ್ತೀರಿ?',
     'riskQuizQ3Subtitle': 'ಸೂಕ್ತ ತಂತ್ರಗಳನ್ನು ಶಿಫಾರಸು ಮಾಡಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ.',
     'riskQuizQ3Opt1': 'ದೀರ್ಘಾವಧಿ (ತಿಂಗಳು/ವರ್ಷಗಳು)',
     'riskQuizQ3Opt2': 'ಮಧ್ಯಮಾವಧಿ (ವಾರಗಳು)',
     'riskQuizQ3Opt3': 'ಷಾರ್ಟ್-ಟರ್ಮ್ (ದಿನಗಳು)',
     'riskQuizQ4Question': 'ನಿಮ್ಮ ಪ್ರಾಥಮಿಕ ಟ್ರೇಡಿಂಗ್ ಲಕ್ಷ್ಯ ಏನು?',
-    'riskQuizQ4Subtitle': 'ನಿಮ್ಮ ಲಕ್ಷ್ಯಕ್ಕೆ ಅನುಗುಣವಾಗಿ ಸೂಚನೆಗಳನ್ನು ಜೋಡಿಸುತ್ತೇವೆ.',
+    'riskQuizQ4Subtitle':
+        'ನಿಮ್ಮ ಲಕ್ಷ್ಯಕ್ಕೆ ಅನುಗುಣವಾಗಿ ಸೂಚನೆಗಳನ್ನು ಜೋಡಿಸುತ್ತೇವೆ.',
     'riskQuizQ4Opt1': 'ಕಡಿಮೆ ರಿಸ್ಕ್‌ನೊಂದಿಗೆ ಸ್ಥಿರ ಬೆಳವಣಿಗೆ',
     'riskQuizQ4Opt2': 'ಸಮತೋಲನ ಬೆಳವಣಿಗೆ ಮತ್ತು ರಿಸ್ಕ್',
     'riskQuizQ4Opt3': 'ಗರಿಷ್ಠ ರಿಟರ್ನ್‌ಗಳು, ಉನ್ನತ ರಿಸ್ಕ್',
     'riskQuizQ5Question': 'ನಷ್ಟಗಳನ್ನು ಹೇಗೆ ನಿರ್ವಹಿಸುತ್ತೀರಿ?',
-    'riskQuizQ5Subtitle': 'ಇದನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು ನಮ್ಮ ಮಾರ್ಗದರ್ಶನವನ್ನು ಸುಧಾರಿಸುತ್ತದೆ.',
+    'riskQuizQ5Subtitle':
+        'ಇದನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು ನಮ್ಮ ಮಾರ್ಗದರ್ಶನವನ್ನು ಸುಧಾರಿಸುತ್ತದೆ.',
     'riskQuizQ5Opt1': 'ನಾನು ಇದನ್ನು ಟ್ರೇಡಿಂಗ್ ಭಾಗವಾಗಿ ಒಪ್ಪಿಕೊಳ್ಳುತ್ತೇನೆ',
     'riskQuizQ5Opt2': 'ನಾನು ಸಮೀಕ್ಷಿಸಿ ಕಲಿಯುತ್ತೇನೆ',
     'riskQuizQ5Opt3': 'ನಾನು ಭಾವನಾತ್ಮಕನಾಗಿ ಆವೇಗ ನಿರ್ಣಯಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳುತ್ತೇನೆ',
-    'riskDescLow': 'ನೀವು ಕಡಿಮೆ ರಿಸ್ಕ್‌ನೊಂದಿಗೆ ಸಾಂಪ್ರದಾಯಿಕ ತಂತ್ರಗಳನ್ನು ಆದ್ಯತೆ ನೀಡುತ್ತೀರಿ. ಸುರಕ್ಷಿತ ಟ್ರೇಡಿಂಗ್ ವಿಧಾನಗಳನ್ನು ಸೂಚಿಸುತ್ತೇವೆ.',
-    'riskDescMedium': 'ನೀವು ಸಮತೋಲನ ರಿಸ್ಕ್‌ನೊಂದಿಗೆ ಸೌಕರ್ಯವಾಗಿದ್ದೀರಿ. ತಂತ್ರಗಳ ಮಿಶ್ರಣವನ್ನು ನೀಡುತ್ತೇವೆ.',
-    'riskDescHigh': 'ಸಂಭಾವ್ಯ ರಿಟರ್ನ್‌ಗಳಿಗಾಗಿ ಉನ್ನತ ರಿಸ್ಕ್ ತೆಗೆದುಕೊಳ್ಳಲು ಸಿದ್ಧರಿದ್ದೀರಿ. ಮುಂದುವರಿದ ತಂತ್ರಗಳನ್ನು ತೋರಿಸುತ್ತೇವೆ.',
+    'riskDescLow':
+        'ನೀವು ಕಡಿಮೆ ರಿಸ್ಕ್‌ನೊಂದಿಗೆ ಸಾಂಪ್ರದಾಯಿಕ ತಂತ್ರಗಳನ್ನು ಆದ್ಯತೆ ನೀಡುತ್ತೀರಿ. ಸುರಕ್ಷಿತ ಟ್ರೇಡಿಂಗ್ ವಿಧಾನಗಳನ್ನು ಸೂಚಿಸುತ್ತೇವೆ.',
+    'riskDescMedium':
+        'ನೀವು ಸಮತೋಲನ ರಿಸ್ಕ್‌ನೊಂದಿಗೆ ಸೌಕರ್ಯವಾಗಿದ್ದೀರಿ. ತಂತ್ರಗಳ ಮಿಶ್ರಣವನ್ನು ನೀಡುತ್ತೇವೆ.',
+    'riskDescHigh':
+        'ಸಂಭಾವ್ಯ ರಿಟರ್ನ್‌ಗಳಿಗಾಗಿ ಉನ್ನತ ರಿಸ್ಕ್ ತೆಗೆದುಕೊಳ್ಳಲು ಸಿದ್ಧರಿದ್ದೀರಿ. ಮುಂದುವರಿದ ತಂತ್ರಗಳನ್ನು ತೋರಿಸುತ್ತೇವೆ.',
     'homeHubFinancial': 'ಫೈನಾನ್ಷಿಯಲ್ ಹಬ್',
     'homeHubConvenient': 'ಕನ್ವೀನಿಯಂಟ್ ಹಬ್',
     'homeHubService': 'ಸರ್ವೀಸ್ ಹಬ್',
@@ -873,7 +933,8 @@ class AppLocalizations {
     'wealthTopGainers': 'ಟಾಪ್ ಗೇನರ್ಸ್',
     'wealthSeeAll': 'ಎಲ್ಲಾ ನೋಡಿ',
     'wealthEarnApr': '5% APR ವರೆಗೆ ಸಂಪಾದಿಸಿ',
-    'wealthEarnRewardsDesc': 'ನಿಮ್ಮ ಬ್ಯಾಲೆನ್ಸ್‌ನಲ್ಲಿ ರಿವಾರ್ಡ್ಸ್ ಹೇಗೆ ಸಂಪಾದಿಸಬೇಕು ತಿಳಿಯಿರಿ',
+    'wealthEarnRewardsDesc':
+        'ನಿಮ್ಮ ಬ್ಯಾಲೆನ್ಸ್‌ನಲ್ಲಿ ರಿವಾರ್ಡ್ಸ್ ಹೇಗೆ ಸಂಪಾದಿಸಬೇಕು ತಿಳಿಯಿರಿ',
     'wealthLatestNews': 'ಇತ್ತೀಚಿನ ಸುದ್ದಿಗಳು',
     'wealthNavHome': 'ಹೋಮ್',
     'wealthNavMarket': 'ಮಾರ್ಕೆಟ್',
@@ -934,9 +995,11 @@ class AppLocalizations {
     'selectLanguage': 'तुमची भाषा निवडा',
     'changeLanguageLater': 'तुम्ही नंतर सेटिंग्जमध्ये बदलू शकता',
     'whyAreYouHere': 'तुम्ही येथे का आहात?',
-    'personalizeExperience': 'तुमच्या उद्देशानुसार अनुभव पसंतीनुसार देऊ. नंतर बदलू शकता.',
+    'personalizeExperience':
+        'तुमच्या उद्देशानुसार अनुभव पसंतीनुसार देऊ. नंतर बदलू शकता.',
     'howExperienced': 'तुम्हाला किती अनुभव आहे?',
-    'experienceGuidance': 'योग्य मार्गदर्शन देण्यात हे मदत करते. नंतर सेटिंग्जमध्ये बदलू शकता.',
+    'experienceGuidance':
+        'योग्य मार्गदर्शन देण्यात हे मदत करते. नंतर सेटिंग्जमध्ये बदलू शकता.',
     'chooseTradingMode': 'तुमचा ट्रेडिंग मोड निवडा',
     'switchLaterSettings': 'तुम्ही नंतर सेटिंग्जमध्ये बदलू शकता.',
     'next': 'पुढे',
@@ -962,7 +1025,8 @@ class AppLocalizations {
     'settingsVersionSubtitle': 'आवृत्ती 1.0.0',
     'languageChangedTo': 'भाषा %s मध्ये बदलली',
     'resetOnboardingTitle': 'ऑनबोर्डिंग रीसेट करा',
-    'resetOnboardingMessage': 'यामुळे तुमच्या ऑनबोर्डिंग प्राधान्यांना रीसेट होईल. ऑनबोर्डिंग प्रवाह पुन्हा करावा लागेल.',
+    'resetOnboardingMessage':
+        'यामुळे तुमच्या ऑनबोर्डिंग प्राधान्यांना रीसेट होईल. ऑनबोर्डिंग प्रवाह पुन्हा करावा लागेल.',
     'cancel': 'रद्द',
     'reset': 'रीसेट',
     'onboardingResetDone': 'ऑनबोर्डिंग रीसेट झाली. कृपया अॅप पुन्हा सुरू करा.',
@@ -980,7 +1044,8 @@ class AppLocalizations {
     'riskQuizQ1Opt1': 'मी शांत राहून माझ्या स्ट्रॅटेजीवर टिकून राहतो',
     'riskQuizQ1Opt2': 'मला थोडी चिंता वाटते पण मी सुरू ठेवतो',
     'riskQuizQ1Opt3': 'मी घाबरून लगेच बाहेर पडू इच्छितो',
-    'riskQuizQ2Question': 'तुमच्या पोर्टफोलिओच्या किती टक्के रिस्क घेण्यास तयार आहात?',
+    'riskQuizQ2Question':
+        'तुमच्या पोर्टफोलिओच्या किती टक्के रिस्क घेण्यास तयार आहात?',
     'riskQuizQ2Subtitle': 'पोझिशन साइझ सुचवण्यासाठी वापरतो.',
     'riskQuizQ2Opt1': '५% पेक्षा कमी',
     'riskQuizQ2Opt2': '५-१५%',
@@ -1000,9 +1065,12 @@ class AppLocalizations {
     'riskQuizQ5Opt1': 'मी ते ट्रेडिंगचा भाग मानतो',
     'riskQuizQ5Opt2': 'मी समीक्षा करून शिकतो',
     'riskQuizQ5Opt3': 'मी भावनिक होऊन आवेगात निर्णय घेतो',
-    'riskDescLow': 'तुम्ही कमी रिस्कसह रूढीवादी स्ट्रॅटेजी पसंत करता. सुरक्षित ट्रेडिंग सुचवू.',
-    'riskDescMedium': 'तुम्हाला संतुलित रिस्कसह सोयीस्कर वाटते. स्ट्रॅटेजीचे मिश्रण देऊ.',
-    'riskDescHigh': 'संभाव्य परताव्यासाठी उच्च रिस्क घेण्यास तयार आहात. प्रगत स्ट्रॅटेजी दाखवू.',
+    'riskDescLow':
+        'तुम्ही कमी रिस्कसह रूढीवादी स्ट्रॅटेजी पसंत करता. सुरक्षित ट्रेडिंग सुचवू.',
+    'riskDescMedium':
+        'तुम्हाला संतुलित रिस्कसह सोयीस्कर वाटते. स्ट्रॅटेजीचे मिश्रण देऊ.',
+    'riskDescHigh':
+        'संभाव्य परताव्यासाठी उच्च रिस्क घेण्यास तयार आहात. प्रगत स्ट्रॅटेजी दाखवू.',
     'homeHubFinancial': 'फायनान्शियल हब',
     'homeHubConvenient': 'कन्व्हीनियंट हब',
     'homeHubService': 'सर्विस हब',
@@ -1102,9 +1170,11 @@ class AppLocalizations {
     'selectLanguage': 'તમારી ભાષા પસંદ કરો',
     'changeLanguageLater': 'તમે પછી સેટિંગ્સમાં બદલી શકો છો',
     'whyAreYouHere': 'તમે અહીં શા માટે છો?',
-    'personalizeExperience': 'તમારા લક્ષ્ય મુજબ અનુભવ પસંદગીનુસાર આપશું. પછી બદલી શકાશે.',
+    'personalizeExperience':
+        'તમારા લક્ષ્ય મુજબ અનુભવ પસંદગીનુસાર આપશું. પછી બદલી શકાશે.',
     'howExperienced': 'તમને કેટલો અનુભવ છે?',
-    'experienceGuidance': 'યોગ્ય માર્ગદર્શન આપવામાં મદદ કરે છે. પછી સેટિંગ્સમાં બદલી શકાશે.',
+    'experienceGuidance':
+        'યોગ્ય માર્ગદર્શન આપવામાં મદદ કરે છે. પછી સેટિંગ્સમાં બદલી શકાશે.',
     'chooseTradingMode': 'તમારો ટ્રેડિંગ મોડ પસંદ કરો',
     'switchLaterSettings': 'તમે પછી સેટિંગ્સમાં બદલી શકો છો.',
     'next': 'આગળ',
@@ -1130,7 +1200,8 @@ class AppLocalizations {
     'settingsVersionSubtitle': 'સંસ્કરણ 1.0.0',
     'languageChangedTo': 'ભાષા %s માં બદલાઈ ગઈ',
     'resetOnboardingTitle': 'ઓનબોર્ડિંગ રીસેટ કરો',
-    'resetOnboardingMessage': 'આ તમારી ઓનબોર્ડિંગ પસંદગીઓ રીસેટ કરશે. ઓનબોર્ડિંગ ફ્લો ફરી કરવો પડશે.',
+    'resetOnboardingMessage':
+        'આ તમારી ઓનબોર્ડિંગ પસંદગીઓ રીસેટ કરશે. ઓનબોર્ડિંગ ફ્લો ફરી કરવો પડશે.',
     'cancel': 'રદ કરો',
     'reset': 'રીસેટ',
     'onboardingResetDone': 'ઓનબોર્ડિંગ રીસેટ થયું. કૃપા કરીને એપ ફરી શરૂ કરો.',
@@ -1143,17 +1214,20 @@ class AppLocalizations {
     'authSignInToContinue': 'ચાલુ રાખવા સાઇન ઇન કરો',
     'settingsDarkThemeEnabled': 'ડાર્ક થીમ સક્ષમ',
     'settingsLightThemeEnabled': 'લાઇટ થીમ સક્ષમ',
-    'riskQuizQ1Question': 'બજારની ચડતી-ઉતરતી સ્થિતિ પર તમે કેવી પ્રતિક્રિયા આપો છો?',
+    'riskQuizQ1Question':
+        'બજારની ચડતી-ઉતરતી સ્થિતિ પર તમે કેવી પ્રતિક્રિયા આપો છો?',
     'riskQuizQ1Subtitle': 'આ રિસ્ક માર્ગદર્શનને અનુકૂળ કરવામાં મદદ કરે છે.',
     'riskQuizQ1Opt1': 'હું શાંત રહું છું અને મારી વ્યૂહરચનાને અટકી રહું છું',
     'riskQuizQ1Opt2': 'હું થોડો ચિંતિત થાઉં છું પણ ચાલુ રાખું છું',
     'riskQuizQ1Opt3': 'હું ગભરાઈ જાઉં છું અને તરત બહાર નીકળવા માંગું છું',
-    'riskQuizQ2Question': 'તમારા પોર્ટફોલિયોનું કેટલું ટકા રિસ્ક લેવા તૈયાર છો?',
+    'riskQuizQ2Question':
+        'તમારા પોર્ટફોલિયોનું કેટલું ટકા રિસ્ક લેવા તૈયાર છો?',
     'riskQuizQ2Subtitle': 'પોઝિશન સાઇઝ સૂચવવા આનો ઉપયોગ કરીએ છીએ.',
     'riskQuizQ2Opt1': '5% કરતા ઓછું',
     'riskQuizQ2Opt2': '5-15%',
     'riskQuizQ2Opt3': '15% કરતા વધુ',
-    'riskQuizQ3Question': 'તમે તમારા ટ્રેડ કેટલા સમય સુધી રાખવાની યોજના બનાવો છો?',
+    'riskQuizQ3Question':
+        'તમે તમારા ટ્રેડ કેટલા સમય સુધી રાખવાની યોજના બનાવો છો?',
     'riskQuizQ3Subtitle': 'યોગ્ય વ્યૂહરચનાઓ ભલામણ કરવામાં મદદ કરે છે.',
     'riskQuizQ3Opt1': 'લાંબી અવધિ (મહિના/વર્ષો)',
     'riskQuizQ3Opt2': 'મધ્યમ અવધિ (અઠવાડિયા)',
@@ -1168,9 +1242,12 @@ class AppLocalizations {
     'riskQuizQ5Opt1': 'હું તેને ટ્રેડિંગનો ભાગ માનું છું',
     'riskQuizQ5Opt2': 'હું સમીક્ષા કરીને શીખું છું',
     'riskQuizQ5Opt3': 'હું ભાવનાત્મક થઈ આવેગમાં નિર્ણય લઉં છું',
-    'riskDescLow': 'તમે ઓછા રિસ્ક સાથે રૂઢિચુસ્ત વ્યૂહરચનાઓ પસંદ કરો છો. સુરક્ષિત ટ્રેડિંગ સૂચવીશું.',
-    'riskDescMedium': 'તમે સંતુલિત રિસ્ક સાથે સગવડમંદ છો. વ્યૂહરચનાઓનું મિશ્રણ આપીશું.',
-    'riskDescHigh': 'સંભવિત રિટર્ન માટે ઉચ્ચ રિસ્ક લેવા તૈયાર છો. અદ્યતન વ્યૂહરચનાઓ દેખાડીશું.',
+    'riskDescLow':
+        'તમે ઓછા રિસ્ક સાથે રૂઢિચુસ્ત વ્યૂહરચનાઓ પસંદ કરો છો. સુરક્ષિત ટ્રેડિંગ સૂચવીશું.',
+    'riskDescMedium':
+        'તમે સંતુલિત રિસ્ક સાથે સગવડમંદ છો. વ્યૂહરચનાઓનું મિશ્રણ આપીશું.',
+    'riskDescHigh':
+        'સંભવિત રિટર્ન માટે ઉચ્ચ રિસ્ક લેવા તૈયાર છો. અદ્યતન વ્યૂહરચનાઓ દેખાડીશું.',
     'homeHubFinancial': 'ਫਾਈਨੈਂਸ਼ੀਅਲ ਹਬ',
     'homeHubConvenient': 'ਕਨਵੀਨੀਅੰਟ ਹਬ',
     'homeHubService': 'ਸਰਵਿਸ ਹਬ',
@@ -1270,9 +1347,11 @@ class AppLocalizations {
     'selectLanguage': 'ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ',
     'changeLanguageLater': 'ਤੁਸੀਂ ਬਾਅਦ ਵਿੱਚ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਬਦਲ ਸਕਦੇ ਹੋ',
     'whyAreYouHere': 'ਤੁਸੀਂ ਇੱਥੇ ਕਿਉਂ ਹੋ?',
-    'personalizeExperience': 'ਤੁਹਾਡੇ ਟੀਚੇ ਅਨੁਸਾਰ ਅਨੁਭਵ ਕਸਟਮਾਇਜ਼ ਕਰਾਂਗੇ। ਬਾਅਦ ਵਿੱਚ ਬਦਲ ਸਕਦੇ ਹੋ।',
+    'personalizeExperience':
+        'ਤੁਹਾਡੇ ਟੀਚੇ ਅਨੁਸਾਰ ਅਨੁਭਵ ਕਸਟਮਾਇਜ਼ ਕਰਾਂਗੇ। ਬਾਅਦ ਵਿੱਚ ਬਦਲ ਸਕਦੇ ਹੋ।',
     'howExperienced': 'ਤੁਹਾਨੂੰ ਕਿੰਨਾ ਅਨੁਭਵ ਹੈ?',
-    'experienceGuidance': 'ਸਹੀ ਮਾਰਗਦਰਸ਼ਨ ਦੇਣ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ। ਬਾਅਦ ਵਿੱਚ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਬਦਲ ਸਕਦੇ ਹੋ।',
+    'experienceGuidance':
+        'ਸਹੀ ਮਾਰਗਦਰਸ਼ਨ ਦੇਣ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ। ਬਾਅਦ ਵਿੱਚ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਬਦਲ ਸਕਦੇ ਹੋ।',
     'chooseTradingMode': 'ਆਪਣਾ ਟ੍ਰੇਡਿੰਗ ਮੋਡ ਚੁਣੋ',
     'switchLaterSettings': 'ਤੁਸੀਂ ਬਾਅਦ ਵਿੱਚ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਬਦਲ ਸਕਦੇ ਹੋ।',
     'next': 'ਅੱਗੇ',
@@ -1298,10 +1377,12 @@ class AppLocalizations {
     'settingsVersionSubtitle': 'ਵਰਜਨ 1.0.0',
     'languageChangedTo': 'ਭਾਸ਼ਾ %s ਵਿੱਚ ਬਦਲ ਗਈ',
     'resetOnboardingTitle': 'ਓਨਬੋਰਡਿੰਗ ਰੀਸੈੱਟ ਕਰੋ',
-    'resetOnboardingMessage': 'ਇਸ ਨਾਲ ਤੁਹਾਡੀਆਂ ਓਨਬੋਰਡਿੰਗ ਤਰਜੀਹਾਂ ਰੀਸੈੱਟ ਹੋ ਜਾਣਗੀਆਂ। ਤੁਹਾਨੂੰ ਓਨਬੋਰਡਿੰਗ ਫਲੋ ਦੁਬਾਰਾ ਕਰਨੀ ਪਏਗੀ।',
+    'resetOnboardingMessage':
+        'ਇਸ ਨਾਲ ਤੁਹਾਡੀਆਂ ਓਨਬੋਰਡਿੰਗ ਤਰਜੀਹਾਂ ਰੀਸੈੱਟ ਹੋ ਜਾਣਗੀਆਂ। ਤੁਹਾਨੂੰ ਓਨਬੋਰਡਿੰਗ ਫਲੋ ਦੁਬਾਰਾ ਕਰਨੀ ਪਏਗੀ।',
     'cancel': 'ਰੱਦ ਕਰੋ',
     'reset': 'ਰੀਸੈੱਟ',
-    'onboardingResetDone': 'ਓਨਬੋਰਡਿੰਗ ਰੀਸੈੱਟ ਹੋ ਗਈ। ਕ੍ਰਿਪਾ ਕਰਕੇ ਐਪ ਦੁਬਾਰਾ ਚਾਲੂ ਕਰੋ।',
+    'onboardingResetDone':
+        'ਓਨਬੋਰਡਿੰਗ ਰੀਸੈੱਟ ਹੋ ਗਈ। ਕ੍ਰਿਪਾ ਕਰਕੇ ਐਪ ਦੁਬਾਰਾ ਚਾਲੂ ਕਰੋ।',
     'appInfoTitle': 'ਐਪ ਜਾਣਕਾਰੀ',
     'appInfoDescription': 'ਮਾਰਗਦਰਸ਼ਿਤ, ਸ਼ੁਰੂਆਤ-ਅਨੁਕੂਲ ਟ੍ਰੇਡਿੰਗ ਅਨੁਭਵ।',
     'ok': 'ਠੀਕ',
@@ -1313,15 +1394,18 @@ class AppLocalizations {
     'settingsLightThemeEnabled': 'ਲਾਇਟ ਥੀਮ ਚਾਲੂ',
     'riskQuizQ1Question': 'ਤੁਸੀਂ ਬਾਜ਼ਾਰ ਦੀ ਉੱਚ-ਨੀਵਾਂ ਨੂੰ ਕਿਵੇਂ ਜਵਾਬ ਦਿੰਦੇ ਹੋ?',
     'riskQuizQ1Subtitle': 'ਇਹ ਰਿਸਕ ਮਾਰਗਦਰਸ਼ਨ ਨੂੰ ਢਾਲਣ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ।',
-    'riskQuizQ1Opt1': 'ਮੈਂ ਸ਼ਾਂਤ ਰਹਿੰਦਾ ਹਾਂ ਅਤੇ ਆਪਣੀ ਰਣਨੀਤੀ \'ਤੇ ਟਿਕਾ ਰਹਿੰਦਾ ਹਾਂ',
+    'riskQuizQ1Opt1':
+        'ਮੈਂ ਸ਼ਾਂਤ ਰਹਿੰਦਾ ਹਾਂ ਅਤੇ ਆਪਣੀ ਰਣਨੀਤੀ \'ਤੇ ਟਿਕਾ ਰਹਿੰਦਾ ਹਾਂ',
     'riskQuizQ1Opt2': 'ਮੈਂ ਥੋੜ੍ਹਾ ਘਬਰਾਉਂਦਾ ਹਾਂ ਪਰ ਜਾਰੀ ਰੱਖਦਾ ਹਾਂ',
     'riskQuizQ1Opt3': 'ਮੈਂ ਘਬਰਾ ਜਾਂਦਾ ਹਾਂ ਅਤੇ ਤੁਰੰਤ ਬਾਹਰ ਨਿਕਲਣਾ ਚਾਹੁੰਦਾ ਹਾਂ',
-    'riskQuizQ2Question': 'ਤੁਸੀਂ ਆਪਣੇ ਪੋਰਟਫੋਲੀਓ ਦਾ ਕਿੰਨਾ ਫੀਸਦੀ ਰਿਸਕ ਲੈਣ ਨੂੰ ਤਿਆਰ ਹੋ?',
+    'riskQuizQ2Question':
+        'ਤੁਸੀਂ ਆਪਣੇ ਪੋਰਟਫੋਲੀਓ ਦਾ ਕਿੰਨਾ ਫੀਸਦੀ ਰਿਸਕ ਲੈਣ ਨੂੰ ਤਿਆਰ ਹੋ?',
     'riskQuizQ2Subtitle': 'ਪੋਜ਼ੀਸ਼ਨ ਸਾਈਜ਼ ਸੁਝਾਉਣ ਲਈ ਵਰਤਦੇ ਹਾਂ।',
     'riskQuizQ2Opt1': '5% ਤੋਂ ਘੱਟ',
     'riskQuizQ2Opt2': '5-15%',
     'riskQuizQ2Opt3': '15% ਤੋਂ ਵੱਧ',
-    'riskQuizQ3Question': 'ਤੁਸੀਂ ਆਪਣੇ ਟ੍ਰੇਡ ਕਿੰਨੇ ਸਮੇਂ ਲਈ ਰੱਖਣ ਦੀ ਯੋਜਨਾ ਬਣਾਉਂਦੇ ਹੋ?',
+    'riskQuizQ3Question':
+        'ਤੁਸੀਂ ਆਪਣੇ ਟ੍ਰੇਡ ਕਿੰਨੇ ਸਮੇਂ ਲਈ ਰੱਖਣ ਦੀ ਯੋਜਨਾ ਬਣਾਉਂਦੇ ਹੋ?',
     'riskQuizQ3Subtitle': 'ਉਚਿਤ ਰਣਨੀਤੀਆਂ ਸਿਫਾਰਿਸ਼ ਕਰਨ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ।',
     'riskQuizQ3Opt1': 'ਲੰਬੀ ਮਿਆਦ (ਮਹੀਨੇ/ਸਾਲ)',
     'riskQuizQ3Opt2': 'ਦਰਮਿਆਨੀ ਮਿਆਦ (ਹਫ਼ਤੇ)',
@@ -1336,9 +1420,12 @@ class AppLocalizations {
     'riskQuizQ5Opt1': 'ਮੈਂ ਇਸਨੂੰ ਟ੍ਰੇਡਿੰਗ ਦਾ ਹਿੱਸਾ ਮੰਨਦਾ ਹਾਂ',
     'riskQuizQ5Opt2': 'ਮੈਂ ਸਮੀਖਿਆ ਕਰਕੇ ਸਿੱਖਦਾ ਹਾਂ',
     'riskQuizQ5Opt3': 'ਮੈਂ ਭਾਵੁਕ ਹੋ ਜਾਂਦਾ ਹਾਂ ਅਤੇ ਜਲਦਬਾਜ਼ੀ ਫੈਸਲੇ ਲੈਂਦਾ ਹਾਂ',
-    'riskDescLow': 'ਤੁਸੀਂ ਘੱਟ ਰਿਸਕ ਵਾਲੀਆਂ ਰੂੜੀਵਾਦੀ ਰਣਨੀਤੀਆਂ ਪਸੰਦ ਕਰਦੇ ਹੋ। ਸੁਰੱਖਿਅਤ ਟ੍ਰੇਡਿੰਗ ਸੁਝਾਵਾਂਗੇ।',
-    'riskDescMedium': 'ਤੁਸੀਂ ਸੰਤੁਲਿਤ ਰਿਸਕ ਨਾਲ ਆਰਾਮਦੇਹ ਹੋ। ਰਣਨੀਤੀਆਂ ਦਾ ਮਿਸ਼ਰਣ ਦੇਵਾਂਗੇ।',
-    'riskDescHigh': 'ਸੰਭਾਵੀ ਰਿਟਰਨ ਲਈ ਉੱਚ ਰਿਸਕ ਲੈਣ ਨੂੰ ਤਿਆਰ ਹੋ। ਅੱਗੇ ਵਾਲੀਆਂ ਰਣਨੀਤੀਆਂ ਦਿਖਾਵਾਂਗੇ।',
+    'riskDescLow':
+        'ਤੁਸੀਂ ਘੱਟ ਰਿਸਕ ਵਾਲੀਆਂ ਰੂੜੀਵਾਦੀ ਰਣਨੀਤੀਆਂ ਪਸੰਦ ਕਰਦੇ ਹੋ। ਸੁਰੱਖਿਅਤ ਟ੍ਰੇਡਿੰਗ ਸੁਝਾਵਾਂਗੇ।',
+    'riskDescMedium':
+        'ਤੁਸੀਂ ਸੰਤੁਲਿਤ ਰਿਸਕ ਨਾਲ ਆਰਾਮਦੇਹ ਹੋ। ਰਣਨੀਤੀਆਂ ਦਾ ਮਿਸ਼ਰਣ ਦੇਵਾਂਗੇ।',
+    'riskDescHigh':
+        'ਸੰਭਾਵੀ ਰਿਟਰਨ ਲਈ ਉੱਚ ਰਿਸਕ ਲੈਣ ਨੂੰ ਤਿਆਰ ਹੋ। ਅੱਗੇ ਵਾਲੀਆਂ ਰਣਨੀਤੀਆਂ ਦਿਖਾਵਾਂਗੇ।',
     'homeHubFinancial': 'ഫൈനാൻഷ്യൽ ഹബ്',
     'homeHubConvenient': 'കൺവീനിയന്റ് ഹബ്',
     'homeHubService': 'സർവീസ് ഹബ്',
@@ -1438,9 +1525,11 @@ class AppLocalizations {
     'selectLanguage': 'നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക',
     'changeLanguageLater': 'പിന്നീട് സെറ്റിംഗുകളിൽ മാറ്റാം',
     'whyAreYouHere': 'നിങ്ങൾ എന്തിനാണ് ഇവിടെ?',
-    'personalizeExperience': 'നിങ്ങളുടെ ലക്ഷ്യം അനുസരിച്ച് അനുഭവം ഇഷ്ടാനുസൃതമാക്കും. പിന്നീട് മാറ്റാം.',
+    'personalizeExperience':
+        'നിങ്ങളുടെ ലക്ഷ്യം അനുസരിച്ച് അനുഭവം ഇഷ്ടാനുസൃതമാക്കും. പിന്നീട് മാറ്റാം.',
     'howExperienced': 'നിങ്ങൾക്ക് എത്ര അനുഭവമുണ്ട്?',
-    'experienceGuidance': 'ശരിയായ മാർഗ്ഗദർശനം നൽകാൻ ഇത് സഹായിക്കും. പിന്നീട് സെറ്റിംഗുകളിൽ മാറ്റാം.',
+    'experienceGuidance':
+        'ശരിയായ മാർഗ്ഗദർശനം നൽകാൻ ഇത് സഹായിക്കും. പിന്നീട് സെറ്റിംഗുകളിൽ മാറ്റാം.',
     'chooseTradingMode': 'നിങ്ങളുടെ ട്രേഡിംഗ് മോഡ് തിരഞ്ഞെടുക്കുക',
     'switchLaterSettings': 'പിന്നീട് സെറ്റിംഗുകളിൽ മാറ്റാം.',
     'next': 'അടുത്തത്',
@@ -1466,12 +1555,15 @@ class AppLocalizations {
     'settingsVersionSubtitle': 'പതിപ്പ് 1.0.0',
     'languageChangedTo': 'ഭാഷ %s ആയി മാറ്റി',
     'resetOnboardingTitle': 'ഓൺബോർഡിംഗ് റീസെറ്റ് ചെയ്യുക',
-    'resetOnboardingMessage': 'ഇത് നിങ്ങളുടെ ഓൺബോർഡിംഗ് മുൻഗണനകൾ റീസെറ്റ് ചെയ്യും. ഓൺബോർഡിംഗ് ഫ്ലോ വീണ്ടും ചെയ്യേണ്ടിവരും.',
+    'resetOnboardingMessage':
+        'ഇത് നിങ്ങളുടെ ഓൺബോർഡിംഗ് മുൻഗണനകൾ റീസെറ്റ് ചെയ്യും. ഓൺബോർഡിംഗ് ഫ്ലോ വീണ്ടും ചെയ്യേണ്ടിവരും.',
     'cancel': 'റദ്ദാക്കുക',
     'reset': 'റീസെറ്റ്',
-    'onboardingResetDone': 'ഓൺബോർഡിംഗ് റീസെറ്റ് ചെയ്തു. ആപ്പ് വീണ്ടും ആരംഭിക്കുക.',
+    'onboardingResetDone':
+        'ഓൺബോർഡിംഗ് റീസെറ്റ് ചെയ്തു. ആപ്പ് വീണ്ടും ആരംഭിക്കുക.',
     'appInfoTitle': 'ആപ്പ് വിവരങ്ങൾ',
-    'appInfoDescription': 'മാർഗ്ഗദർശിത, തുടക്കക്കാർക്ക് അനുയോജ്യമായ ട്രേഡിംഗ് അനുഭവം.',
+    'appInfoDescription':
+        'മാർഗ്ഗദർശിത, തുടക്കക്കാർക്ക് അനുയോജ്യമായ ട്രേഡിംഗ് അനുഭവം.',
     'ok': 'ശരി',
     'authWelcomeBack': 'വീണ്ടും സ്വാഗതം',
     'authCreateAccount': 'അക്കൗണ്ട് സൃഷ്ടിക്കുക',
@@ -1484,12 +1576,14 @@ class AppLocalizations {
     'riskQuizQ1Opt1': 'ഞാൻ ശാന്തമായി എന്റെ തന്ത്രം പിന്തുടരുന്നു',
     'riskQuizQ1Opt2': 'ഞാൻ അല്പം ആകുലനാകുമെങ്കിലും തുടരുന്നു',
     'riskQuizQ1Opt3': 'ഞാൻ പരിഭ്രാന്തനായി ഉടൻ പുറത്തുപോകാൻ ആഗ്രഹിക്കുന്നു',
-    'riskQuizQ2Question': 'നിങ്ങളുടെ പോർട്ട്ഫോളിയോയുടെ എത്ര ശതമാനം റിസ്ക് ചെയ്യാൻ തയ്യാറാണ്?',
+    'riskQuizQ2Question':
+        'നിങ്ങളുടെ പോർട്ട്ഫോളിയോയുടെ എത്ര ശതമാനം റിസ്ക് ചെയ്യാൻ തയ്യാറാണ്?',
     'riskQuizQ2Subtitle': 'പോസിഷൻ സൈസുകൾ നിർദ്ദേശിക്കാൻ ഇത് ഉപയോഗിക്കുന്നു.',
     'riskQuizQ2Opt1': '5% ൽ കുറവ്',
     'riskQuizQ2Opt2': '5-15%',
     'riskQuizQ2Opt3': '15% ൽ കൂടുതൽ',
-    'riskQuizQ3Question': 'നിങ്ങളുടെ ട്രേഡുകൾ എത്രകാലം പിടിച്ചിരിക്കാൻ പദ്ധതിയിടുന്നു?',
+    'riskQuizQ3Question':
+        'നിങ്ങളുടെ ട്രേഡുകൾ എത്രകാലം പിടിച്ചിരിക്കാൻ പദ്ധതിയിടുന്നു?',
     'riskQuizQ3Subtitle': 'അനുയോജ്യമായ തന്ത്രങ്ങൾ ശുപാർശ ചെയ്യാൻ സഹായിക്കും.',
     'riskQuizQ3Opt1': 'ദീർഘകാലം (മാസ/വർഷങ്ങൾ)',
     'riskQuizQ3Opt2': 'ഇടത്തരം കാലം (ആഴ്ചകൾ)',
@@ -1500,13 +1594,17 @@ class AppLocalizations {
     'riskQuizQ4Opt2': 'സന്തുലിത വളർച്ചയും റിസ്കും',
     'riskQuizQ4Opt3': 'പരമാവധി വരുമാനം, ഉയർന്ന റിസ്ക്',
     'riskQuizQ5Question': 'നഷ്ടങ്ങൾ എങ്ങനെ കൈകാര്യം ചെയ്യും?',
-    'riskQuizQ5Subtitle': 'ഇത് മനസ്സിലാക്കുന്നത് ഞങ്ങളുടെ മാർഗ്ഗദർശനം മെച്ചപ്പെടുത്തും.',
+    'riskQuizQ5Subtitle':
+        'ഇത് മനസ്സിലാക്കുന്നത് ഞങ്ങളുടെ മാർഗ്ഗദർശനം മെച്ചപ്പെടുത്തും.',
     'riskQuizQ5Opt1': 'ഞാൻ ഇത് ട്രേഡിംഗിന്റെ ഭാഗമായി സ്വീകരിക്കുന്നു',
     'riskQuizQ5Opt2': 'ഞാൻ അവലോകനം ചെയ്ത് പഠിക്കുന്നു',
     'riskQuizQ5Opt3': 'ഞാൻ വികാരാധീനനായി ആവേഗ നിര്ണയങ്ങൾ എടുക്കുന്നു',
-    'riskDescLow': 'കുറഞ്ഞ റിസ്കുള്ള പാരമ്പര്യ തന്ത്രങ്ങൾ ഇഷ്ടപ്പെടുന്നു. സുരക്ഷിത ട്രേഡിംഗ് സമീപനങ്ങൾ ശുപാർശ ചെയ്യും.',
-    'riskDescMedium': 'സന്തുലിത റിസ്കുമായി സുഖപ്രദമാണ്. തന്ത്രങ്ങളുടെ മിശ്രിതം നൽകും.',
-    'riskDescHigh': 'സാധ്യമായ വരുമാനത്തിനായി ഉയർന്ന റിസ്ക് എടുക്കാൻ തയ്യാറാണ്. നൂതന തന്ത്രങ്ങൾ കാണിക്കും.',
+    'riskDescLow':
+        'കുറഞ്ഞ റിസ്കുള്ള പാരമ്പര്യ തന്ത്രങ്ങൾ ഇഷ്ടപ്പെടുന്നു. സുരക്ഷിത ട്രേഡിംഗ് സമീപനങ്ങൾ ശുപാർശ ചെയ്യും.',
+    'riskDescMedium':
+        'സന്തുലിത റിസ്കുമായി സുഖപ്രദമാണ്. തന്ത്രങ്ങളുടെ മിശ്രിതം നൽകും.',
+    'riskDescHigh':
+        'സാധ്യമായ വരുമാനത്തിനായി ഉയർന്ന റിസ്ക് എടുക്കാൻ തയ്യാറാണ്. നൂതന തന്ത്രങ്ങൾ കാണിക്കും.',
     'homeHubFinancial': 'ഫൈനാൻഷ്യൽ ഹബ്',
     'homeHubConvenient': 'കൺവീനിയന്റ് ഹബ്',
     'homeHubService': 'സർവീസ് ഹബ്',
@@ -1606,9 +1704,11 @@ class AppLocalizations {
     'selectLanguage': 'আপনার ভাষা নির্বাচন করুন',
     'changeLanguageLater': 'পরে সেটিংস থেকে পরিবর্তন করতে পারবেন',
     'whyAreYouHere': 'আপনি এখানে কেন?',
-    'personalizeExperience': 'আপনার লক্ষ্য অনুযায়ী অভিজ্ঞতা কাস্টমাইজ করব। পরে পরিবর্তন করতে পারবেন।',
+    'personalizeExperience':
+        'আপনার লক্ষ্য অনুযায়ী অভিজ্ঞতা কাস্টমাইজ করব। পরে পরিবর্তন করতে পারবেন।',
     'howExperienced': 'আপনার কত অভিজ্ঞতা আছে?',
-    'experienceGuidance': 'সঠিক নির্দেশনা দিতে সাহায্য করে। পরে সেটিংস থেকে পরিবর্তন করতে পারবেন।',
+    'experienceGuidance':
+        'সঠিক নির্দেশনা দিতে সাহায্য করে। পরে সেটিংস থেকে পরিবর্তন করতে পারবেন।',
     'chooseTradingMode': 'আপনার ট্রেডিং মোড নির্বাচন করুন',
     'switchLaterSettings': 'পরে সেটিংস থেকে পরিবর্তন করতে পারবেন।',
     'next': 'পরবর্তী',
@@ -1634,7 +1734,8 @@ class AppLocalizations {
     'settingsVersionSubtitle': 'সংস্করণ 1.0.0',
     'languageChangedTo': 'ভাষা %s এ পরিবর্তন করা হয়েছে',
     'resetOnboardingTitle': 'অনবোর্ডিং রিসেট করুন',
-    'resetOnboardingMessage': 'এটি আপনার অনবোর্ডিং পছন্দগুলি রিসেট করবে। আপনাকে অনবোর্ডিং ফ্লো আবার সম্পূর্ণ করতে হবে।',
+    'resetOnboardingMessage':
+        'এটি আপনার অনবোর্ডিং পছন্দগুলি রিসেট করবে। আপনাকে অনবোর্ডিং ফ্লো আবার সম্পূর্ণ করতে হবে।',
     'cancel': 'বাতিল',
     'reset': 'রিসেট',
     'onboardingResetDone': 'অনবোর্ডিং রিসেট হয়েছে। অ্যাপ আবার চালু করুন।',
@@ -1672,9 +1773,12 @@ class AppLocalizations {
     'riskQuizQ5Opt1': 'আমি এটাকে ট্রেডিংয়ের অংশ হিসেবে মেনে নিই',
     'riskQuizQ5Opt2': 'আমি পর্যালোচনা করে শিখি',
     'riskQuizQ5Opt3': 'আমি আবেগপ্রবণ হয়ে তাড়াহুড়ো সিদ্ধান্ত নিই',
-    'riskDescLow': 'আপনি কম ঝুঁকির রক্ষণশীল কৌশল পছন্দ করেন। নিরাপদ ট্রেডিং পদ্ধতি সুপারিশ করব।',
-    'riskDescMedium': 'আপনি সন্তুলিত ঝুঁকিতে স্বাচ্ছন্দ্য বোধ করেন। কৌশলের মিশ্রণ দেব।',
-    'riskDescHigh': 'সম্ভাব্য রিটার্নের জন্য উচ্চ ঝুঁকি নিতে প্রস্তুত। উন্নত কৌশল দেখাব।',
+    'riskDescLow':
+        'আপনি কম ঝুঁকির রক্ষণশীল কৌশল পছন্দ করেন। নিরাপদ ট্রেডিং পদ্ধতি সুপারিশ করব।',
+    'riskDescMedium':
+        'আপনি সন্তুলিত ঝুঁকিতে স্বাচ্ছন্দ্য বোধ করেন। কৌশলের মিশ্রণ দেব।',
+    'riskDescHigh':
+        'সম্ভাব্য রিটার্নের জন্য উচ্চ ঝুঁকি নিতে প্রস্তুত। উন্নত কৌশল দেখাব।',
     'homeHubFinancial': 'ফাইন্যান্সিয়াল হাব',
     'homeHubConvenient': 'কনভেনিয়েন্ট হাব',
     'homeHubService': 'সার্ভিস হাব',
@@ -1921,6 +2025,7 @@ class AppLocalizations {
   String get wealthCrypto => _t('wealthCrypto');
   String get wealthNFTs => _t('wealthNFTs');
   String get wealthGold => _t('wealthGold');
+  String get wealthMutualFunds => _t('wealthMutualFunds');
   String get wealthWatchlist => _t('wealthWatchlist');
   String get wealthEditWatchlist => _t('wealthEditWatchlist');
   String get wealthCryptoAssets => _t('wealthCryptoAssets');
@@ -1935,49 +2040,94 @@ class AppLocalizations {
   String get wealthNavPortfolio => _t('wealthNavPortfolio');
   String get wealthNavWallet => _t('wealthNavWallet');
   String get wealthNavProfile => _t('wealthNavProfile');
+  String get wealthNifty50 => _t('wealthNifty50');
+  String get wealthNiftyBank => _t('wealthNiftyBank');
+  String get wealthDigitalGold => _t('wealthDigitalGold');
+  String get wealthSilver => _t('wealthSilver');
+  String get wealthInvested => _t('wealthInvested');
+  String get wealthCurrent => _t('wealthCurrent');
+  String get wealthPnL => _t('wealthPnL');
 
   /// Returns the list of risk quiz questions for the current locale.
   List<Map<String, dynamic>> get riskQuizQuestions => [
-        {'question': riskQuizQ1Question, 'subtitle': riskQuizQ1Subtitle, 'options': [riskQuizQ1Opt1, riskQuizQ1Opt2, riskQuizQ1Opt3]},
-        {'question': riskQuizQ2Question, 'subtitle': riskQuizQ2Subtitle, 'options': [riskQuizQ2Opt1, riskQuizQ2Opt2, riskQuizQ2Opt3]},
-        {'question': riskQuizQ3Question, 'subtitle': riskQuizQ3Subtitle, 'options': [riskQuizQ3Opt1, riskQuizQ3Opt2, riskQuizQ3Opt3]},
-        {'question': riskQuizQ4Question, 'subtitle': riskQuizQ4Subtitle, 'options': [riskQuizQ4Opt1, riskQuizQ4Opt2, riskQuizQ4Opt3]},
-        {'question': riskQuizQ5Question, 'subtitle': riskQuizQ5Subtitle, 'options': [riskQuizQ5Opt1, riskQuizQ5Opt2, riskQuizQ5Opt3]},
-      ];
+    {
+      'question': riskQuizQ1Question,
+      'subtitle': riskQuizQ1Subtitle,
+      'options': [riskQuizQ1Opt1, riskQuizQ1Opt2, riskQuizQ1Opt3],
+    },
+    {
+      'question': riskQuizQ2Question,
+      'subtitle': riskQuizQ2Subtitle,
+      'options': [riskQuizQ2Opt1, riskQuizQ2Opt2, riskQuizQ2Opt3],
+    },
+    {
+      'question': riskQuizQ3Question,
+      'subtitle': riskQuizQ3Subtitle,
+      'options': [riskQuizQ3Opt1, riskQuizQ3Opt2, riskQuizQ3Opt3],
+    },
+    {
+      'question': riskQuizQ4Question,
+      'subtitle': riskQuizQ4Subtitle,
+      'options': [riskQuizQ4Opt1, riskQuizQ4Opt2, riskQuizQ4Opt3],
+    },
+    {
+      'question': riskQuizQ5Question,
+      'subtitle': riskQuizQ5Subtitle,
+      'options': [riskQuizQ5Opt1, riskQuizQ5Opt2, riskQuizQ5Opt3],
+    },
+  ];
 
   /// Returns question text for risk quiz by index (0–4). Ensures current locale is read at call time.
   String riskQuizQuestionAt(int index) {
     switch (index) {
-      case 0: return riskQuizQ1Question;
-      case 1: return riskQuizQ2Question;
-      case 2: return riskQuizQ3Question;
-      case 3: return riskQuizQ4Question;
-      case 4: return riskQuizQ5Question;
-      default: return riskQuizQ1Question;
+      case 0:
+        return riskQuizQ1Question;
+      case 1:
+        return riskQuizQ2Question;
+      case 2:
+        return riskQuizQ3Question;
+      case 3:
+        return riskQuizQ4Question;
+      case 4:
+        return riskQuizQ5Question;
+      default:
+        return riskQuizQ1Question;
     }
   }
 
   /// Returns subtitle for risk quiz by index (0–4).
   String? riskQuizSubtitleAt(int index) {
     switch (index) {
-      case 0: return riskQuizQ1Subtitle;
-      case 1: return riskQuizQ2Subtitle;
-      case 2: return riskQuizQ3Subtitle;
-      case 3: return riskQuizQ4Subtitle;
-      case 4: return riskQuizQ5Subtitle;
-      default: return riskQuizQ1Subtitle;
+      case 0:
+        return riskQuizQ1Subtitle;
+      case 1:
+        return riskQuizQ2Subtitle;
+      case 2:
+        return riskQuizQ3Subtitle;
+      case 3:
+        return riskQuizQ4Subtitle;
+      case 4:
+        return riskQuizQ5Subtitle;
+      default:
+        return riskQuizQ1Subtitle;
     }
   }
 
   /// Returns options for risk quiz by index (0–4).
   List<String> riskQuizOptionsAt(int index) {
     switch (index) {
-      case 0: return [riskQuizQ1Opt1, riskQuizQ1Opt2, riskQuizQ1Opt3];
-      case 1: return [riskQuizQ2Opt1, riskQuizQ2Opt2, riskQuizQ2Opt3];
-      case 2: return [riskQuizQ3Opt1, riskQuizQ3Opt2, riskQuizQ3Opt3];
-      case 3: return [riskQuizQ4Opt1, riskQuizQ4Opt2, riskQuizQ4Opt3];
-      case 4: return [riskQuizQ5Opt1, riskQuizQ5Opt2, riskQuizQ5Opt3];
-      default: return [riskQuizQ1Opt1, riskQuizQ1Opt2, riskQuizQ1Opt3];
+      case 0:
+        return [riskQuizQ1Opt1, riskQuizQ1Opt2, riskQuizQ1Opt3];
+      case 1:
+        return [riskQuizQ2Opt1, riskQuizQ2Opt2, riskQuizQ2Opt3];
+      case 2:
+        return [riskQuizQ3Opt1, riskQuizQ3Opt2, riskQuizQ3Opt3];
+      case 3:
+        return [riskQuizQ4Opt1, riskQuizQ4Opt2, riskQuizQ4Opt3];
+      case 4:
+        return [riskQuizQ5Opt1, riskQuizQ5Opt2, riskQuizQ5Opt3];
+      default:
+        return [riskQuizQ1Opt1, riskQuizQ1Opt2, riskQuizQ1Opt3];
     }
   }
 

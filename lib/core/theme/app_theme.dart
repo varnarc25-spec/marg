@@ -8,14 +8,14 @@ class AppColors {
   static const Color primaryBlue = Color(0xFF1E88E5);
   static const Color primaryBlueDark = Color(0xFF1565C0);
   static const Color primaryBlueLight = Color(0xFF64B5F6);
-  
+
   // Accent Colors
   static const Color accentGreen = Color(0xFF00C853); // Profit
   static const Color accentRed = Color(0xFFE53935); // Loss
   static const Color accentOrange = Color(0xFFFF6F00); // Warning
-  
+
   // Neutral Colors
-  static const Color backgroundLight = Color(0xFFFAFAFA);
+  static const Color backgroundLight = Color(0xFFFFFFFF);
   static const Color backgroundDark = Color(0xFF121212);
   static const Color surfaceLight = Color(0xFFFFFFFF);
   static const Color surfaceDark = Color(0xFF1E1E1E);
@@ -23,7 +23,7 @@ class AppColors {
   static const Color textSecondary = Color(0xFF757575);
   static const Color textPrimaryDark = Color(0xFFFFFFFF);
   static const Color textSecondaryDark = Color(0xFFB0B0B0);
-  
+
   // Risk Colors
   static const Color riskLow = Color(0xFF00C853);
   static const Color riskMedium = Color(0xFFFF6F00);
@@ -75,14 +75,8 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
         ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          color: AppColors.textPrimary,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: AppColors.textSecondary,
-        ),
+        bodyLarge: TextStyle(fontSize: 16, color: AppColors.textPrimary),
+        bodyMedium: TextStyle(fontSize: 14, color: AppColors.textSecondary),
       ),
     );
     return ThemeData(
@@ -100,9 +94,7 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.backgroundLight,
       cardTheme: CardThemeData(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: AppColors.surfaceLight,
       ),
       appBarTheme: AppBarTheme(
@@ -154,7 +146,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceLight,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
         hintStyle: GoogleFonts.mulish(
           fontSize: 16,
           color: AppColors.textSecondary,
@@ -214,14 +209,8 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimaryDark,
         ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          color: AppColors.textPrimaryDark,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: AppColors.textSecondaryDark,
-        ),
+        bodyLarge: TextStyle(fontSize: 16, color: AppColors.textPrimaryDark),
+        bodyMedium: TextStyle(fontSize: 14, color: AppColors.textSecondaryDark),
       ),
     );
     return ThemeData(
@@ -239,9 +228,7 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.backgroundDark,
       cardTheme: CardThemeData(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: AppColors.surfaceDark,
       ),
       appBarTheme: AppBarTheme(
@@ -293,7 +280,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceDark,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
         hintStyle: GoogleFonts.mulish(
           fontSize: 16,
           color: AppColors.textSecondaryDark,
@@ -316,7 +306,10 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28),
-          borderSide: const BorderSide(color: AppColors.primaryBlueLight, width: 2),
+          borderSide: const BorderSide(
+            color: AppColors.primaryBlueLight,
+            width: 2,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28),

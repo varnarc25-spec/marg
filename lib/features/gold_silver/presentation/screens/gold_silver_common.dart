@@ -1,15 +1,14 @@
-export 'gold_silver_screens.dart';
-
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 
-/// Base scaffold used for all Gold & Silver feature pages.
-class _GoldSilverFeaturePage extends StatelessWidget {
+/// Base scaffold used for Gold & Silver placeholder pages.
+class GoldSilverFeaturePlaceholderPage extends StatelessWidget {
   final String title;
   final String subtitle;
   final IconData icon;
 
-  const _GoldSilverFeaturePage({
+  const GoldSilverFeaturePlaceholderPage({
+    super.key,
     required this.title,
     required this.subtitle,
     required this.icon,
@@ -58,10 +57,7 @@ class _GoldSilverFeaturePage extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
+              style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
             ),
             const Spacer(),
             const Text(
@@ -75,25 +71,7 @@ class _GoldSilverFeaturePage extends StatelessWidget {
   }
 }
 
-class BuyGoldPage extends StatelessWidget {
-  const BuyGoldPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _BuyMetalPage(config: _MetalConfig.gold);
-  }
-}
-
-class BuySilver999Page extends StatelessWidget {
-  const BuySilver999Page({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _BuyMetalPage(config: _MetalConfig.silver999);
-  }
-}
-
-class _MetalConfig {
+class MetalConfig {
   final String appBarTitle;
   final String balanceTitle;
   final String investTitle;
@@ -105,9 +83,8 @@ class _MetalConfig {
   final Color appBarColor;
   final Color accentColor;
   final Color chartFill;
-  final IconData icon;
 
-  const _MetalConfig({
+  const MetalConfig({
     required this.appBarTitle,
     required this.balanceTitle,
     required this.investTitle,
@@ -119,10 +96,9 @@ class _MetalConfig {
     required this.appBarColor,
     required this.accentColor,
     required this.chartFill,
-    required this.icon,
   });
 
-  static const gold = _MetalConfig(
+  static const gold = MetalConfig(
     appBarTitle: 'eSwarna Digital Gold',
     balanceTitle: 'My Gold Balance',
     investTitle: 'Invest in 24k Gold',
@@ -134,10 +110,9 @@ class _MetalConfig {
     appBarColor: Color(0xFF1876B6),
     accentColor: Color(0xFF1876B6),
     chartFill: Color(0xFFFFC107),
-    icon: Icons.monetization_on_rounded,
   );
 
-  static const silver999 = _MetalConfig(
+  static const silver999 = MetalConfig(
     appBarTitle: 'Digital Silver (999)',
     balanceTitle: 'My Silver Balance',
     investTitle: 'Invest in 999 Silver',
@@ -149,20 +124,20 @@ class _MetalConfig {
     appBarColor: Color(0xFF374151),
     accentColor: Color(0xFF374151),
     chartFill: Color(0xFFB0BEC5),
-    icon: Icons.diamond_rounded,
   );
 }
 
-class _BuyMetalPage extends StatefulWidget {
-  final _MetalConfig config;
+/// Full buy flow page (used by Buy Gold / Buy Silver).
+class BuyMetalPage extends StatefulWidget {
+  final MetalConfig config;
 
-  const _BuyMetalPage({required this.config});
+  const BuyMetalPage({super.key, required this.config});
 
   @override
-  State<_BuyMetalPage> createState() => _BuyMetalPageState();
+  State<BuyMetalPage> createState() => _BuyMetalPageState();
 }
 
-class _BuyMetalPageState extends State<_BuyMetalPage> {
+class _BuyMetalPageState extends State<BuyMetalPage> {
   final _amountController = TextEditingController();
   bool _buyInRupees = true;
 
@@ -1137,24 +1112,31 @@ class _TrendTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Color(0xFFF3F4F6),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.article_outlined, color: AppColors.primaryBlue, size: 18),
-          ),
+          const _TrendIcon(),
           const SizedBox(width: 12),
-          Expanded(
-            child: Text(text, style: const TextStyle(fontSize: 13)),
-          ),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 13))),
         ],
       ),
+    );
+  }
+}
+
+class _TrendIcon extends StatelessWidget {
+  const _TrendIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: Color(0xFFF3F4F6),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
+      child: Icon(Icons.article_outlined, color: AppColors.primaryBlue, size: 18),
     );
   }
 }
@@ -1164,8 +1146,8 @@ class _PoweredByFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: const [
+    return const Column(
+      children: [
         Text('Powered by Marg Metals Partner', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
         SizedBox(height: 6),
         Icon(Icons.verified_rounded, color: AppColors.textSecondary),
@@ -1174,199 +1156,3 @@ class _PoweredByFooter extends StatelessWidget {
   }
 }
 
-class DailyGoldSavingsPage extends StatelessWidget {
-  const DailyGoldSavingsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Daily Gold Savings',
-      subtitle: 'Automate small daily contributions into digital gold.',
-      icon: Icons.savings_rounded,
-    );
-  }
-}
-
-class DailySilverSavingsPage extends StatelessWidget {
-  const DailySilverSavingsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Daily Silver Savings',
-      subtitle: 'Build long-term silver exposure with SIP-style investments.',
-      icon: Icons.savings_outlined,
-    );
-  }
-}
-
-class SmartSipPage extends StatelessWidget {
-  const SmartSipPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Smart SIP (Auto-buy on dips)',
-      subtitle: 'Configure rules to auto-buy gold/silver when prices dip.',
-      icon: Icons.auto_graph_rounded,
-    );
-  }
-}
-
-class PortfolioHoldingsPage extends StatelessWidget {
-  const PortfolioHoldingsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Portfolio & Holdings',
-      subtitle: 'Track quantity, average price, and current value of holdings.',
-      icon: Icons.account_balance_wallet_rounded,
-    );
-  }
-}
-
-class ProfitLossPage extends StatelessWidget {
-  const ProfitLossPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Profit / Loss',
-      subtitle: 'View mark-to-market P&L across all gold & silver positions.',
-      icon: Icons.show_chart_rounded,
-    );
-  }
-}
-
-class PriceAlertsPage extends StatelessWidget {
-  const PriceAlertsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Price Alerts',
-      subtitle:
-          'Set custom alerts when gold or silver crosses your target levels.',
-      icon: Icons.notifications_active_rounded,
-    );
-  }
-}
-
-class SellGoldSilverPage extends StatelessWidget {
-  const SellGoldSilverPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Sell Gold / Silver',
-      subtitle: 'Exit positions and withdraw to your linked bank account.',
-      icon: Icons.currency_exchange_rounded,
-    );
-  }
-}
-
-class ConvertPhysicalGoldPage extends StatelessWidget {
-  const ConvertPhysicalGoldPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Convert to Physical Gold',
-      subtitle: 'Request doorstep delivery or store at a secure vault partner.',
-      icon: Icons.local_shipping_rounded,
-    );
-  }
-}
-
-class ConvertPhysicalSilverPage extends StatelessWidget {
-  const ConvertPhysicalSilverPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Convert to Physical Silver',
-      subtitle: 'Convert digital silver units into coins or bars.',
-      icon: Icons.local_shipping_outlined,
-    );
-  }
-}
-
-class GiftGoldSilverPage extends StatelessWidget {
-  const GiftGoldSilverPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Gift Gold / Silver',
-      subtitle: 'Send digital gold or silver to friends and family securely.',
-      icon: Icons.card_giftcard_rounded,
-    );
-  }
-}
-
-class FamilyVaultPage extends StatelessWidget {
-  const FamilyVaultPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Family Vault',
-      subtitle: 'Create a shared vault for family investments and goals.',
-      icon: Icons.lock_rounded,
-    );
-  }
-}
-
-class NomineeManagementPage extends StatelessWidget {
-  const NomineeManagementPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Nominee Management',
-      subtitle: 'Add / update nominees for smooth transmission of assets.',
-      icon: Icons.person_add_alt_1_rounded,
-    );
-  }
-}
-
-class TransactionHistoryPage extends StatelessWidget {
-  const TransactionHistoryPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Transaction History',
-      subtitle: 'Browse all buy, sell, convert and gift transactions.',
-      icon: Icons.history_rounded,
-    );
-  }
-}
-
-class TaxCapitalGainsReportPage extends StatelessWidget {
-  const TaxCapitalGainsReportPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Tax & Capital Gains Report',
-      subtitle:
-          'Download ready-to-file capital gains statements for tax filing.',
-      icon: Icons.receipt_long_rounded,
-    );
-  }
-}
-
-class AnnualStatementPage extends StatelessWidget {
-  const AnnualStatementPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _GoldSilverFeaturePage(
-      title: 'Annual Statement',
-      subtitle: 'Get a consolidated annual summary of your holdings and flows.',
-      icon: Icons.description_rounded,
-    );
-  }
-}

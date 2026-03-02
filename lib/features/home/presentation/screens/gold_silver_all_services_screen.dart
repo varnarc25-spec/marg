@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon_tile.dart';
-import '../../../gold_silver/presentation/screens/gold_silver_feature_pages.dart';
+import '../../../gold_silver/presentation/screens/gold_silver_screens.dart';
 
 class GoldSilverAllServicesScreen extends StatelessWidget {
   const GoldSilverAllServicesScreen({super.key});
@@ -33,8 +33,15 @@ class GoldSilverAllServicesScreen extends StatelessWidget {
                   builder: (_) => const DailyGoldSavingsPage()),
               _ServiceItem('Daily Silver Savings', Icons.savings_outlined,
                   builder: (_) => const DailySilverSavingsPage()),
-              _ServiceItem('Smart SIP (Auto-buy on dips)', Icons.auto_graph_rounded,
+              _ServiceItem('Smart SIP ', Icons.auto_graph_rounded,
                   builder: (_) => const SmartSipPage()),
+              _ServiceItem('Gift Gold / Silver', Icons.card_giftcard_rounded,
+                  builder: (_) => const GiftGoldSilverPage()),
+              _ServiceItem('Family Vault', Icons.lock_rounded,
+                  builder: (_) => const FamilyVaultPage()),
+              _ServiceItem('Nominees',
+                  Icons.person_add_alt_1_rounded,
+                  builder: (_) => const NomineeManagementPage()),
             ],
           ),
           const SizedBox(height: 18),
@@ -49,13 +56,6 @@ class GoldSilverAllServicesScreen extends StatelessWidget {
                   builder: (_) => const ProfitLossPage()),
               _ServiceItem('Price Alerts', Icons.notifications_active_rounded,
                   builder: (_) => const PriceAlertsPage()),
-            ],
-          ),
-          const SizedBox(height: 18),
-          _ServicesSection(
-            title: 'Actions',
-            icon: Icons.swap_horiz_rounded,
-            items: [
               _ServiceItem('Sell Gold / Silver',
                   Icons.currency_exchange_rounded,
                   builder: (_) => const SellGoldSilverPage()),
@@ -65,21 +65,6 @@ class GoldSilverAllServicesScreen extends StatelessWidget {
               _ServiceItem('Convert to Physical Silver',
                   Icons.local_shipping_outlined,
                   builder: (_) => const ConvertPhysicalSilverPage()),
-            ],
-          ),
-          const SizedBox(height: 18),
-          _ServicesSection(
-            title: 'Extras',
-            icon: Icons.card_giftcard_rounded,
-            items: [
-              _ServiceItem('Gift Gold / Silver',
-                  Icons.card_giftcard_rounded,
-                  builder: (_) => const GiftGoldSilverPage()),
-              _ServiceItem('Family Vault', Icons.lock_rounded,
-                  builder: (_) => const FamilyVaultPage()),
-              _ServiceItem('Nominee Management',
-                  Icons.person_add_alt_1_rounded,
-                  builder: (_) => const NomineeManagementPage()),
             ],
           ),
           const SizedBox(height: 18),
@@ -127,9 +112,9 @@ class _LivePricesHeader extends StatelessWidget {
             title: 'Live Silver',
             subtitle: '₹120.50 / gm',
             gradient: [
-              Color(0xFF90CAF9),
-              Color(0xFF64B5F6),
-              Color(0xFF42A5F5),
+              Color(0xFFE5E7EB),
+              Color(0xFFCBD5E1),
+              Color(0xFF94A3B8),
             ],
             icon: Icons.diamond_rounded,
           ),

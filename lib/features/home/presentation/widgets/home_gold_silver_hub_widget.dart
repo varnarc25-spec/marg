@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_localizations.dart';
-import '../../../gold_silver/presentation/screens/gold_silver_feature_pages.dart';
+import '../../../gold_silver/presentation/screens/gold_silver_screens.dart';
 import 'home_icon_grid_widget.dart';
 
 /// Gold & Silver hub: Buy Gold, Daily Gold Savings, Buy 999 Silver, Daily Silver Savings.
