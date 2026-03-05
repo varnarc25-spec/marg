@@ -94,8 +94,7 @@ class _MobileRechargeHomePageState extends ConsumerState<DthRechargeHomePage> {
                   );
               if (result == null || !context.mounted) return;
               _searchController.text = result.number;
-              ref.read(dthSubscriberIdProvider.notifier).state =
-                  result.number;
+              ref.read(dthSubscriberIdProvider.notifier).state = result.number;
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => const DthOperatorSelectionPage(),
@@ -524,8 +523,10 @@ class _QuickTopUpCard extends ConsumerWidget {
       child: InkWell(
         onTap: () {
           ref.read(dthSubscriberIdProvider.notifier).state = entry.number;
-          ref.read(selectedDthOperatorProvider.notifier).state =
-              DthOperator(id: entry.operatorId, name: entry.operatorName);
+          ref.read(selectedDthOperatorProvider.notifier).state = DthOperator(
+            id: entry.operatorId,
+            name: entry.operatorName,
+          );
           Navigator.of(
             context,
           ).push(MaterialPageRoute(builder: (_) => const DthPlanListPage()));
@@ -688,9 +689,7 @@ class _RecentTile extends ConsumerWidget {
     return InkWell(
       onTap: () {
         ref.read(dthSubscriberIdProvider.notifier).state = item.number;
-        ref
-            .read(selectedDthOperatorProvider.notifier)
-            .state = DthOperator(
+        ref.read(selectedDthOperatorProvider.notifier).state = DthOperator(
           id: item.operatorName.toLowerCase().replaceAll(' ', '_'),
           name: item.operatorName,
         );

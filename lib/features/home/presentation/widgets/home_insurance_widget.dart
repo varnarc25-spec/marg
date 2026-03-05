@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../insurance/bike/presentation/pages/bike_insurance_home_page.dart';
+import '../../../insurance/car/presentation/pages/car_insurance_home_page.dart';
+import '../../../insurance/health/presentation/pages/health_insurance_home_page.dart';
+import '../../../insurance/life/presentation/pages/life_insurance_home_page.dart';
 import 'home_icon_grid_widget.dart';
 
 /// Dark blue promotional banner for health insurance: "Did you know?" / "Health plans start at ₹224/mo*".
@@ -86,10 +90,47 @@ class HomeInsuranceHub extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = ref.watch(l10nProvider);
     final items = [
-      HomeIconGridItem(Icons.two_wheeler_rounded, l10n.homeInsuranceBike),
-      HomeIconGridItem(Icons.directions_car_rounded, l10n.homeInsuranceCar),
-      HomeIconGridItem(Icons.medical_services_rounded, l10n.homeInsuranceHealth),
-      HomeIconGridItem(Icons.umbrella_rounded, l10n.homeInsuranceLife),
+      HomeIconGridItem(
+        Icons.two_wheeler_rounded,
+        l10n.homeInsuranceBike,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const BikeInsuranceHomePage(),
+            ),
+          );
+        },
+      ),
+      HomeIconGridItem(Icons.directions_car_rounded, l10n.homeInsuranceCar,
+          onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const CarInsuranceHomePage(),
+          ),
+        );
+      }),
+      HomeIconGridItem(
+        Icons.medical_services_rounded,
+        l10n.homeInsuranceHealth,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const HealthInsuranceHomePage(),
+            ),
+          );
+        },
+      ),
+      HomeIconGridItem(
+        Icons.umbrella_rounded,
+        l10n.homeInsuranceLife,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const LifeInsuranceHomePage(),
+            ),
+          );
+        },
+      ),
     ];
     return HomeIconGrid(items: items, columns: 4);
   }
