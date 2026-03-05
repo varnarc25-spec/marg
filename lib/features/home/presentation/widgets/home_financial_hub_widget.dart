@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import 'home_icon_grid_widget.dart';
 import '../../../financial_hub/card_repay/presentation/pages/pay_credit_card_bill_page.dart';
-import '../../../financial_hub/my_savings/presentation/pages/my_savings_page.dart';
+import '../../../financial_hub/budget/presentation/pages/mybudget_page.dart';
 import '../../../financial_hub/invest/presentation/pages/invest_page.dart';
 import '../../../financial_hub/crypto/presentation/pages/crypto_wallet_page.dart';
 
@@ -32,7 +32,7 @@ class HomeFinancialHub extends ConsumerWidget {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => const MySavingsPage(),
+              builder: (_) => const MybudgetPage(),
             ),
           );
         },

@@ -173,7 +173,7 @@ class AppLocalizations {
     'homeTravelTrain': 'Train',
     'homeTravelHotel': 'Hotel',
     'homeIconCardRepay': 'Card Repay',
-    'homeIconSavings': 'Savings',
+    'homeIconSavings': 'Budget',
     'homeIconInvest': 'Invest',
     'homeIconExchange': 'Exchange',
     'homeIconTravel': 'Travel',
