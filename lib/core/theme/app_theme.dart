@@ -24,6 +24,12 @@ class AppColors {
   static const Color textPrimaryDark = Color(0xFFFFFFFF);
   static const Color textSecondaryDark = Color(0xFFB0B0B0);
 
+  // Wealth colors
+  static const Color iconBGStocks = Color(0xFF4DBBB0);
+  static const Color iconBGCrypto = Color(0xFFE45A1B);
+  static const Color iconBGGold = Color(0xFFF9A447);
+  static const Color iconBGMF = Color(0xFFA1B9AB);
+
   // Risk Colors
   static const Color riskLow = Color(0xFF00C853);
   static const Color riskMedium = Color(0xFFFF6F00);

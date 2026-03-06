@@ -181,8 +181,20 @@ class FirebaseAuthService {
       );
 
       return completer.future;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_getErrorMessage(e));
     } catch (e) {
-      throw Exception('Failed to send OTP: ${e.toString()}');
+      final msg = e.toString();
+      if (msg.contains('Firebase is not initialized') || msg.contains('no firebase app')) {
+        rethrow;
+      }
+      if (msg.contains('recaptcha') || msg.contains('RecaptchaVerifier') || msg.contains('ArgumentError')) {
+        throw Exception(
+          'Phone verification could not start. On web, ensure you allow the security check. '
+          'You can also try Email sign-in.',
+        );
+      }
+      throw Exception('Could not send OTP. Please try again or use Email sign-in.');
     }
   }
 
@@ -485,9 +497,21 @@ class FirebaseAuthService {
       case 'too-many-requests':
         return 'Too many requests. Please try again later.';
       case 'operation-not-allowed':
-        return 'This operation is not allowed.';
+        return 'Phone sign-in is not enabled. Enable it in Firebase Console (Authentication > Sign-in method > Phone).';
       case 'user-disabled':
         return 'This user account has been disabled.';
+      // Phone auth specific
+      case 'invalid-phone-number':
+        return 'Invalid phone number. Use a valid 10-digit number with country code.';
+      case 'captcha-check-failed':
+        return 'Verification check failed. Please try again.';
+      case 'missing-client-identifier':
+        return 'Phone auth is not set up for this app. Check Firebase configuration.';
+      case 'quota-exceeded':
+        return 'SMS quota exceeded. Try again later or use Email sign-in.';
+      case 'app-deleted':
+      case 'invalid-app-credential':
+        return 'App configuration error. Run: flutterfire configure';
       default:
         return e.message ?? 'An error occurred during authentication.';
     }

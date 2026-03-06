@@ -226,6 +226,13 @@ class AppLocalizations {
     'wealthInvested': 'Invested',
     'wealthCurrent': 'Current',
     'wealthPnL': 'P&L',
+    'wealthWatchlistSearchHint':
+        'Search eg: infy bse, nifty fut, index fund, et',
+    'wealthWatchlistNewGroup': 'New group',
+    'wealthWatchlistNewList': 'New list',
+    'wealthWatchlistCreateNewList': 'Create New List',
+    'wealthWatchlistListName': 'Name',
+    'wealthWatchlistCreate': 'Create',
   };
 
   static const Map<String, String> _hi = {
@@ -2040,6 +2047,12 @@ class AppLocalizations {
   String get wealthNavPortfolio => _t('wealthNavPortfolio');
   String get wealthNavWallet => _t('wealthNavWallet');
   String get wealthNavProfile => _t('wealthNavProfile');
+  String get wealthWatchlistSearchHint => _t('wealthWatchlistSearchHint');
+  String get wealthWatchlistNewGroup => _t('wealthWatchlistNewGroup');
+  String get wealthWatchlistNewList => _t('wealthWatchlistNewList');
+  String get wealthWatchlistCreateNewList => _t('wealthWatchlistCreateNewList');
+  String get wealthWatchlistListName => _t('wealthWatchlistListName');
+  String get wealthWatchlistCreate => _t('wealthWatchlistCreate');
   String get wealthNifty50 => _t('wealthNifty50');
   String get wealthNiftyBank => _t('wealthNiftyBank');
   String get wealthDigitalGold => _t('wealthDigitalGold');

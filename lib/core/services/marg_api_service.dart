@@ -67,6 +67,32 @@ class MargApiService {
     throw Exception(message is String ? message : 'Registration failed');
   }
 
+  /// Ensure the user has a paper wallet (fintech app_wallets). Creates one if missing.
+  /// Call after login so the user always has a wallet. Requires [idToken].
+  /// Throws on 4xx/5xx so callers can log or handle (e.g. migrations not run).
+  Future<Map<String, dynamic>?> ensurePaperWallet({
+    required String idToken,
+    String? currency,
+  }) async {
+    final body = <String, dynamic>{};
+    if (currency != null && currency.isNotEmpty) body['currency'] = currency;
+    final res = await http.post(
+      Uri.parse('$_baseUrl/api/user/paper-wallet'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+      body: jsonEncode(body),
+    );
+    final data = jsonDecode(res.body) as Map<String, dynamic>?;
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      final d = data?['data'];
+      return d is Map<String, dynamic> ? d : null;
+    }
+    final message = data?['message'] ?? data?['error'] ?? 'Paper wallet failed (${res.statusCode})';
+    throw Exception(message is String ? message : 'Paper wallet failed (${res.statusCode})');
+  }
+
   /// Get onboarding. Pass [idToken] when logged in, or [sessionId] when anonymous.
   Future<Map<String, dynamic>?> getOnboarding({
     String? idToken,
