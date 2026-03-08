@@ -230,4 +230,18 @@ class MargApiService {
     final message = data?['message'] ?? data?['error'] ?? 'OCR failed';
     throw Exception(message is String ? message : 'OCR failed');
   }
+
+  /// GET /api/commodities/gold-silver — gold & silver rates in INR (gBuy, sBuy per gram).
+  /// Returns { success, data: { rates: { gBuy, sBuy, gBuyGst, sBuyGst }, taxes, blockId }, global: { gold, silver } }.
+  Future<Map<String, dynamic>?> getGoldSilverRates() async {
+    final res = await http.get(
+      Uri.parse('$_baseUrl/api/commodities/gold-silver'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    final data = jsonDecode(res.body) as Map<String, dynamic>?;
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      return data;
+    }
+    return null;
+  }
 }
