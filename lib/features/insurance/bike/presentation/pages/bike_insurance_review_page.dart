@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/bike_vehicle_provider.dart';
 import 'bike_insurance_help_page.dart';
+import 'bike_insurance_payment_success_page.dart';
 
 /// Review selected plan and proceed to payment.
 class BikeInsuranceReviewPage extends ConsumerWidget {
@@ -9,8 +10,18 @@ class BikeInsuranceReviewPage extends ConsumerWidget {
 
   static String _formatDate(DateTime d) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${d.day} ${months[d.month - 1]} ${d.year}';
   }
@@ -23,8 +34,7 @@ class BikeInsuranceReviewPage extends ConsumerWidget {
     final vehicleState = ref.watch(bikeVehicleProvider);
     final selectedPlan = ref.watch(selectedBikePlanProvider);
 
-    if (selectedPlan == null ||
-        vehicleState is! BikeVehicleSuccess) {
+    if (selectedPlan == null || vehicleState is! BikeVehicleSuccess) {
       return Scaffold(
         backgroundColor: colorScheme.surface,
         appBar: AppBar(
@@ -52,7 +62,8 @@ class BikeInsuranceReviewPage extends ConsumerWidget {
     }
 
     final vehicle = vehicleState.vehicle;
-    final totalPrice = selectedPlan.price + 0; // Optional: add GST or other fees
+    final totalPrice =
+        selectedPlan.price + 0; // Optional: add GST or other fees
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -257,9 +268,11 @@ class BikeInsuranceReviewPage extends ConsumerWidget {
                 flex: 1,
                 child: ElevatedButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Payment would be processed here'),
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => BikeInsurancePaymentSuccessPage(
+                          amountInRupees: totalPrice,
+                        ),
                       ),
                     );
                   },
@@ -311,9 +324,7 @@ class _ReviewDetailRow extends StatelessWidget {
         Expanded(
           child: Text(
             value,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface,
-            ),
+            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
           ),
         ),
       ],

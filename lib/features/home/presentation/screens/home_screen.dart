@@ -7,6 +7,7 @@ import '../widgets/home_widgets.dart';
 import 'hub_detail_screen.dart';
 import 'gold_silver_all_services_screen.dart';
 import 'wealth_home_screen.dart';
+import 'ai_assistant_screen.dart';
 import '../../../accounts/presentation/screens/my_account_screen.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
 import '../../../learning/presentation/screens/learning_hub_screen.dart';
@@ -29,17 +30,74 @@ class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   /// Recharges & Bills hub items with navigation to each feature. Used for grid and View All.
-  static List<HomeIconGridItem> _rechargesBillsItems(BuildContext context, AppLocalizations l10n) {
+  static List<HomeIconGridItem> _rechargesBillsItems(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     return [
-      HomeIconGridItem(Icons.phone_android_rounded, l10n.homeRechargeMobile, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MobileRechargeRoutes.entryPage()))),
-      HomeIconGridItem(Icons.tv_rounded, l10n.homeRechargeDth, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => DthRechargeRoutes.entryPage()))),
-      HomeIconGridItem(Icons.directions_car_rounded, l10n.homeRechargeFastag, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => FastagRoutes.entryPage()))),
-      HomeIconGridItem(Icons.bolt_rounded, l10n.homeRechargeElectricity, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => ElectricityRoutes.entryPage()))),
-      HomeIconGridItem(Icons.wifi_rounded, l10n.homeRechargeBroadband, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => BroadbandRoutes.entryPage()))),
-      HomeIconGridItem(Icons.credit_card_rounded, l10n.homeRechargeCreditCard, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => CreditCardRoutes.entryPage()))),
-      HomeIconGridItem(Icons.school_rounded, l10n.homeRechargeSchoolFees, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => EducationRoutes.entryPage()))),
-      HomeIconGridItem(Icons.water_drop_rounded, l10n.homeRechargeMunicipal, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => GovernmentBillsRoutes.entryPage()))),
-      HomeIconGridItem(Icons.account_balance_rounded, l10n.homeRechargeLoanEmi, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => CreditCardRoutes.entryPage()))),
+      HomeIconGridItem(
+        Icons.phone_android_rounded,
+        l10n.homeRechargeMobile,
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => MobileRechargeRoutes.entryPage()),
+        ),
+      ),
+      HomeIconGridItem(
+        Icons.tv_rounded,
+        l10n.homeRechargeDth,
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => DthRechargeRoutes.entryPage()),
+        ),
+      ),
+      HomeIconGridItem(
+        Icons.directions_car_rounded,
+        l10n.homeRechargeFastag,
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => FastagRoutes.entryPage())),
+      ),
+      HomeIconGridItem(
+        Icons.bolt_rounded,
+        l10n.homeRechargeElectricity,
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => ElectricityRoutes.entryPage()),
+        ),
+      ),
+      HomeIconGridItem(
+        Icons.wifi_rounded,
+        l10n.homeRechargeBroadband,
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => BroadbandRoutes.entryPage())),
+      ),
+      HomeIconGridItem(
+        Icons.credit_card_rounded,
+        l10n.homeRechargeCreditCard,
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => CreditCardRoutes.entryPage())),
+      ),
+      HomeIconGridItem(
+        Icons.school_rounded,
+        l10n.homeRechargeSchoolFees,
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => EducationRoutes.entryPage())),
+      ),
+      HomeIconGridItem(
+        Icons.water_drop_rounded,
+        l10n.homeRechargeMunicipal,
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => GovernmentBillsRoutes.entryPage()),
+        ),
+      ),
+      HomeIconGridItem(
+        Icons.account_balance_rounded,
+        l10n.homeRechargeLoanEmi,
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => CreditCardRoutes.entryPage())),
+      ),
     ];
   }
 
@@ -51,6 +109,7 @@ class HomeScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
+            _buildMargHeader(context, l10n),
             const HomeHeader(),
             Expanded(
               child: ListView(
@@ -72,7 +131,9 @@ class HomeScreen extends ConsumerWidget {
                     },
                   ),
                   const SizedBox(height: 12),
-                  HomeRechargesBillsHub(items: _rechargesBillsItems(context, l10n)),
+                  HomeRechargesBillsHub(
+                    items: _rechargesBillsItems(context, l10n),
+                  ),
                   const SizedBox(height: 24),
                   HomeSectionTitle(
                     title: l10n.homeHubGoldSilver,
@@ -106,13 +167,34 @@ class HomeScreen extends ConsumerWidget {
                     showViewAll: true,
                     onViewAllTap: () {
                       final items = [
-                        HomeIconGridItem(Icons.directions_car_rounded, l10n.homeIconTravel),
-                        HomeIconGridItem(Icons.add_circle_outline_rounded, l10n.homeIconTopUp),
-                        HomeIconGridItem(Icons.local_fire_department_rounded, l10n.homeIconUtilities),
-                        HomeIconGridItem(Icons.business_rounded, l10n.homeIconCityServices),
-                        HomeIconGridItem(Icons.card_giftcard_rounded, l10n.homeIconRewards),
-                        HomeIconGridItem(Icons.family_restroom_rounded, l10n.homeIconFamilyCenter),
-                        HomeIconGridItem(Icons.eco_rounded, l10n.homeIconCreditLife),
+                        HomeIconGridItem(
+                          Icons.directions_car_rounded,
+                          l10n.homeIconTravel,
+                        ),
+                        HomeIconGridItem(
+                          Icons.add_circle_outline_rounded,
+                          l10n.homeIconTopUp,
+                        ),
+                        HomeIconGridItem(
+                          Icons.local_fire_department_rounded,
+                          l10n.homeIconUtilities,
+                        ),
+                        HomeIconGridItem(
+                          Icons.business_rounded,
+                          l10n.homeIconCityServices,
+                        ),
+                        HomeIconGridItem(
+                          Icons.card_giftcard_rounded,
+                          l10n.homeIconRewards,
+                        ),
+                        HomeIconGridItem(
+                          Icons.family_restroom_rounded,
+                          l10n.homeIconFamilyCenter,
+                        ),
+                        HomeIconGridItem(
+                          Icons.eco_rounded,
+                          l10n.homeIconCreditLife,
+                        ),
                         HomeIconGridItem(Icons.apps_rounded, l10n.homeIconMore),
                       ];
                       Navigator.of(context).push(
@@ -133,12 +215,16 @@ class HomeScreen extends ConsumerWidget {
                   HomeServiceHub(
                     onFirstMessageTap: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const NotificationListScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationListScreen(),
+                        ),
                       );
                     },
                     onSecondMessageTap: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const AddPromoScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const AddPromoScreen(),
+                        ),
                       );
                     },
                   ),
@@ -157,9 +243,9 @@ class HomeScreen extends ConsumerWidget {
                 );
               },
               onScanTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const ScanQrScreen()),
-                );
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => const ScanQrScreen()));
               },
               onDiscoverTap: () {
                 Navigator.of(context).push(
@@ -178,7 +264,9 @@ class HomeScreen extends ConsumerWidget {
                   );
                   if (loggedIn == true && context.mounted) {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const MyAccountScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => const MyAccountScreen(),
+                      ),
                     );
                   }
                 }
@@ -189,4 +277,67 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+Widget _buildMargHeader(BuildContext context, AppLocalizations l10n) {
+  return Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.06),
+          blurRadius: 6,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    child: Row(
+      children: [
+        Icon(Icons.eco_rounded, size: 28, color: AppColors.primaryBlue),
+        const SizedBox(width: 8),
+        Text(
+          l10n.appName,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryBlue,
+          ),
+        ),
+        const Spacer(),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const AiAssistantScreen()),
+            );
+          },
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          child: const Text(
+            'AI',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+        IconButton(
+          icon: const Icon(Icons.search_rounded, color: AppColors.textPrimary),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.notifications_outlined,
+            color: AppColors.textPrimary,
+          ),
+          onPressed: () {},
+        ),
+      ],
+    ),
+  );
 }

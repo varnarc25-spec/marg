@@ -19,37 +19,42 @@ class BudgetTransaction {
   final String dateTime;
   final double amount;
   final IconData icon;
+  final String? note;
+  final DateTime? date;
 
   const BudgetTransaction({
     required this.title,
     required this.dateTime,
     required this.amount,
     this.icon = Icons.restaurant_rounded,
+    this.note,
+    this.date,
+  });
+}
+
+/// Single budget entry added from New income/expense sheets.
+/// Positive amount = income, negative amount = expense.
+class BudgetEntry {
+  final String category;
+  final double amount;
+  final DateTime date;
+
+  const BudgetEntry({
+    required this.category,
+    required this.amount,
+    required this.date,
   });
 }
 
 /// Default summary for Mybudget page (Total Amount, Expenses, Budget).
 const BudgetSummary defaultBudgetSummary = BudgetSummary(
-  totalAmount: 49920.00,
-  expenses: 80.00,
-  budget: 50000.00,
+  totalAmount: 0.0,
+  expenses: 0.0,
+  budget: 0.0,
 );
 
 /// Mock recent transactions.
-final List<BudgetTransaction> defaultBudgetTransactions = [
-  const BudgetTransaction(
-    title: 'Poori',
-    dateTime: '2026-03-01 18:50',
-    amount: 35.00,
-    icon: Icons.restaurant_rounded,
-  ),
-  const BudgetTransaction(
-    title: 'Dosa',
-    dateTime: '2026-03-01 08:48',
-    amount: 45.00,
-    icon: Icons.restaurant_rounded,
-  ),
-];
+final List<BudgetTransaction> defaultBudgetTransactions = [];
 
 // --- Analytics ---
 
