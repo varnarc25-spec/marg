@@ -64,6 +64,7 @@ class _LivePriceCardsState extends State<LivePriceCards> {
 
     final globalGoldUsd = goldGlobal?['usdPerOz']?.toString() ?? '--';
     final globalSilverUsd = silverGlobal?['usdPerOz']?.toString() ?? '--';
+    // Gold/silver INR per gram: use data.rates.gBuy/sBuy only (do not use global.gold.inrPerGram / global.silver.inrPerGram).
     final gBuy = rates?['gBuy']?.toString() ?? '--';
     final sBuy = rates?['sBuy']?.toString() ?? '--';
 

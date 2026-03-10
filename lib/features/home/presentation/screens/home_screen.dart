@@ -4,6 +4,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../widgets/home_widgets.dart';
+import '../../../../shared/widgets/marg_header.dart';
 import 'hub_detail_screen.dart';
 import 'gold_silver_all_services_screen.dart';
 import 'wealth_home_screen.dart';
@@ -109,7 +110,14 @@ class HomeScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            _buildMargHeader(context, l10n),
+            MargHeader(
+              l10n: l10n,
+              onAiTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AiAssistantScreen()),
+                );
+              },
+            ),
             const HomeHeader(),
             Expanded(
               child: ListView(
@@ -279,65 +287,3 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-Widget _buildMargHeader(BuildContext context, AppLocalizations l10n) {
-  return Container(
-    decoration: BoxDecoration(
-      color: Colors.white,
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.06),
-          blurRadius: 6,
-          offset: const Offset(0, 2),
-        ),
-      ],
-    ),
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    child: Row(
-      children: [
-        Icon(Icons.eco_rounded, size: 28, color: AppColors.primaryBlue),
-        const SizedBox(width: 8),
-        Text(
-          l10n.appName,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryBlue,
-          ),
-        ),
-        const Spacer(),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const AiAssistantScreen()),
-            );
-          },
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-          child: const Text(
-            'AI',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ),
-        const SizedBox(width: 4),
-        IconButton(
-          icon: const Icon(Icons.search_rounded, color: AppColors.textPrimary),
-          onPressed: () {},
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.notifications_outlined,
-            color: AppColors.textPrimary,
-          ),
-          onPressed: () {},
-        ),
-      ],
-    ),
-  );
-}

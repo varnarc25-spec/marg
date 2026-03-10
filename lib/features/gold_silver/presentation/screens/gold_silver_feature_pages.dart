@@ -127,7 +127,7 @@ class _MetalConfig {
     balanceTitle: 'My Gold Balance',
     investTitle: 'Invest in 24k Gold',
     buyPriceLabel: 'Buying Price:',
-    buyPriceValue: '₹16334.18/gm',
+    buyPriceValue: '₹16334.18/gm - test',
     buyPriceMeta: '(+3% GST)',
     riseText: '245.8% Gold price rise in last 5 years',
     purityText: 'You will be purchasing gold of 24K | 99.9% purity',
