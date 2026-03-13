@@ -11,14 +11,10 @@ class HomeConvenientHub extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = ref.watch(l10nProvider);
     final items = [
-      HomeIconGridItem(Icons.directions_car_rounded, l10n.homeIconTravel),
-      HomeIconGridItem(Icons.add_circle_outline_rounded, l10n.homeIconTopUp),
-      HomeIconGridItem(Icons.local_fire_department_rounded, l10n.homeIconUtilities),
       HomeIconGridItem(Icons.business_rounded, l10n.homeIconCityServices),
       HomeIconGridItem(Icons.card_giftcard_rounded, l10n.homeIconRewards),
       HomeIconGridItem(Icons.family_restroom_rounded, l10n.homeIconFamilyCenter),
       HomeIconGridItem(Icons.eco_rounded, l10n.homeIconCreditLife),
-      HomeIconGridItem(Icons.apps_rounded, l10n.homeIconMore),
     ];
     return HomeIconGrid(items: items, columns: 4, maxItems: 4);
   }

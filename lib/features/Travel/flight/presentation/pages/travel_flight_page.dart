@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_theme.dart';
 import '../../data/flight_city_model.dart';
 import '../providers/flight_search_provider.dart';
+import '../../data/flight_search_service.dart';
 import 'flight_city_select_page.dart';
+import 'flight_my_bookings_page.dart';
 import 'flight_search_results_page.dart';
 
 /// Single Travel Flights page: app bar, promo, search card,
@@ -22,6 +24,9 @@ class _TravelFlightPageState extends ConsumerState<TravelFlightPage> {
   int _specialFareIndex = 0; // Student, Armed Forces, Senior Citizen
   bool _nonStopOnly = false;
   int _bottomNavIndex = 3; // Flight Tracker selected
+  DateTime _departureDate = DateTime.now();
+  int _adults = 1;
+  String _cabinClass = 'Economy';
 
   Future<void> _openCitySelect({required bool selectingFrom}) async {
     final from = ref.read(flightFromProvider);
@@ -111,9 +116,208 @@ class _TravelFlightPageState extends ConsumerState<TravelFlightPage> {
                   fromCity: from.cityName,
                   toCode: to.code,
                   toCity: to.cityName,
+                  departureDate: _departureDate,
                   onFromTap: () => _openCitySelect(selectingFrom: true),
                   onToTap: () => _openCitySelect(selectingFrom: false),
-                  onSearchPressed: () {
+                  onDepartureDateTap: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _departureDate.isAfter(now)
+                          ? _departureDate
+                          : now,
+                      firstDate: now,
+                      lastDate: now.add(const Duration(days: 365)),
+                    );
+                    if (picked != null && mounted) {
+                      setState(() {
+                        _departureDate = picked;
+                      });
+                    }
+                  },
+                  adults: _adults,
+                  cabinClass: _cabinClass,
+                  onTravellersTap: () async {
+                    final result =
+                        await showModalBottomSheet<
+                          ({int adults, String cabinClass})
+                        >(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) {
+                            final theme = Theme.of(context);
+                            final colorScheme = theme.colorScheme;
+                            final textTheme = theme.textTheme;
+                            int tmpAdults = _adults;
+                            String tmpCabin = _cabinClass;
+                            return StatefulBuilder(
+                              builder: (context, setModalState) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.surface,
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(20),
+                                    ),
+                                  ),
+                                  padding: EdgeInsets.fromLTRB(
+                                    20,
+                                    16,
+                                    20,
+                                    16 + MediaQuery.paddingOf(context).bottom,
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Travellers & Cabin Class',
+                                            style: textTheme.titleMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w600,
+                                                  color: colorScheme.onSurface,
+                                                ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            icon: Icon(
+                                              Icons.close_rounded,
+                                              color:
+                                                  colorScheme.onSurfaceVariant,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'Adults',
+                                        style: textTheme.bodyMedium?.copyWith(
+                                          color: colorScheme.onSurface,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              if (tmpAdults > 1) {
+                                                setModalState(
+                                                  () => tmpAdults--,
+                                                );
+                                              }
+                                            },
+                                            icon: const Icon(
+                                              Icons.remove_circle,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '$tmpAdults Adult${tmpAdults > 1 ? "s" : ""}',
+                                        style: textTheme.bodyMedium?.copyWith(
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'Cabin Class',
+                                        style: textTheme.bodyMedium?.copyWith(
+                                          color: colorScheme.onSurface,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Wrap(
+                                        spacing: 8,
+                                        children: [
+                                          for (final label in const [
+                                            'Economy',
+                                            'Premium Economy',
+                                            'Business',
+                                            'First',
+                                          ])
+                                            ChoiceChip(
+                                              label: Text(label),
+                                              selected: tmpCabin == label,
+                                              onSelected: (_) {
+                                                setModalState(
+                                                  () => tmpCabin = label,
+                                                );
+                                              },
+                                            ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 20),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        height: 48,
+                                        child: FilledButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop((
+                                              adults: tmpAdults,
+                                              cabinClass: tmpCabin,
+                                            ));
+                                          },
+                                          child: const Text('Done'),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                    if (result != null && mounted) {
+                      setState(() {
+                        _adults = result.adults;
+                        _cabinClass = result.cabinClass;
+                      });
+                    }
+                  },
+                  onSearchPressed: () async {
+                    final api = ref.read(flightApiServiceProvider);
+
+                    // Use selected date and travellers for the search.
+                    final departureDate = _departureDate
+                        .toIso8601String()
+                        .split('T')
+                        .first; // YYYY-MM-DD
+                    final dateLabel =
+                        '${_departureDate.day.toString().padLeft(2, '0')}/'
+                        '${_departureDate.month.toString().padLeft(2, '0')}/'
+                        '${_departureDate.year}';
+
+                    try {
+                      final flights = await api.searchOneWay(
+                        fromCode: from.code,
+                        toCode: to.code,
+                        departureDate: departureDate,
+                        adults: _adults,
+                      );
+                      if (!mounted) return;
+                      ref.read(flightResultsProvider.notifier).state = flights;
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Could not fetch live flights. Showing demo data instead.',
+                          ),
+                        ),
+                      );
+                      ref.read(flightResultsProvider.notifier).state =
+                          FlightSearchService.flightResultsMock;
+                    }
+
+                    if (!mounted) return;
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => FlightSearchResultsPage(
@@ -121,9 +325,10 @@ class _TravelFlightPageState extends ConsumerState<TravelFlightPage> {
                           fromCity: from.cityName,
                           toCode: to.code,
                           toCity: to.cityName,
-                          dateLabel: 'Tue, 10 Mar',
-                          travellersLabel: '1 Traveller',
-                          cabinLabel: 'Economy',
+                          dateLabel: dateLabel,
+                          travellersLabel:
+                              '$_adults Adult${_adults > 1 ? "s" : ""}',
+                          cabinLabel: _cabinClass,
                         ),
                       ),
                     );
@@ -131,41 +336,81 @@ class _TravelFlightPageState extends ConsumerState<TravelFlightPage> {
                   oneWay: _oneWay,
                   onOneWayChanged: (v) => setState(() => _oneWay = v),
                   specialFareIndex: _specialFareIndex,
-                  onSpecialFareTap: (i) => setState(() => _specialFareIndex = i),
+                  onSpecialFareTap: (i) =>
+                      setState(() => _specialFareIndex = i),
                   nonStopOnly: _nonStopOnly,
                   onNonStopChanged: (v) => setState(() => _nonStopOnly = v),
                   colorScheme: colorScheme,
                   textTheme: textTheme,
                 ),
                 const SizedBox(height: 24),
-                _SectionTitle(title: 'Destination of the Week: Malaysia', textTheme: textTheme, colorScheme: colorScheme),
+                _SectionTitle(
+                  title: 'Destination of the Week: Malaysia',
+                  textTheme: textTheme,
+                  colorScheme: colorScheme,
+                ),
                 const SizedBox(height: 10),
-                _DestinationWeekRow(colorScheme: colorScheme, textTheme: textTheme),
+                _DestinationWeekRow(
+                  colorScheme: colorScheme,
+                  textTheme: textTheme,
+                ),
                 const SizedBox(height: 24),
-                _SectionTitle(title: 'Long Weekend Getaways', textTheme: textTheme, colorScheme: colorScheme),
+                _SectionTitle(
+                  title: 'Long Weekend Getaways',
+                  textTheme: textTheme,
+                  colorScheme: colorScheme,
+                ),
                 const SizedBox(height: 10),
                 _LongWeekendRow(colorScheme: colorScheme, textTheme: textTheme),
                 const SizedBox(height: 24),
-                _SectionTitle(title: 'Bank Offers', textTheme: textTheme, colorScheme: colorScheme),
+                _SectionTitle(
+                  title: 'Bank Offers',
+                  textTheme: textTheme,
+                  colorScheme: colorScheme,
+                ),
                 const SizedBox(height: 10),
                 _BankOffersRow(colorScheme: colorScheme, textTheme: textTheme),
                 const SizedBox(height: 24),
-                _CricketFeverBanner(colorScheme: colorScheme, textTheme: textTheme),
+                _CricketFeverBanner(
+                  colorScheme: colorScheme,
+                  textTheme: textTheme,
+                ),
                 const SizedBox(height: 24),
-                _SectionTitle(title: 'Exotic places now Visa-free', textTheme: textTheme, colorScheme: colorScheme),
+                _SectionTitle(
+                  title: 'Exotic places now Visa-free',
+                  textTheme: textTheme,
+                  colorScheme: colorScheme,
+                ),
                 const SizedBox(height: 10),
                 _VisaFreeRow(colorScheme: colorScheme, textTheme: textTheme),
                 const SizedBox(height: 24),
-                _SectionTitle(title: 'Recent Searches', textTheme: textTheme, colorScheme: colorScheme),
+                _SectionTitle(
+                  title: 'Recent Searches',
+                  textTheme: textTheme,
+                  colorScheme: colorScheme,
+                ),
                 const SizedBox(height: 10),
-                _RecentSearchesRow(colorScheme: colorScheme, textTheme: textTheme),
+                _RecentSearchesRow(
+                  colorScheme: colorScheme,
+                  textTheme: textTheme,
+                ),
                 const SizedBox(height: 24),
               ],
             ),
           ),
           _TravelBottomNav(
             selectedIndex: _bottomNavIndex,
-            onTap: (i) => setState(() => _bottomNavIndex = i),
+            onTap: (i) {
+              if (i == 0) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const FlightMyBookingsPage(),
+                  ),
+                );
+                return;
+              }
+              setState(() => _bottomNavIndex = i);
+            },
             colorScheme: colorScheme,
             textTheme: textTheme,
           ),
@@ -192,7 +437,11 @@ class _PromoBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.card_giftcard_rounded, size: 22, color: colorScheme.primary),
+          Icon(
+            Icons.card_giftcard_rounded,
+            size: 22,
+            color: colorScheme.primary,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -214,8 +463,13 @@ class _FlightSearchCard extends StatelessWidget {
     required this.fromCity,
     required this.toCode,
     required this.toCity,
+    required this.departureDate,
     required this.onFromTap,
     required this.onToTap,
+    required this.onDepartureDateTap,
+    required this.adults,
+    required this.cabinClass,
+    required this.onTravellersTap,
     required this.onSearchPressed,
     required this.oneWay,
     required this.onOneWayChanged,
@@ -233,6 +487,11 @@ class _FlightSearchCard extends StatelessWidget {
   final String toCity;
   final VoidCallback onFromTap;
   final VoidCallback onToTap;
+  final DateTime departureDate;
+  final VoidCallback onDepartureDateTap;
+  final int adults;
+  final String cabinClass;
+  final VoidCallback onTravellersTap;
   final VoidCallback onSearchPressed;
   final bool oneWay;
   final ValueChanged<bool> onOneWayChanged;
@@ -286,9 +545,25 @@ class _FlightSearchCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('From', style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant)),
-                          Text(fromCode, style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
-                          Text(fromCity, style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+                          Text(
+                            'From',
+                            style: textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          Text(
+                            fromCode,
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          Text(
+                            fromCity,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -296,7 +571,10 @@ class _FlightSearchCard extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.swap_horiz_rounded, color: colorScheme.primary),
+                  icon: Icon(
+                    Icons.swap_horiz_rounded,
+                    color: colorScheme.primary,
+                  ),
                 ),
                 Expanded(
                   child: InkWell(
@@ -307,9 +585,25 @@ class _FlightSearchCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('To', style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant)),
-                          Text(toCode, style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
-                          Text(toCity, style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+                          Text(
+                            'To',
+                            style: textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          Text(
+                            toCode,
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          Text(
+                            toCity,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -320,39 +614,102 @@ class _FlightSearchCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Departure Date', style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant)),
-                    Text('Tue, 10 Mar 26', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: colorScheme.onSurface)),
-                  ],
+                InkWell(
+                  onTap: onDepartureDateTap,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Departure Date',
+                          style: textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${departureDate.day.toString().padLeft(2, '0')} '
+                          '${_monthShort(departureDate.month)} '
+                          '${departureDate.year.toString().substring(2)}',
+                          style: textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 const Spacer(),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('Save more on Roundtrip', style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+                    Text(
+                      'Save more on Roundtrip',
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                     TextButton(
                       onPressed: () {},
-                      style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                      child: Text('+ Add Return', style: textTheme.bodySmall?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.w600)),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        '+ Add Return',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            _LabelValue(label: 'Travellers & Cabin Class', value: '1 Adult • Economy', colorScheme: colorScheme, textTheme: textTheme),
+            InkWell(
+              onTap: onTravellersTap,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: _LabelValue(
+                  label: 'Travellers & Cabin Class',
+                  value: '$adults Adult${adults > 1 ? "s" : ""} • $cabinClass',
+                  colorScheme: colorScheme,
+                  textTheme: textTheme,
+                ),
+              ),
+            ),
             const SizedBox(height: 14),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Special Fares (optional)', style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+                Text(
+                  'Special Fares (optional)',
+                  style: textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
                 Row(
                   children: [
-                    Icon(Icons.savings_rounded, size: 16, color: AppColors.accentGreen),
+                    Icon(
+                      Icons.savings_rounded,
+                      size: 16,
+                      color: AppColors.accentGreen,
+                    ),
                     const SizedBox(width: 4),
-                    Text('Extra Savings', style: textTheme.labelSmall?.copyWith(color: AppColors.accentGreen, fontWeight: FontWeight.w600)),
+                    Text(
+                      'Extra Savings',
+                      style: textTheme.labelSmall?.copyWith(
+                        color: AppColors.accentGreen,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -362,9 +719,27 @@ class _FlightSearchCard extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                _SpecialFareChip(label: 'Student Extra Baggage', selected: specialFareIndex == 0, onTap: () => onSpecialFareTap(0), colorScheme: colorScheme, textTheme: textTheme),
-                _SpecialFareChip(label: 'Armed Forces Up to ₹600 off', selected: specialFareIndex == 1, onTap: () => onSpecialFareTap(1), colorScheme: colorScheme, textTheme: textTheme),
-                _SpecialFareChip(label: 'Senior Citizen Up to ₹600 off', selected: specialFareIndex == 2, onTap: () => onSpecialFareTap(2), colorScheme: colorScheme, textTheme: textTheme),
+                _SpecialFareChip(
+                  label: 'Student Extra Baggage',
+                  selected: specialFareIndex == 0,
+                  onTap: () => onSpecialFareTap(0),
+                  colorScheme: colorScheme,
+                  textTheme: textTheme,
+                ),
+                _SpecialFareChip(
+                  label: 'Armed Forces Up to ₹600 off',
+                  selected: specialFareIndex == 1,
+                  onTap: () => onSpecialFareTap(1),
+                  colorScheme: colorScheme,
+                  textTheme: textTheme,
+                ),
+                _SpecialFareChip(
+                  label: 'Senior Citizen Up to ₹600 off',
+                  selected: specialFareIndex == 2,
+                  onTap: () => onSpecialFareTap(2),
+                  colorScheme: colorScheme,
+                  textTheme: textTheme,
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -376,12 +751,21 @@ class _FlightSearchCard extends StatelessWidget {
                   child: Checkbox(
                     value: nonStopOnly,
                     onChanged: (v) => onNonStopChanged(v ?? false),
-                    fillColor: WidgetStateProperty.resolveWith((_) => colorScheme.primary),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                    fillColor: WidgetStateProperty.resolveWith(
+                      (_) => colorScheme.primary,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text('Show Non-stop flights only', style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface)),
+                Text(
+                  'Show Non-stop flights only',
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -400,18 +784,37 @@ class _FlightSearchCard extends StatelessWidget {
   }
 }
 
-Widget _LabelValue({required String label, required String value, required ColorScheme colorScheme, required TextTheme textTheme}) {
+Widget _LabelValue({
+  required String label,
+  required String value,
+  required ColorScheme colorScheme,
+  required TextTheme textTheme,
+}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant)),
-      Text(value, style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface)),
+      Text(
+        label,
+        style: textTheme.labelSmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      ),
+      Text(
+        value,
+        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
+      ),
     ],
   );
 }
 
 class _SegmentChip extends StatelessWidget {
-  const _SegmentChip({required this.label, required this.selected, required this.onTap, required this.colorScheme, required this.textTheme});
+  const _SegmentChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    required this.colorScheme,
+    required this.textTheme,
+  });
 
   final String label;
   final bool selected;
@@ -422,7 +825,9 @@ class _SegmentChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? colorScheme.surfaceContainerHighest : colorScheme.primary.withValues(alpha: 0.1),
+      color: selected
+          ? colorScheme.surfaceContainerHighest
+          : colorScheme.primary.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
@@ -434,7 +839,9 @@ class _SegmentChip extends StatelessWidget {
               label,
               style: textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: selected ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+                color: selected
+                    ? colorScheme.onSurface
+                    : colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -445,7 +852,13 @@ class _SegmentChip extends StatelessWidget {
 }
 
 class _SpecialFareChip extends StatelessWidget {
-  const _SpecialFareChip({required this.label, required this.selected, required this.onTap, required this.colorScheme, required this.textTheme});
+  const _SpecialFareChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    required this.colorScheme,
+    required this.textTheme,
+  });
 
   final String label;
   final bool selected;
@@ -456,7 +869,9 @@ class _SpecialFareChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? Colors.transparent : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+      color: selected
+          ? Colors.transparent
+          : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: onTap,
@@ -470,7 +885,9 @@ class _SpecialFareChip extends StatelessWidget {
           child: Text(
             label,
             style: textTheme.bodySmall?.copyWith(
-              color: selected ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+              color: selected
+                  ? colorScheme.onSurface
+                  : colorScheme.onSurfaceVariant,
               fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -480,8 +897,31 @@ class _SpecialFareChip extends StatelessWidget {
   }
 }
 
+String _monthShort(int month) {
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  if (month < 1 || month > 12) return '';
+  return months[month - 1];
+}
+
 class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({required this.title, required this.textTheme, required this.colorScheme});
+  const _SectionTitle({
+    required this.title,
+    required this.textTheme,
+    required this.colorScheme,
+  });
 
   final String title;
   final TextTheme textTheme;
@@ -500,7 +940,10 @@ class _SectionTitle extends StatelessWidget {
 }
 
 class _DestinationWeekRow extends StatelessWidget {
-  const _DestinationWeekRow({required this.colorScheme, required this.textTheme});
+  const _DestinationWeekRow({
+    required this.colorScheme,
+    required this.textTheme,
+  });
 
   final ColorScheme colorScheme;
   final TextTheme textTheme;
@@ -509,7 +952,11 @@ class _DestinationWeekRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       ('Malaysia Itinerary', 'Explore Now', AppColors.iconTilePastelBlue),
-      ('Visa Requirements', 'Check Now', AppColors.accentGreen.withValues(alpha: 0.3)),
+      (
+        'Visa Requirements',
+        'Check Now',
+        AppColors.accentGreen.withValues(alpha: 0.3),
+      ),
       ('Top Things to Do', 'Explore Now', AppColors.iconTilePastelPurple),
     ];
     return SizedBox(
@@ -520,7 +967,13 @@ class _DestinationWeekRow extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, i) {
           final (title, sub, bg) = items[i];
-          return _DiscoveryCard(title: title, subtitle: sub, backgroundColor: bg, colorScheme: colorScheme, textTheme: textTheme);
+          return _DiscoveryCard(
+            title: title,
+            subtitle: sub,
+            backgroundColor: bg,
+            colorScheme: colorScheme,
+            textTheme: textTheme,
+          );
         },
       ),
     );
@@ -548,7 +1001,12 @@ class _LongWeekendRow extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, i) {
           final (title, sub) = items[i];
-          return _GetawayCard(title: title, subtitle: sub, colorScheme: colorScheme, textTheme: textTheme);
+          return _GetawayCard(
+            title: title,
+            subtitle: sub,
+            colorScheme: colorScheme,
+            textTheme: textTheme,
+          );
         },
       ),
     );
@@ -582,8 +1040,14 @@ class _DiscoveryCard extends StatelessWidget {
             Expanded(
               flex: 3,
               child: Container(
-                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                child: Icon(Icons.image_rounded, size: 48, color: colorScheme.onSurfaceVariant),
+                color: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
+                child: Icon(
+                  Icons.image_rounded,
+                  size: 48,
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
             Container(
@@ -592,8 +1056,19 @@ class _DiscoveryCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: colorScheme.onSurface)),
-                  Text(subtitle, style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+                  Text(
+                    title,
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -605,7 +1080,12 @@ class _DiscoveryCard extends StatelessWidget {
 }
 
 class _GetawayCard extends StatelessWidget {
-  const _GetawayCard({required this.title, required this.subtitle, required this.colorScheme, required this.textTheme});
+  const _GetawayCard({
+    required this.title,
+    required this.subtitle,
+    required this.colorScheme,
+    required this.textTheme,
+  });
 
   final String title;
   final String subtitle;
@@ -624,8 +1104,14 @@ class _GetawayCard extends StatelessWidget {
             Expanded(
               flex: 3,
               child: Container(
-                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                child: Icon(Icons.landscape_rounded, size: 48, color: colorScheme.onSurfaceVariant),
+                color: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
+                child: Icon(
+                  Icons.landscape_rounded,
+                  size: 48,
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
             Padding(
@@ -633,8 +1119,21 @@ class _GetawayCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: colorScheme.onSurface)),
-                  Text(subtitle, style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(
+                    title,
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
@@ -654,9 +1153,27 @@ class _BankOffersRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      ('RBLBANK', 'Flat 10% Off', 'on International Flights →', 'INTRBLEMI', colorScheme.primary),
-      ('AXIS BANK', 'Flat 10% Off', 'on International Flights →', 'INTAXISEMI', const Color(0xFFAB47BC)),
-      ('HDFC BANK', 'Up to ₹5000 Off', 'on International Flights →', 'INTHDFC3M', colorScheme.primary),
+      (
+        'RBLBANK',
+        'Flat 10% Off',
+        'on International Flights →',
+        'INTRBLEMI',
+        colorScheme.primary,
+      ),
+      (
+        'AXIS BANK',
+        'Flat 10% Off',
+        'on International Flights →',
+        'INTAXISEMI',
+        const Color(0xFFAB47BC),
+      ),
+      (
+        'HDFC BANK',
+        'Up to ₹5000 Off',
+        'on International Flights →',
+        'INTHDFC3M',
+        colorScheme.primary,
+      ),
     ];
     return SizedBox(
       height: 180,
@@ -712,7 +1229,13 @@ class _BankOfferCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               color: topColor.withValues(alpha: 0.3),
-              child: Text(bankName, style: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
+              child: Text(
+                bankName,
+                style: textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
+              ),
             ),
             Container(
               padding: const EdgeInsets.all(10),
@@ -720,8 +1243,17 @@ class _BankOfferCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(offerTitle, style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
-                  Text(offerSubtitle, style: textTheme.bodySmall?.copyWith(color: Colors.white70)),
+                  Text(
+                    offerTitle,
+                    style: textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    offerSubtitle,
+                    style: textTheme.bodySmall?.copyWith(color: Colors.white70),
+                  ),
                 ],
               ),
             ),
@@ -734,12 +1266,20 @@ class _BankOfferCard extends StatelessWidget {
                   children: [
                     Text(
                       'Valid on Credit Card EMI • T&C Apply',
-                      style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
-                    Text('Promo: $promoCode', style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600, color: colorScheme.onSurface)),
+                    Text(
+                      'Promo: $promoCode',
+                      style: textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -752,7 +1292,10 @@ class _BankOfferCard extends StatelessWidget {
 }
 
 class _CricketFeverBanner extends StatelessWidget {
-  const _CricketFeverBanner({required this.colorScheme, required this.textTheme});
+  const _CricketFeverBanner({
+    required this.colorScheme,
+    required this.textTheme,
+  });
 
   final ColorScheme colorScheme;
   final TextTheme textTheme;
@@ -768,7 +1311,10 @@ class _CricketFeverBanner extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [colorScheme.primary.withValues(alpha: 0.3), colorScheme.primary.withValues(alpha: 0.15)],
+            colors: [
+              colorScheme.primary.withValues(alpha: 0.3),
+              colorScheme.primary.withValues(alpha: 0.15),
+            ],
           ),
         ),
         child: Row(
@@ -778,18 +1324,36 @@ class _CricketFeverBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Fly for the T20 Fever!', style: textTheme.titleSmall?.copyWith(color: AppColors.accentOrange, fontWeight: FontWeight.bold)),
-                  Text('Flat 10% Off on international Flight', style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface)),
+                  Text(
+                    'Fly for the T20 Fever!',
+                    style: textTheme.titleSmall?.copyWith(
+                      color: AppColors.accentOrange,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Flat 10% Off on international Flight',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   FilledButton(
                     onPressed: () {},
-                    style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16), backgroundColor: AppColors.accentOrange),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      backgroundColor: AppColors.accentOrange,
+                    ),
                     child: const Text('Book Now'),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.flight_takeoff_rounded, size: 56, color: colorScheme.primary.withValues(alpha: 0.5)),
+            Icon(
+              Icons.flight_takeoff_rounded,
+              size: 56,
+              color: colorScheme.primary.withValues(alpha: 0.5),
+            ),
           ],
         ),
       ),
@@ -831,14 +1395,21 @@ class _VisaFreeRow extends StatelessWidget {
 }
 
 class _RecentSearchesRow extends StatelessWidget {
-  const _RecentSearchesRow({required this.colorScheme, required this.textTheme});
+  const _RecentSearchesRow({
+    required this.colorScheme,
+    required this.textTheme,
+  });
 
   final ColorScheme colorScheme;
   final TextTheme textTheme;
 
   @override
   Widget build(BuildContext context) {
-    final items = [('MAA - CMB', '08 Mar 26'), ('BBI - TIR', '04 Mar 26'), ('BBI - CDP', '04 Mar 26')];
+    final items = [
+      ('MAA - CMB', '08 Mar 26'),
+      ('BBI - TIR', '04 Mar 26'),
+      ('BBI - CDP', '04 Mar 26'),
+    ];
     return SizedBox(
       height: 72,
       child: ListView.separated(
@@ -852,13 +1423,27 @@ class _RecentSearchesRow extends StatelessWidget {
               onTap: () {},
               borderRadius: BorderRadius.circular(16),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(route, style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600, color: colorScheme.onSurface)),
-                    Text(date, style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+                    Text(
+                      route,
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      date,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -893,10 +1478,21 @@ class _TravelBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + MediaQuery.paddingOf(context).bottom),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        12,
+        16,
+        12 + MediaQuery.paddingOf(context).bottom,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, -2))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
@@ -912,28 +1508,39 @@ class _TravelBottomNav extends StatelessWidget {
                 onTap: () => onTap(i),
                 borderRadius: BorderRadius.circular(12),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: selected ? colorScheme.primary.withValues(alpha: 0.15) : Colors.transparent,
+                          color: selected
+                              ? colorScheme.primary.withValues(alpha: 0.15)
+                              : Colors.transparent,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           item.icon,
                           size: 24,
-                          color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                          color: selected
+                              ? colorScheme.primary
+                              : colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         item.label,
                         style: textTheme.labelSmall?.copyWith(
-                          color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
-                          fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                          color: selected
+                              ? colorScheme.primary
+                              : colorScheme.onSurfaceVariant,
+                          fontWeight: selected
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                         ),
                         textAlign: TextAlign.center,
                       ),

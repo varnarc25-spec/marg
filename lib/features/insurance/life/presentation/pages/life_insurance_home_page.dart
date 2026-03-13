@@ -58,9 +58,7 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
         ref.read(lifeSelectedSumAssuredLakhsProvider.notifier).state =
             next.result.recommendedCoverLakhs;
         Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => const LifeInsuranceCoverPage(),
-          ),
+          MaterialPageRoute(builder: (_) => const LifeInsuranceCoverPage()),
         );
       }
     });
@@ -145,7 +143,11 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.percent_rounded, size: 40, color: colorScheme.primary),
+                  Icon(
+                    Icons.percent_rounded,
+                    size: 40,
+                    color: colorScheme.primary,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     '0%',
@@ -229,14 +231,20 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
                       );
                       if (picked != null && mounted) {
                         setState(() => _selectedDob = picked);
-                        ref.read(lifeDateOfBirthProvider.notifier).state = picked;
+                        ref.read(lifeDateOfBirthProvider.notifier).state =
+                            picked;
                       }
                     },
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                        color: colorScheme.surfaceContainerHighest.withValues(
+                          alpha: 0.5,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: colorScheme.outline.withValues(alpha: 0.2),
@@ -276,8 +284,10 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(12),
+                      color: colorScheme.surfaceContainerHighest.withValues(
+                        alpha: 0.5,
+                      ),
+                      borderRadius: BorderRadius.circular(24),
                       border: Border.all(
                         color: colorScheme.outline.withValues(alpha: 0.2),
                       ),
@@ -288,7 +298,9 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
                       onChanged: (v) {
                         ref.read(lifeAnnualIncomeProvider.notifier).state = v;
                       },
-                      style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Eg: 10,00,000',
                         hintStyle: textTheme.bodyLarge?.copyWith(
@@ -324,8 +336,13 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
                     child: FilledButton(
                       onPressed: canCheck && coverState is! LifeCoverLoading
                           ? () {
-                              if (_selectedDob == null || income == null || income <= 0) return;
-                              ref.read(lifeCoverProvider.notifier).calculateCover(
+                              if (_selectedDob == null ||
+                                  income == null ||
+                                  income <= 0)
+                                return;
+                              ref
+                                  .read(lifeCoverProvider.notifier)
+                                  .calculateCover(
                                     dateOfBirth: _selectedDob!,
                                     annualIncome: income,
                                   );
@@ -363,8 +380,9 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
           const SizedBox(height: 12),
           InkWell(
             onTap: () {
-              ref.read(lifeAdvisoryConsentProvider.notifier).state =
-                  !ref.read(lifeAdvisoryConsentProvider);
+              ref.read(lifeAdvisoryConsentProvider.notifier).state = !ref.read(
+                lifeAdvisoryConsentProvider,
+              );
             },
             borderRadius: BorderRadius.circular(8),
             child: Row(
@@ -387,8 +405,11 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: advisoryConsent
-                      ? Icon(Icons.check_rounded,
-                          size: 18, color: colorScheme.onPrimary)
+                      ? Icon(
+                          Icons.check_rounded,
+                          size: 18,
+                          color: colorScheme.onPrimary,
+                        )
                       : null,
                 ),
                 const SizedBox(width: 12),
@@ -433,17 +454,36 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
             spacing: 8,
             runSpacing: 8,
             children: [
-              _FooterLink(label: 'Terms and Conditions', onTap: () {}, colorScheme: colorScheme, textTheme: textTheme),
+              _FooterLink(
+                label: 'Terms and Conditions',
+                onTap: () {},
+                colorScheme: colorScheme,
+                textTheme: textTheme,
+              ),
               Text(
                 ' ',
-                style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
-              _FooterLink(label: 'Privacy Policy', onTap: () {}, colorScheme: colorScheme, textTheme: textTheme),
+              _FooterLink(
+                label: 'Privacy Policy',
+                onTap: () {},
+                colorScheme: colorScheme,
+                textTheme: textTheme,
+              ),
               Text(
                 ' ',
-                style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
-              _FooterLink(label: 'Grievance Policy', onTap: () {}, colorScheme: colorScheme, textTheme: textTheme),
+              _FooterLink(
+                label: 'Grievance Policy',
+                onTap: () {},
+                colorScheme: colorScheme,
+                textTheme: textTheme,
+              ),
             ],
           ),
           const SizedBox(height: 24),
@@ -493,10 +533,7 @@ class _FeatureCard extends StatelessWidget {
 }
 
 class _BenefitsGrid extends StatelessWidget {
-  const _BenefitsGrid({
-    required this.colorScheme,
-    required this.textTheme,
-  });
+  const _BenefitsGrid({required this.colorScheme, required this.textTheme});
 
   final ColorScheme colorScheme;
   final TextTheme textTheme;

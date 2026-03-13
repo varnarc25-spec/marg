@@ -37,11 +37,9 @@ Reg. Address - Office-2, Floor 4,5,6,7, Wing A, Block A, Salarpuria Softzone, Se
 
     ref.listen<CarVehicleState>(carVehicleProvider, (prev, next) {
       if (next is CarVehicleSuccess && mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => const FindYourCarPage(),
-          ),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const FindYourCarPage()));
       }
     });
 
@@ -72,9 +70,7 @@ Reg. Address - Office-2, Floor 4,5,6,7, Wing A, Block A, Salarpuria Softzone, Se
             ),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const CarInsuranceHelpPage(),
-                ),
+                MaterialPageRoute(builder: (_) => const CarInsuranceHelpPage()),
               );
             },
           ),
@@ -125,7 +121,7 @@ Reg. Address - Office-2, Floor 4,5,6,7, Wing A, Block A, Salarpuria Softzone, Se
           Container(
             decoration: BoxDecoration(
               color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: colorScheme.outline.withValues(alpha: 0.2),
               ),
@@ -374,9 +370,7 @@ class _FindPlansSection extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             (vehicleState as CarVehicleError).message,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.error,
-            ),
+            style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
           ),
         ],
       ],

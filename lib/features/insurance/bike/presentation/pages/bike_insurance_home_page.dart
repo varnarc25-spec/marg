@@ -40,11 +40,9 @@ Lowest price on PhonePe platform. By proceeding, I consent to the terms and cond
 
     ref.listen<BikeVehicleState>(bikeVehicleProvider, (prev, next) {
       if (next is BikeVehicleSuccess && mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => const FindYourBikePage(),
-          ),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const FindYourBikePage()));
       }
     });
 
@@ -113,7 +111,7 @@ Lowest price on PhonePe platform. By proceeding, I consent to the terms and cond
           Container(
             decoration: BoxDecoration(
               color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(26),
               border: Border.all(
                 color: colorScheme.outline.withValues(alpha: 0.2),
               ),
@@ -351,9 +349,7 @@ class _FindPlansSection extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             (vehicleState as BikeVehicleError).message,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.error,
-            ),
+            style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
           ),
         ],
       ],
