@@ -1,12 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/flight_booking_model.dart';
 import '../../data/flight_city_model.dart';
 import '../../data/flight_result_model.dart';
 import '../../data/flight_search_service.dart';
+import '../../data/flight_api_service.dart';
 
-/// Flight search service (mock).
+/// Flight search service (mock, kept as fallback/demo).
 final flightSearchServiceProvider = Provider<FlightSearchService>((ref) {
   return FlightSearchService();
+});
+
+/// Real flight API service backed by FlightAPI.io (one-way, INR).
+final flightApiServiceProvider = Provider<FlightApiService>((ref) {
+  return FlightApiService();
 });
 
 /// From city/airport selection. Default: Chennai (MAA).
@@ -32,3 +39,17 @@ final flightToProvider = StateProvider<FlightCityResult>((ref) {
 final flightResultsProvider = StateProvider<List<FlightResultItem>>((ref) {
   return FlightSearchService.flightResultsMock;
 });
+
+/// Completed flight bookings stored in memory for the session.
+final flightBookingsProvider =
+    StateNotifierProvider<FlightBookingsNotifier, List<FlightBooking>>((ref) {
+  return FlightBookingsNotifier();
+});
+
+class FlightBookingsNotifier extends StateNotifier<List<FlightBooking>> {
+  FlightBookingsNotifier() : super([]);
+
+  void add(FlightBooking booking) {
+    state = [booking, ...state];
+  }
+}

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../core/theme/app_theme.dart';
 import '../../data/card_repay_data.dart';
 import '../providers/card_repay_provider.dart';
 import 'pay_your_credit_card_bill_page.dart';
@@ -13,7 +12,8 @@ class AddBankCreditCardPage extends ConsumerStatefulWidget {
   final String bankName;
 
   @override
-  ConsumerState<AddBankCreditCardPage> createState() => _AddBankCreditCardPageState();
+  ConsumerState<AddBankCreditCardPage> createState() =>
+      _AddBankCreditCardPageState();
 }
 
 class _AddBankCreditCardPageState extends ConsumerState<AddBankCreditCardPage> {
@@ -41,7 +41,9 @@ class _AddBankCreditCardPageState extends ConsumerState<AddBankCreditCardPage> {
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+      backgroundColor: colorScheme.surfaceContainerHighest.withValues(
+        alpha: 0.3,
+      ),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
@@ -120,7 +122,10 @@ class _AddBankCreditCardPageState extends ConsumerState<AddBankCreditCardPage> {
                       hintStyle: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
-                      counterText: '',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide(color: colorScheme.onSecondary),
+                      ),
                     ),
                     style: textTheme.bodyLarge?.copyWith(
                       color: colorScheme.onSurface,
@@ -187,7 +192,8 @@ class _AddBankCreditCardPageState extends ConsumerState<AddBankCreditCardPage> {
                       _RelationChip(
                         label: 'Spouse',
                         selected: _selectedRelation == 'Spouse',
-                        onTap: () => setState(() => _selectedRelation = 'Spouse'),
+                        onTap: () =>
+                            setState(() => _selectedRelation = 'Spouse'),
                         colorScheme: colorScheme,
                         textTheme: textTheme,
                       ),
@@ -195,7 +201,8 @@ class _AddBankCreditCardPageState extends ConsumerState<AddBankCreditCardPage> {
                         label: '+ Add NickName',
                         selected: false,
                         isAdd: true,
-                        onTap: () => setState(() => _selectedRelation = 'Custom'),
+                        onTap: () =>
+                            setState(() => _selectedRelation = 'Custom'),
                         colorScheme: colorScheme,
                         textTheme: textTheme,
                       ),
@@ -223,7 +230,9 @@ class _AddBankCreditCardPageState extends ConsumerState<AddBankCreditCardPage> {
               onPressed: _canProceed
                   ? () {
                       final last4 = _lastFourController.text.trim();
-                      ref.read(savedCreditCardsProvider.notifier).add(
+                      ref
+                          .read(savedCreditCardsProvider.notifier)
+                          .add(
                             SavedCreditCard(
                               bankName: widget.bankName,
                               lastFourDigits: last4,
@@ -325,12 +334,20 @@ class _CardVisual extends StatelessWidget {
           Positioned(
             left: 20,
             bottom: 50,
-            child: Icon(Icons.sim_card_rounded, color: Colors.white54, size: 32),
+            child: Icon(
+              Icons.sim_card_rounded,
+              color: Colors.white54,
+              size: 32,
+            ),
           ),
           Positioned(
             right: 20,
             bottom: 50,
-            child: Icon(Icons.credit_card_rounded, color: Colors.white24, size: 48),
+            child: Icon(
+              Icons.credit_card_rounded,
+              color: Colors.white24,
+              size: 48,
+            ),
           ),
         ],
       ),
@@ -370,9 +387,7 @@ class _RelationChip extends StatelessWidget {
                 : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(20),
             border: isAdd
-                ? Border.all(
-                    color: colorScheme.outline.withValues(alpha: 0.5),
-                  )
+                ? Border.all(color: colorScheme.outline.withValues(alpha: 0.5))
                 : null,
           ),
           child: Text(

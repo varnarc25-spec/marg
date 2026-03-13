@@ -4,6 +4,7 @@ import '../../../../../core/theme/app_theme.dart';
 import '../../data/flight_list_data.dart';
 import '../../data/flight_result_model.dart';
 import '../providers/flight_search_provider.dart';
+import 'flight_detail_sheet.dart';
 
 /// Flight search results page: route header, date/fare strip, filters, sort, flight list.
 /// Uses app theme colors and widgets. Data from flight_list_data and flight_results_provider (bike insurance structure).
@@ -249,6 +250,17 @@ class _FlightSearchResultsPageState
                 flight: flights[i],
                 colorScheme: colorScheme,
                 textTheme: textTheme,
+                onTap: () {
+                  showFlightDetailSheet(
+                    context,
+                    flight: flights[i],
+                    dateLabel: widget.dateLabel,
+                    route:
+                        '${widget.fromCity} - ${widget.toCity}',
+                    fromCode: widget.fromCode,
+                    toCode: widget.toCode,
+                  );
+                },
               ),
             ),
           ),
@@ -547,11 +559,13 @@ class _FlightResultCard extends StatelessWidget {
     required this.flight,
     required this.colorScheme,
     required this.textTheme,
+    this.onTap,
   });
 
   final FlightResultItem flight;
   final ColorScheme colorScheme;
   final TextTheme textTheme;
+  final VoidCallback? onTap;
 
   String _formatPrice(int price) {
     final s = price.toString();
@@ -571,7 +585,10 @@ class _FlightResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Padding(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -742,6 +759,7 @@ class _FlightResultCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

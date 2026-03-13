@@ -162,51 +162,7 @@ class HomeScreen extends ConsumerWidget {
                   const SizedBox(height: 12),
                   const HomeFinancialHub(),
                   const SizedBox(height: 24),
-                  HomeSectionTitle(
-                    title: l10n.homeHubConvenient,
-                    showViewAll: true,
-                    onViewAllTap: () {
-                      final items = [
-                        HomeIconGridItem(
-                          Icons.directions_car_rounded,
-                          l10n.homeIconTravel,
-                        ),
-                        HomeIconGridItem(
-                          Icons.add_circle_outline_rounded,
-                          l10n.homeIconTopUp,
-                        ),
-                        HomeIconGridItem(
-                          Icons.local_fire_department_rounded,
-                          l10n.homeIconUtilities,
-                        ),
-                        HomeIconGridItem(
-                          Icons.business_rounded,
-                          l10n.homeIconCityServices,
-                        ),
-                        HomeIconGridItem(
-                          Icons.card_giftcard_rounded,
-                          l10n.homeIconRewards,
-                        ),
-                        HomeIconGridItem(
-                          Icons.family_restroom_rounded,
-                          l10n.homeIconFamilyCenter,
-                        ),
-                        HomeIconGridItem(
-                          Icons.eco_rounded,
-                          l10n.homeIconCreditLife,
-                        ),
-                        HomeIconGridItem(Icons.apps_rounded, l10n.homeIconMore),
-                      ];
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => HubDetailScreen(
-                            title: l10n.homeHubConvenient,
-                            items: items,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                  HomeSectionTitle(title: l10n.homeHubConvenient),
                   const SizedBox(height: 12),
                   const HomeConvenientHub(),
                   const SizedBox(height: 24),
