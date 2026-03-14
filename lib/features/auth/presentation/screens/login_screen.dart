@@ -276,7 +276,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _showError(String message) {
-    if (message.contains('Firebase is not') ||
+    if (message.contains('Firebase Auth is not available') ||
+        message.contains('Firebase is not') ||
         message.contains('no firebase app') ||
         message.contains('flutterfire configure')) {
       _showFirebaseErrorDialog(message);

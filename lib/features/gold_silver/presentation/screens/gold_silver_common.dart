@@ -11,6 +11,8 @@ import '../../../../shared/widgets/trends_section.dart';
 import '../../../../shared/widgets/powered_by_footer.dart';
 import '../../../../shared/widgets/shop_section.dart';
 import '../../../../shared/widgets/info_icons_row.dart';
+import '../../models/metal_config.dart';
+export '../../models/metal_config.dart';
 
 /// Base scaffold used for Gold & Silver placeholder pages.
 class GoldSilverFeaturePlaceholderPage extends StatelessWidget {
@@ -83,62 +85,6 @@ class GoldSilverFeaturePlaceholderPage extends StatelessWidget {
       ),
     );
   }
-}
-
-class MetalConfig {
-  final String appBarTitle;
-  final String balanceTitle;
-  final String investTitle;
-  final String buyPriceLabel;
-  final String buyPriceValue;
-  final String buyPriceMeta;
-  final String riseText;
-  final String purityText;
-  final Color appBarColor;
-  final Color accentColor;
-  final Color chartFill;
-
-  const MetalConfig({
-    required this.appBarTitle,
-    required this.balanceTitle,
-    required this.investTitle,
-    required this.buyPriceLabel,
-    required this.buyPriceValue,
-    required this.buyPriceMeta,
-    required this.riseText,
-    required this.purityText,
-    required this.appBarColor,
-    required this.accentColor,
-    required this.chartFill,
-  });
-
-  static const gold = MetalConfig(
-    appBarTitle: 'Marg Digital Gold',
-    balanceTitle: 'My Gold Balance',
-    investTitle: 'Invest in 24k Gold',
-    buyPriceLabel: 'Buying Price:',
-    buyPriceValue: '₹1634.18/gm',
-    buyPriceMeta: '(+3% GST)',
-    riseText: '245.8% Gold price rise in last 5 years',
-    purityText: 'You will be purchasing gold of 24K | 99.9% purity',
-    appBarColor: Color(0xFF1876B6),
-    accentColor: Color(0xFF1876B6),
-    chartFill: Color(0xFFFFC107),
-  );
-
-  static const silver999 = MetalConfig(
-    appBarTitle: 'Digital Silver (999)',
-    balanceTitle: 'My Silver Balance',
-    investTitle: 'Invest in 999 Silver',
-    buyPriceLabel: 'Buying Price:',
-    buyPriceValue: '₹120.50/gm',
-    buyPriceMeta: '(+3% GST)',
-    riseText: '112.4% Silver price rise in last 5 years',
-    purityText: 'You will be purchasing silver of 999 | 99.9% purity',
-    appBarColor: Color(0xFF374151),
-    accentColor: Color(0xFF374151),
-    chartFill: Color(0xFFB0BEC5),
-  );
 }
 
 /// Full buy flow page (used by Buy Gold / Buy Silver).
@@ -221,12 +167,12 @@ class _BuyMetalPageState extends ConsumerState<BuyMetalPage> {
                   const SizedBox(height: 16),
                   InfoIconsRow(accent: c.accentColor),
                   const SizedBox(height: 16),
-                  const ShopSection(sectionKey: 'gold_buy'),
+                  ShopSection(sectionKey: c.sectionKey),
                   const SizedBox(height: 16),
                   const SizedBox(height: 16),
-                  const FaqSection(sectionKey: 'gold_buy'),
+                  FaqSection(sectionKey: c.sectionKey),
                   const SizedBox(height: 16),
-                  const TrendsSection(sectionKey: 'gold_buy'),
+                  TrendsSection(sectionKey: c.sectionKey),
                   const SizedBox(height: 24),
                   const PoweredByFooter(),
                 ],

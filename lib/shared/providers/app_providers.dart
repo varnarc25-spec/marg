@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/services/marg_api_service.dart';
+import '../../core/config/api_config.dart';
 import '../models/faq_item.dart';
 import '../models/trend_item.dart';
 import '../models/shop_product_item.dart';
@@ -214,12 +215,9 @@ class LanguageNotifier extends StateNotifier<String> {
   }
 }
 
-/// Marg API base URL (change for production). Used by MargApiService.
-const String margApiBaseUrl = 'http://localhost:3000';
-
 /// Marg API Service Provider
 final margApiServiceProvider = Provider<MargApiService>((ref) {
-  return MargApiService(baseUrl: margApiBaseUrl);
+  return MargApiService(baseUrl: ApiConfig.baseUrl);
 });
 
 /// Onboarding session ID for anonymous users (before login). Stored in prefs.
