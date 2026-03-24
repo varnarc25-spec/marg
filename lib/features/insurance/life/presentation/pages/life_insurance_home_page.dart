@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../providers/life_insurance_provider.dart';
+import '../widgets/life_home_benefits.dart';
+import '../widgets/life_home_feature_card.dart';
+import '../widgets/life_home_footer_link.dart';
 import 'life_insurance_cover_page.dart';
 import 'life_insurance_help_page.dart';
 
@@ -52,13 +56,29 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
     final textTheme = theme.textTheme;
     final coverState = ref.watch(lifeCoverProvider);
     final advisoryConsent = ref.watch(lifeAdvisoryConsentProvider);
+    final bootstrap = ref.watch(lifeHomeBootstrapProvider);
+
+    final partnerLabel = bootstrap.maybeWhen(
+      data: (b) =>
+          b.partners.isEmpty ? '8+ Top Insurers' : '${b.partners.length}+ Top Insurers',
+      orElse: () => '8+ Top Insurers',
+    );
 
     ref.listen<LifeCoverState>(lifeCoverProvider, (prev, next) {
-      if (next is LifeCoverSuccess && mounted) {
+      if (!mounted) return;
+      if (next is LifeCoverSuccess) {
         ref.read(lifeSelectedSumAssuredLakhsProvider.notifier).state =
             next.result.recommendedCoverLakhs;
+        final till = next.result.defaultCoverTillAge;
+        if (till != null && lifeCoverTillAgeOptions.contains(till)) {
+          ref.read(lifeCoverTillAgeProvider.notifier).state = till;
+        }
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const LifeInsuranceCoverPage()),
+        );
+      } else if (next is LifeCoverError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next.message)),
         );
       }
     });
@@ -119,12 +139,33 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
           ),
           const SizedBox(height: 12),
           Text(
-            'GST on Life Insurance drops to 0%',
+            bootstrap.maybeWhen(
+              data: (b) => b.promos.isNotEmpty && (b.promos.first.title?.isNotEmpty ?? false)
+                  ? b.promos.first.title!
+                  : 'GST on Life Insurance drops to 0%',
+              orElse: () => 'GST on Life Insurance drops to 0%',
+            ),
             style: textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.onSurface,
             ),
           ),
+          if (bootstrap.maybeWhen(
+            data: (b) =>
+                b.promos.isNotEmpty && (b.promos.first.subtitle?.isNotEmpty ?? false),
+            orElse: () => false,
+          )) ...[
+            const SizedBox(height: 8),
+            Text(
+              bootstrap.maybeWhen(
+                data: (b) => b.promos.first.subtitle ?? '',
+                orElse: () => '',
+              ),
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           Container(
             height: 100,
@@ -164,16 +205,16 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
           Row(
             children: [
               Expanded(
-                child: _FeatureCard(
+                child: LifeHomeFeatureCard(
                   icon: Icons.savings_rounded,
-                  label: '8+ Top Insurers',
+                  label: partnerLabel,
                   colorScheme: colorScheme,
                   textTheme: textTheme,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _FeatureCard(
+                child: LifeHomeFeatureCard(
                   icon: Icons.person_rounded,
                   label: 'Relationship manager',
                   colorScheme: colorScheme,
@@ -182,7 +223,7 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _FeatureCard(
+                child: LifeHomeFeatureCard(
                   icon: Icons.discount_rounded,
                   label: 'Upto 10% discount',
                   colorScheme: colorScheme,
@@ -336,16 +377,17 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
                     child: FilledButton(
                       onPressed: canCheck && coverState is! LifeCoverLoading
                           ? () {
-                              if (_selectedDob == null ||
-                                  income == null ||
-                                  income <= 0)
-                                return;
-                              ref
-                                  .read(lifeCoverProvider.notifier)
-                                  .calculateCover(
-                                    dateOfBirth: _selectedDob!,
-                                    annualIncome: income,
-                                  );
+                              switch (income) {
+                                case final int i when i > 0:
+                                  ref
+                                      .read(lifeCoverProvider.notifier)
+                                      .calculateCover(
+                                        dateOfBirth: _selectedDob!,
+                                        annualIncome: i,
+                                      );
+                                default:
+                                  break;
+                              }
                             }
                           : null,
                       style: FilledButton.styleFrom(
@@ -440,7 +482,19 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
             ),
           ),
           const SizedBox(height: 16),
-          _BenefitsGrid(colorScheme: colorScheme, textTheme: textTheme),
+          bootstrap.when(
+            data: (b) => b.benefits.isEmpty
+                ? LifeHomeBenefitsGrid(colorScheme: colorScheme, textTheme: textTheme)
+                : LifeHomeBenefitsFromApi(
+                    items: b.benefits,
+                    colorScheme: colorScheme,
+                    textTheme: textTheme,
+                  ),
+            loading: () =>
+                LifeHomeBenefitsGrid(colorScheme: colorScheme, textTheme: textTheme),
+            error: (_, __) =>
+                LifeHomeBenefitsGrid(colorScheme: colorScheme, textTheme: textTheme),
+          ),
           const SizedBox(height: 24),
           Text(
             _legalText,
@@ -454,7 +508,7 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
             spacing: 8,
             runSpacing: 8,
             children: [
-              _FooterLink(
+              LifeHomeFooterLink(
                 label: 'Terms and Conditions',
                 onTap: () {},
                 colorScheme: colorScheme,
@@ -466,7 +520,7 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
                   color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              _FooterLink(
+              LifeHomeFooterLink(
                 label: 'Privacy Policy',
                 onTap: () {},
                 colorScheme: colorScheme,
@@ -478,7 +532,7 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
                   color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              _FooterLink(
+              LifeHomeFooterLink(
                 label: 'Grievance Policy',
                 onTap: () {},
                 colorScheme: colorScheme,
@@ -488,130 +542,6 @@ Premiums presented are for an 18-year-old healthy non-smoker male for a Sum Assu
           ),
           const SizedBox(height: 24),
         ],
-      ),
-    );
-  }
-}
-
-class _FeatureCard extends StatelessWidget {
-  const _FeatureCard({
-    required this.icon,
-    required this.label,
-    required this.colorScheme,
-    required this.textTheme,
-  });
-
-  final IconData icon;
-  final String label;
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 28, color: colorScheme.primary),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BenefitsGrid extends StatelessWidget {
-  const _BenefitsGrid({required this.colorScheme, required this.textTheme});
-
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-
-  static const List<MapEntry<String, IconData>> _items = [
-    MapEntry('Pre-approved Offers', Icons.verified_user_rounded),
-    MapEntry('Zero Cost Insurance', Icons.money_off_rounded),
-    MapEntry('Upto 10% discount', Icons.discount_rounded),
-    MapEntry('Relationship Manager', Icons.support_agent_rounded),
-    MapEntry('Claims Support', Icons.shield_rounded),
-    MapEntry('Customizable Payment Options', Icons.payment_rounded),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 3,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 0.95,
-      children: _items.map((e) {
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(e.value, size: 28, color: colorScheme.primary),
-                const SizedBox(height: 8),
-                Text(
-                  e.key,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _FooterLink extends StatelessWidget {
-  const _FooterLink({
-    required this.label,
-    required this.onTap,
-    required this.colorScheme,
-    required this.textTheme,
-  });
-
-  final String label;
-  final VoidCallback onTap;
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onTap,
-      style: TextButton.styleFrom(
-        foregroundColor: colorScheme.primary,
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        minimumSize: Size.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-      child: Text(
-        label,
-        style: textTheme.bodySmall?.copyWith(
-          color: colorScheme.primary,
-          fontWeight: FontWeight.w500,
-        ),
       ),
     );
   }

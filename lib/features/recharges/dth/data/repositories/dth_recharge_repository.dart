@@ -1,36 +1,87 @@
+import 'package:marg/core/services/firebase_auth_service.dart';
+
 import '../models/dth_operator.dart';
 import '../models/dth_plan.dart';
 import '../models/dth_recharge_history_item.dart';
+import '../models/dth_saved_account.dart';
+import '../services/dth_api_service.dart';
 
-/// DTH recharge repository. TODO: BBPS/recharge API integration.
+/// DTH recharge: Marg `/api/recharges/dth/*` APIs.
 class DthRechargeRepository {
+  DthRechargeRepository(this._api, this._auth);
+
+  final DthApiService _api;
+  final FirebaseAuthService _auth;
+
+  Future<String?> _token() => _auth.getIdToken(forceRefresh: false);
+
   Future<List<DthOperator>> getOperators() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    return [
-      const DthOperator(id: 'dish_tv', name: 'Dish TV'),
-      const DthOperator(id: 'd2h', name: 'D2H'),
-      const DthOperator(id: 'airtel_dth', name: 'Airtel DTH'),
-      const DthOperator(id: 'sun_direct', name: 'Sun Direct'),
-      const DthOperator(id: 'tatasky', name: 'Tata Sky'),
-    ];
+    return _api.getOperators(idToken: await _token());
   }
 
-  Future<List<DthRechargeHistoryItem>> getRecentHistory() async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    return [];
+  /// `POST /plans` body: `{ "operatorId": "tataplay" }` only.
+  Future<List<DthPlan>> fetchPlans({required String operatorId}) async {
+    return _api.postPlans(
+      {'operatorId': operatorId},
+      idToken: await _token(),
+    );
   }
 
-  Future<List<DthPlan>> getPlans(String operatorId) async {
-    await Future.delayed(const Duration(milliseconds: 400));
-    return [
-      const DthPlan(id: '1', name: '₹299 Pack', amount: 299, validity: '1 month', isBestValue: true),
-      const DthPlan(id: '2', name: '₹499 Pack', amount: 499, validity: '2 months'),
-      const DthPlan(id: '3', name: '₹999 Pack', amount: 999, validity: '6 months'),
-    ];
+  /// `POST /initiate` — full plan + subscriber fields.
+  Future<Map<String, dynamic>> initiateRecharge({
+    required String operatorId,
+    required String subscriberId,
+    required DthPlan plan,
+  }) async {
+    final planType =
+        plan.planType.trim().isNotEmpty ? plan.planType.trim() : 'DTH';
+    return _api.initiate(
+      {
+        'subscriberId': subscriberId,
+        'operatorId': operatorId,
+        'amount': plan.amount,
+        'planId': plan.id,
+        'planName': plan.name,
+        'planType': planType,
+        'validity': plan.validity,
+      },
+      idToken: await _token(),
+    );
   }
 
-  Future<bool> performRecharge({required String operatorId, required String subscriberId, required double amount}) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return true;
+  Future<Map<String, dynamic>> getRechargeStatus(String id) async {
+    return _api.getStatus(id, idToken: await _token());
+  }
+
+  Future<List<DthRechargeHistoryItem>> getHistory() async {
+    return _api.getHistory(idToken: await _token());
+  }
+
+  Future<List<DthSavedAccount>> getSavedAccounts() async {
+    return _api.getSavedAccounts(idToken: await _token());
+  }
+
+  Future<void> deleteSavedAccount(String id) async {
+    await _api.deleteSavedAccount(id, idToken: await _token());
+  }
+
+  /// `POST /saved-accounts` body.
+  Future<DthSavedAccount> saveAccount({
+    required String subscriberId,
+    required String label,
+    required String operatorCode,
+    required String operatorName,
+    bool isPrimary = false,
+  }) async {
+    return _api.postSavedAccount(
+      {
+        'subscriberId': subscriberId,
+        'label': label,
+        'operatorCode': operatorCode,
+        'operatorName': operatorName,
+        'isPrimary': isPrimary,
+      },
+      idToken: await _token(),
+    );
   }
 }

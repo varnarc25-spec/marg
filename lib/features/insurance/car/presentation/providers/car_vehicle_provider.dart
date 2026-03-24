@@ -33,10 +33,30 @@ class CarVehicleNotifier extends StateNotifier<CarVehicleState> {
       state = CarVehicleError('Please enter vehicle number');
       return;
     }
+    final normalized = vehicleNumber
+        .trim()
+        .toUpperCase()
+        .replaceAll(RegExp(r'[\s\-]+'), '');
+    if (normalized.length < 4) {
+      state = CarVehicleError(
+        'Enter a valid registration number (at least 4 characters)',
+      );
+      return;
+    }
+    if (!RegExp(r'^[A-Z0-9]+$').hasMatch(normalized)) {
+      state = CarVehicleError('Use only letters and numbers');
+      return;
+    }
     state = CarVehicleLoading();
     try {
       final vehicle = await _service.getVehicleDetails(vehicleNumber);
       final plans = await _service.getPlans(vehicleNumber);
+      if (plans.isEmpty) {
+        state = CarVehicleError(
+          'No insurers available. Please try again later.',
+        );
+        return;
+      }
       state = CarVehicleSuccess(vehicle, plans);
     } catch (e) {
       state = CarVehicleError(

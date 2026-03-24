@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_theme.dart';
-import '../../data/bus_list_data.dart';
+import '../../data/models/bus_list_data.dart';
 
 /// Filter category for the left column.
 class _FilterCategory {

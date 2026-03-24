@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter/foundation.dart' show debugPrint, kDebugMode, defaultTargetPlatform;
+import 'package:flutter/foundation.dart'
+    show debugPrint, kDebugMode, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart' show TargetPlatform;
 import '../../firebase_options.dart';
 
@@ -10,11 +11,14 @@ import '../../firebase_options.dart';
 /// Handles authentication using Firebase Authentication
 class FirebaseAuthService {
   FirebaseAuth? _auth;
-  late final GoogleSignIn _googleSignIn;
+  GoogleSignIn? _googleSignIn;
 
   FirebaseAuthService() {
     _initializeAuth();
-    _initializeGoogleSignIn();
+    // Prevent web startup crash when the `google-signin-client_id` meta tag
+    // is not configured yet. Google sign-in will still be available after
+    // fixing web configuration.
+    if (!kIsWeb) _initializeGoogleSignIn();
   }
 
   void _initializeGoogleSignIn() {
@@ -308,8 +312,18 @@ class FirebaseAuthService {
     }
 
     try {
+      if (_googleSignIn == null) {
+        _initializeGoogleSignIn();
+      }
+
+      if (_googleSignIn == null) {
+        throw Exception(
+          'Google sign-in is not configured. Please set the web client id first.',
+        );
+      }
+
       // Trigger the Google Sign-In flow
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAccount? googleUser = await _googleSignIn!.signIn();
       
       if (googleUser == null) {
         throw Exception('Google Sign-In was cancelled');
@@ -437,7 +451,9 @@ class FirebaseAuthService {
       if (_auth != null) {
         await _auth!.signOut();
       }
-      await _googleSignIn.signOut();
+      if (_googleSignIn != null) {
+        await _googleSignIn!.signOut();
+      }
     } catch (e) {
       throw Exception('Failed to sign out: ${e.toString()}');
     }
@@ -451,13 +467,13 @@ class FirebaseAuthService {
     return _auth!.authStateChanges();
   }
 
-  /// Get user ID token
-  Future<String?> getIdToken() async {
+  /// Get user ID token. Use [forceRefresh] when calling protected APIs after idle.
+  Future<String?> getIdToken({bool forceRefresh = false}) async {
     if (_auth == null) return null;
     try {
       final user = _auth!.currentUser;
       if (user == null) return null;
-      return await user.getIdToken();
+      return await user.getIdToken(forceRefresh);
     } catch (e) {
       return null;
     }

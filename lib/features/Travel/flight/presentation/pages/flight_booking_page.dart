@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_theme.dart';
-import '../../data/flight_result_model.dart';
-import 'flight_booking_flight_card.dart';
-import 'flight_booking_offers_section.dart';
-import 'flight_booking_traveller_section.dart';
+import '../../data/models/flight_result_model.dart';
+import '../widgets/flight_booking_flight_card.dart';
+import '../widgets/flight_booking_offers_section.dart';
+import '../widgets/flight_booking_traveller_section.dart';
 import 'flight_seat_meal_addons_page.dart';
 
 /// Full-page booking flow after fare selection.
@@ -73,102 +73,108 @@ class _FlightBookingPageState extends State<FlightBookingPage> {
         foregroundColor: colorScheme.onSurface,
         elevation: 0,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Stepper
-          Container(
-            color: colorScheme.surface,
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-            child: _BookingStepper(
-              flightDetailsComplete: _flightDetailsComplete,
-              passengerComplete: _passengerSaved,
-              colorScheme: colorScheme,
-              textTheme: textTheme,
-            ),
+          Column(
+            children: [
+              Container(
+                color: colorScheme.surface,
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+                child: _BookingStepper(
+                  flightDetailsComplete: _flightDetailsComplete,
+                  passengerComplete: _passengerSaved,
+                  colorScheme: colorScheme,
+                  textTheme: textTheme,
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.fromLTRB(
+                    16, 8, 16, 100 + MediaQuery.paddingOf(context).bottom,
+                  ),
+                  children: [
+                    FlightBookingFlightCard(
+                      flight: widget.flight,
+                      fareName: widget.fareName,
+                      dateLabel: widget.dateLabel,
+                      route: widget.route,
+                      cancellationOption: _cancellationOption,
+                      onCancellationChanged: (v) =>
+                          setState(() => _cancellationOption = v),
+                    ),
+                    const SizedBox(height: 16),
+                    FlightBookingOffersSection(
+                      selectedOffer: _selectedOffer,
+                      onOfferChanged: (v) =>
+                          setState(() => _selectedOffer = v),
+                    ),
+                    const SizedBox(height: 16),
+                    FlightBookingTravellerSection(
+                      passengerSaved: _passengerSaved,
+                      contactSaved: _contactSaved,
+                      onPassengerSaved: (name) =>
+                          setState(() {
+                            _passengerSaved = true;
+                            _passengerName = name;
+                          }),
+                      onContactSaved: () =>
+                          setState(() => _contactSaved = true),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ],
           ),
-
-          // Scrollable content
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              children: [
-                FlightBookingFlightCard(
-                  flight: widget.flight,
-                  fareName: widget.fareName,
-                  dateLabel: widget.dateLabel,
-                  route: widget.route,
-                  cancellationOption: _cancellationOption,
-                  onCancellationChanged: (v) =>
-                      setState(() => _cancellationOption = v),
-                ),
-                const SizedBox(height: 16),
-                FlightBookingOffersSection(
-                  selectedOffer: _selectedOffer,
-                  onOfferChanged: (v) =>
-                      setState(() => _selectedOffer = v),
-                ),
-                const SizedBox(height: 16),
-                FlightBookingTravellerSection(
-                  passengerSaved: _passengerSaved,
-                  contactSaved: _contactSaved,
-                  onPassengerSaved: (name) =>
-                      setState(() {
-                        _passengerSaved = true;
-                        _passengerName = name;
-                      }),
-                  onContactSaved: () =>
-                      setState(() => _contactSaved = true),
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
-
-          // Bottom bar
-          _BottomFareBar(
-            totalFare: _totalFare,
-            onContinue: () {
-              if (!_passengerSaved || !_contactSaved) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Please save traveller details and add contact info first.',
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16 + MediaQuery.paddingOf(context).bottom,
+            child: _BottomFareBar(
+              totalFare: _totalFare,
+              onContinue: () {
+                if (!_passengerSaved || !_contactSaved) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Please save traveller details and add contact info first.',
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => FlightSeatMealAddonsPage(
+                      passengerName: _passengerName,
+                      routeLabel:
+                          '${widget.flight.departureCity} - ${widget.flight.arrivalCity}',
+                      farePrice: _totalFare,
+                      dateLabel: widget.dateLabel,
+                      route:
+                          '${widget.flight.departureCity}  ➜  ${widget.flight.arrivalCity}',
+                      departureTime: widget.flight.departureTime,
+                      arrivalTime: widget.flight.arrivalTime,
+                      fareName: widget.fareName,
+                      airlineName: widget.flight.airlineName,
+                      flightNumber: widget.flight.flightNumbers,
+                      duration: widget.flight.duration,
+                      stops: widget.flight.stops,
+                      cancellationLabel:
+                          _cancellationOption == 1 ? 'Classic' : null,
+                      cancellationFee: _cancellationOption == 1 ? 565 : 0,
+                      promoDiscount: _selectedOffer == 0 ? 500 : (_selectedOffer == 1 ? 1026 : 0),
+                      fromCode: widget.fromCode,
+                      toCode: widget.toCode,
+                      departureCity: widget.flight.departureCity,
+                      arrivalCity: widget.flight.arrivalCity,
                     ),
                   ),
                 );
-                return;
-              }
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => FlightSeatMealAddonsPage(
-                    passengerName: _passengerName,
-                    routeLabel:
-                        '${widget.flight.departureCity} - ${widget.flight.arrivalCity}',
-                    farePrice: _totalFare,
-                    dateLabel: widget.dateLabel,
-                    route:
-                        '${widget.flight.departureCity}  ➜  ${widget.flight.arrivalCity}',
-                    departureTime: widget.flight.departureTime,
-                    arrivalTime: widget.flight.arrivalTime,
-                    fareName: widget.fareName,
-                    airlineName: widget.flight.airlineName,
-                    flightNumber: widget.flight.flightNumbers,
-                    duration: widget.flight.duration,
-                    stops: widget.flight.stops,
-                    cancellationLabel:
-                        _cancellationOption == 1 ? 'Classic' : null,
-                    cancellationFee: _cancellationOption == 1 ? 565 : 0,
-                    promoDiscount: _selectedOffer == 0 ? 500 : (_selectedOffer == 1 ? 1026 : 0),
-                    fromCode: widget.fromCode,
-                    toCode: widget.toCode,
-                    departureCity: widget.flight.departureCity,
-                    arrivalCity: widget.flight.arrivalCity,
-                  ),
-                ),
-              );
-            },
-            colorScheme: colorScheme,
-            textTheme: textTheme,
+              },
+              colorScheme: colorScheme,
+              textTheme: textTheme,
+            ),
           ),
         ],
       ),
@@ -305,21 +311,14 @@ class _BottomFareBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        20, 12, 20, 12 + MediaQuery.paddingOf(context).bottom,
-      ),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Row(
+    return Material(
+      elevation: 8,
+      shadowColor: Colors.black26,
+      borderRadius: BorderRadius.circular(20),
+      color: colorScheme.surface,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        child: Row(
         children: [
           Expanded(
             child: Column(
@@ -374,6 +373,7 @@ class _BottomFareBar extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }

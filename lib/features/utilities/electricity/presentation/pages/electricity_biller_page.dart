@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../../core/theme/app_theme.dart';
-import '../../data/models/electricity_biller.dart';
+import '../../data/electricity_api_exceptions.dart';
 import '../providers/electricity_provider.dart';
 import 'electricity_consumer_id_page.dart';
 
@@ -38,7 +38,7 @@ class ElectricityBillerPage extends ConsumerWidget {
                 },
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              error: (e, _) => Center(child: Text(electricityApiUserMessage(e))),
             ),
     );
   }

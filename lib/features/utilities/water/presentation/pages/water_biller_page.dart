@@ -1,56 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../../../core/theme/app_theme.dart';
-import '../../data/repositories/water_repository.dart';
+import '../../data/water_api_exceptions.dart';
+import '../providers/water_provider.dart';
+import 'water_consumer_id_page.dart';
 
-final waterRepositoryProvider = Provider<WaterRepository>((ref) => WaterRepository());
-
-class WaterBillerPage extends ConsumerStatefulWidget {
+class WaterBillerPage extends ConsumerWidget {
   const WaterBillerPage({super.key});
 
   @override
-  ConsumerState<WaterBillerPage> createState() => _WaterBillerPageState();
-}
-
-class _WaterBillerPageState extends ConsumerState<WaterBillerPage> {
-  List<Map<String, String>> _billers = [];
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    ref.read(waterRepositoryProvider).getBillers().then((v) {
-      if (mounted) setState(() {
-        _billers = v;
-        _loading = false;
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(selectedWaterStateProvider);
+    final billersAsync =
+        state != null ? ref.watch(waterBillersProvider(state.id)) : null;
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(title: const Text('Water Bill'), backgroundColor: AppColors.surfaceLight, foregroundColor: AppColors.textPrimary),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _billers.length,
-              itemBuilder: (_, i) {
-                final b = _billers[i];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    leading: const Icon(Icons.water_drop_rounded),
-                    title: Text(b['name'] ?? ''),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('TODO: Consumer ID & fetch bill (BBPS)')));
-                    },
-                  ),
-                );
-              },
+      appBar: AppBar(
+        title: const Text('Select provider'),
+        backgroundColor: AppColors.surfaceLight,
+        foregroundColor: AppColors.textPrimary,
+      ),
+      body: billersAsync == null
+          ? const Center(child: Text('Select state first'))
+          : billersAsync.when(
+              data: (billers) => ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: billers.length,
+                itemBuilder: (_, i) {
+                  final b = billers[i];
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      leading: const Icon(Icons.apartment_rounded),
+                      title: Text(b.name),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        ref.read(selectedWaterBillerProvider.notifier).state =
+                            b;
+                        Navigator.push<void>(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => const WaterConsumerIdPage(),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text(waterApiUserMessage(e))),
             ),
     );
   }

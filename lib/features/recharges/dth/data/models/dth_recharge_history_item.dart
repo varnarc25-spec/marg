@@ -76,4 +76,39 @@ class DthRechargeHistoryItem {
       maskedNumber: json['maskedNumber'] as String?,
     );
   }
+
+  /// DTH history row from `GET /api/recharges/dth/history`.
+  factory DthRechargeHistoryItem.fromApiJson(Map<String, dynamic> json) {
+    final id = (json['id'] ?? json['transactionId'] ?? json['_id'] ?? '').toString();
+    final number = (json['subscriberId'] ??
+            json['customerId'] ??
+            json['accountNumber'] ??
+            json['number'] ??
+            '')
+        .toString();
+    final operatorName = (json['operatorName'] ?? json['operator'] ?? '').toString();
+    final amount = (json['amount'] ?? json['rechargeAmount'] ?? json['planAmount']);
+    double amt = 0;
+    if (amount is num) {
+      amt = amount.toDouble();
+    } else if (amount != null) {
+      amt = double.tryParse(amount.toString().replaceAll(RegExp(r'[^0-9.]'), '')) ??
+          0;
+    }
+    final dateStr = json['createdAt'] ?? json['date'] ?? json['rechargedAt'];
+    DateTime date = DateTime.now();
+    if (dateStr != null) {
+      date = DateTime.tryParse(dateStr.toString()) ?? date;
+    }
+    return DthRechargeHistoryItem(
+      id: id.isEmpty ? '${number}_$operatorName' : id,
+      number: number,
+      operatorName: operatorName.isEmpty ? 'DTH' : operatorName,
+      alias: (json['subscriberName'] ?? json['name'] ?? '').toString(),
+      amount: amt,
+      date: date,
+      status: (json['status'] ?? 'Success').toString(),
+      planName: (json['planName'] ?? '').toString(),
+    );
+  }
 }

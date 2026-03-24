@@ -1,25 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../../../../../core/theme/app_theme.dart';
-
-/// Single booking card data (for Completed list).
-class TravelBookingItem {
-  const TravelBookingItem({
-    required this.bookingId,
-    required this.route,
-    required this.serviceDetails,
-    required this.status,
-    required this.dateTime,
-  });
-
-  final String bookingId;
-  final String route;
-  final String serviceDetails;
-  final String status;
-  final String dateTime;
-}
+import '../../data/models/bus_booking_model.dart';
 
 /// Travel Bookings page: header with Bus dropdown, status tabs, empty state or booking list.
-/// Uses app theme. Opens from My Bookings on bus page.
 class TravelBookingsPage extends StatefulWidget {
   const TravelBookingsPage({super.key});
 
@@ -28,7 +12,7 @@ class TravelBookingsPage extends StatefulWidget {
 }
 
 class _TravelBookingsPageState extends State<TravelBookingsPage> {
-  int _selectedTabIndex = 0; // Ongoing
+  int _selectedTabIndex = 0;
 
   static const List<String> _tabLabels = [
     'Ongoing',
@@ -76,13 +60,15 @@ class _TravelBookingsPageState extends State<TravelBookingsPage> {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Material(
-              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+              color:
+                  colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(20),
               child: InkWell(
                 onTap: () {},
                 borderRadius: BorderRadius.circular(20),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -157,7 +143,11 @@ class _TabBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border(bottom: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2))),
+        border: Border(
+          bottom: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.2),
+          ),
+        ),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -174,8 +164,11 @@ class _TabBar extends StatelessWidget {
                     Text(
                       labels[i],
                       style: textTheme.titleSmall?.copyWith(
-                        fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                        color: selected ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+                        fontWeight:
+                            selected ? FontWeight.w600 : FontWeight.w500,
+                        color: selected
+                            ? colorScheme.onSurface
+                            : colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -313,7 +306,8 @@ class _BookingCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+                  color: colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -354,7 +348,9 @@ class _BookingCard extends StatelessWidget {
                     Text(
                       booking.status,
                       style: textTheme.labelMedium?.copyWith(
-                        color: isCompleted ? AppColors.accentGreen : colorScheme.onSurfaceVariant,
+                        color: isCompleted
+                            ? AppColors.accentGreen
+                            : colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

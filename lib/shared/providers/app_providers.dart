@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/services/marg_api_service.dart';
@@ -232,6 +233,12 @@ final onboardingSessionIdProvider = FutureProvider<String>((ref) async {
 /// Firebase Auth Service Provider
 final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {
   return FirebaseAuthService();
+});
+
+/// Current Firebase user stream. Watch this so data providers refetch after login/logout.
+final firebaseAuthUserProvider = StreamProvider<User?>((ref) {
+  final auth = ref.watch(firebaseAuthServiceProvider);
+  return auth.authStateChanges();
 });
 
 /// Mock KYC Service Provider

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_theme.dart';
-import '../../data/bus_list_data.dart';
+import '../../data/models/bus_list_data.dart';
 
 /// Result passed when user selects a city on the search page.
 /// [cityName] is the selected city; [forFrom] is true when selecting origin.

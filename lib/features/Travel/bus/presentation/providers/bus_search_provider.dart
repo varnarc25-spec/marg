@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/bus_city_model.dart';
-import '../../data/bus_search_service.dart';
+import '../../data/models/bus_city_model.dart';
+import '../../data/services/bus_search_service.dart';
 
 final busSearchServiceProvider = Provider<BusSearchService>((ref) {
   return BusSearchService();

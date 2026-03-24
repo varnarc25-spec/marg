@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/flight_booking_model.dart';
-import '../../data/flight_city_model.dart';
-import '../../data/flight_result_model.dart';
-import '../../data/flight_search_service.dart';
-import '../../data/flight_api_service.dart';
+import '../../data/models/flight_booking_model.dart';
+import '../../data/models/flight_city_model.dart';
+import '../../data/models/flight_result_model.dart';
+import '../../data/services/flight_search_service.dart';
+import '../../data/services/flight_api_service.dart';
 
 /// Flight search service (mock, kept as fallback/demo).
 final flightSearchServiceProvider = Provider<FlightSearchService>((ref) {

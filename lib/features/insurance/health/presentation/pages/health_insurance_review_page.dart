@@ -116,7 +116,9 @@ class HealthInsuranceReviewPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '₹$monthlyPrice/month',
+                    monthlyPrice != null
+                        ? '₹$monthlyPrice/month'
+                        : 'Premium on quote (final amount after underwriting)',
                     style: textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -222,14 +224,18 @@ class HealthInsuranceReviewPage extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '₹$monthlyPrice/month',
+                      monthlyPrice != null
+                          ? '₹$monthlyPrice/month'
+                          : 'Premium on quote',
                       style: textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: colorScheme.onSurface,
                       ),
                     ),
                     Text(
-                      'Inclusive of GST',
+                      monthlyPrice != null
+                          ? 'Inclusive of GST'
+                          : 'Final premium after insurer review',
                       style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),

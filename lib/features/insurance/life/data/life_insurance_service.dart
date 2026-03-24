@@ -16,8 +16,12 @@ class LifeInsuranceService {
     final incomeLakhs = annualIncome / 100000;
     final recommended = (incomeLakhs * 10).round().clamp(minCoverLakhs, maxCoverLakhs);
     return LifeCoverResult(
+      minCoverLakhs: minCoverLakhs,
       maxCoverLakhs: maxCoverLakhs,
       recommendedCoverLakhs: recommended,
+      idealCoverRationale: '10x of income',
+      defaultCoverTillAge: 65,
+      defaultSumAssuredLakhs: recommended,
     );
   }
 }

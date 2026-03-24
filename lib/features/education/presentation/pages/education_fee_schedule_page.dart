@@ -20,10 +20,12 @@ class _EducationFeeSchedulePageState extends ConsumerState<EducationFeeScheduleP
     final inst = ref.read(selectedEducationInstitutionProvider);
     if (inst != null) {
       ref.read(educationRepositoryProvider).getFeeSchedule(inst.id).then((list) {
-        if (mounted) setState(() {
-          _schedule = list;
-          _loading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _schedule = list;
+            _loading = false;
+          });
+        }
       });
     } else {
       setState(() => _loading = false);
