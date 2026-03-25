@@ -45,8 +45,8 @@ final flightResultsProvider = StateProvider<List<FlightResultItem>>((ref) {
 /// Completed flight bookings stored in memory for the session.
 final flightBookingsProvider =
     StateNotifierProvider<FlightBookingsNotifier, List<FlightBooking>>((ref) {
-  return FlightBookingsNotifier();
-});
+      return FlightBookingsNotifier();
+    });
 
 class FlightBookingsNotifier extends StateNotifier<List<FlightBooking>> {
   FlightBookingsNotifier() : super([]);

@@ -1,0 +1,97 @@
+import 'package:flutter/material.dart';
+
+/// Maps API [icon_name] (and common aliases) to Material icons for dynamic home grids.
+IconData mapHomeIcon(String iconName) {
+  switch (iconName.toLowerCase().trim()) {
+    case 'mobile':
+    case 'phone':
+    case 'mobile-postpaid':
+    case 'mobile_postpaid':
+      return Icons.phone_android_rounded;
+    case 'tv':
+      return Icons.tv_rounded;
+    case 'fastag':
+      return Icons.directions_car_rounded;
+    case 'electricity':
+    case 'bolt':
+      return Icons.bolt_rounded;
+    case 'broadband':
+    case 'wifi':
+      return Icons.wifi_rounded;
+    case 'credit-card':
+    case 'credit_card':
+    case 'card':
+      return Icons.credit_card_rounded;
+    case 'loan':
+      return Icons.account_balance_rounded;
+    case 'cylinder':
+    case 'book-cylinder':
+      return Icons.local_gas_station_rounded;
+    case 'piped-gas':
+    case 'piped_gas':
+      return Icons.local_fire_department_rounded;
+    case 'prepaid-meter':
+    case 'prepaid_meter':
+      return Icons.speed_rounded;
+    case 'water':
+      return Icons.water_drop_rounded;
+    case 'education':
+    case 'school':
+      return Icons.school_rounded;
+    case 'municipal':
+      return Icons.location_city_rounded;
+    case 'insurance':
+    case 'shield':
+      return Icons.shield_rounded;
+    case 'gold':
+      return Icons.workspace_premium_rounded;
+    case 'silver':
+      return Icons.diamond_rounded;
+    case 'travel':
+    case 'flight':
+      return Icons.flight_takeoff_rounded;
+    case 'bus':
+      return Icons.directions_bus_rounded;
+    case 'train':
+      return Icons.train_rounded;
+    case 'hotel':
+      return Icons.hotel_rounded;
+    case 'bill':
+      return Icons.receipt_long_rounded;
+    case 'ev':
+      return Icons.ev_station_rounded;
+    case 'donation':
+      return Icons.volunteer_activism_rounded;
+    case 'devotion':
+      return Icons.self_improvement_rounded;
+    case 'nps':
+      return Icons.savings_rounded;
+    case 'subscription':
+      return Icons.subscriptions_rounded;
+    case 'echallan':
+      return Icons.gavel_rounded;
+    case 'sim':
+      return Icons.sim_card_rounded;
+    case 'bike':
+      return Icons.two_wheeler_rounded;
+    case 'car':
+      return Icons.directions_car_rounded;
+    case 'health':
+      return Icons.medical_services_rounded;
+    case 'life':
+      return Icons.favorite_rounded;
+    case 'budget':
+      return Icons.pie_chart_rounded;
+    case 'invest':
+      return Icons.trending_up_rounded;
+    case 'globe':
+      return Icons.public_rounded;
+    case 'google-play':
+    case 'apple':
+    case 'ncmc':
+    case 'cable-tv':
+      return Icons.shopping_bag_rounded;
+    default:
+      return Icons.widgets_rounded;
+  }
+}

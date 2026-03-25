@@ -1,0 +1,9 @@
+[
+    {
+      "origin": ["https://varnarc.com", "http://localhost:56527"],
+      "method": ["GET", "HEAD"],
+      "responseHeader": ["Content-Type", "Content-Length"],
+      "maxAgeSeconds": 3600
+    }
+  ]
+  
