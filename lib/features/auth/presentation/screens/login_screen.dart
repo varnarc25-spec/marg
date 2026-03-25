@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -70,7 +71,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       );
     } catch (e) {
-      _showError(e.toString());
+      final message = e.toString()
+          .replaceFirst(RegExp(r'^Exception:\s*'), '')
+          .replaceFirst(RegExp(r'^Error:\s*'), '')
+          .trim();
+      _showError(message.isNotEmpty ? message : 'Could not send OTP. Try again or use Email sign-in.');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -122,14 +127,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           );
 
       // Register user in marg_api (POST /api/user/register) for both login and signup
-      try {
-        final idToken = await authService.getIdToken();
-        if (idToken != null) {
-          final api = ref.read(margApiServiceProvider);
+      final idToken = await authService.getIdToken();
+      if (idToken != null) {
+        final api = ref.read(margApiServiceProvider);
+        try {
           await api.register(idToken: idToken, name: email);
+        } catch (e) {
+          if (kDebugMode) debugPrint('MargApi │ register: $e');
+          // Continue – user may already exist
         }
-      } catch (_) {
-        // Continue even if backend register fails (e.g. API unreachable)
+        // Always ensure wallet exists (runs even if register failed, e.g. user already registered)
+        try {
+          await api.ensurePaperWallet(idToken: idToken);
+        } catch (e) {
+          if (kDebugMode) debugPrint('MargApi │ ensurePaperWallet: $e');
+        }
       }
 
       // Claim anonymous onboarding to this user if we have a session id
@@ -189,14 +201,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           );
 
       // Register user in marg_api (POST /api/user/register)
-      try {
-        final idToken = await authService.getIdToken();
-        if (idToken != null) {
-          final api = ref.read(margApiServiceProvider);
-          final name = userData['email'] as String? ?? userData['displayName'] as String?;
+      final idToken = await authService.getIdToken();
+      if (idToken != null) {
+        final api = ref.read(margApiServiceProvider);
+        final name = userData['email'] as String? ?? userData['displayName'] as String?;
+        try {
           await api.register(idToken: idToken, name: name);
+        } catch (e) {
+          if (kDebugMode) debugPrint('MargApi │ register: $e');
         }
-      } catch (_) {}
+        try {
+          await api.ensurePaperWallet(idToken: idToken);
+        } catch (e) {
+          if (kDebugMode) debugPrint('MargApi │ ensurePaperWallet: $e');
+        }
+      }
 
       // Claim anonymous onboarding if we have a session id
       try {
@@ -257,7 +276,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _showError(String message) {
-    if (message.contains('Firebase is not') ||
+    if (message.contains('Firebase Auth is not available') ||
+        message.contains('Firebase is not') ||
         message.contains('no firebase app') ||
         message.contains('flutterfire configure')) {
       _showFirebaseErrorDialog(message);

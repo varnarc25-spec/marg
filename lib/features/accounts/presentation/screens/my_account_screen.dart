@@ -194,7 +194,7 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
         const SizedBox(height: 24),
         _buildSectionHeading(context, 'Account'),
         const SizedBox(height: 8),
-        _OverviewLink(title: 'Funds', icon: Icons.currency_rupee_rounded, onTap: () {}),
+        _OverviewLink(title: 'Funds', icon: Icons.currency_rupee_rounded, trailing: '₹309.20', onTap: () {}),
         _OverviewLink(title: 'App Code', icon: Icons.lock_outline_rounded, onTap: () {}),
         _OverviewLink(title: 'Profile', icon: Icons.person_outline_rounded, onTap: () {
           Navigator.of(context).push(
@@ -413,7 +413,12 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
     );
   }
 
-  Widget _OverviewLink({required String title, required IconData icon, required VoidCallback onTap}) {
+  Widget _OverviewLink({
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+    String? trailing,
+  }) {
     return Builder(
       builder: (context) => InkWell(
         onTap: onTap,
@@ -429,6 +434,17 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                       ),
                 ),
               ),
+              if (trailing != null && trailing.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Text(
+                    trailing,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                  ),
+                ),
               Icon(icon, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
             ],
           ),

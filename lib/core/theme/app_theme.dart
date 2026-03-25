@@ -4,6 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 /// Indian Fintech Color Palette
 /// Trust-building, modern colors inspired by Zerodha, Groww, etc.
 class AppColors {
+  // Page Background Colors
+  static const Color primaryBgGray = Color.fromARGB(170, 231, 231, 231);
+
   // Primary Colors - Trust Blue
   static const Color primaryBlue = Color(0xFF1E88E5);
   static const Color primaryBlueDark = Color(0xFF1565C0);
@@ -23,6 +26,12 @@ class AppColors {
   static const Color textSecondary = Color(0xFF757575);
   static const Color textPrimaryDark = Color(0xFFFFFFFF);
   static const Color textSecondaryDark = Color(0xFFB0B0B0);
+
+  // Wealth colors
+  static const Color iconBGStocks = Color(0xFF4DBBB0);
+  static const Color iconBGCrypto = Color(0xFFE45A1B);
+  static const Color iconBGGold = Color(0xFFF9A447);
+  static const Color iconBGMF = Color(0xFFA1B9AB);
 
   // Risk Colors
   static const Color riskLow = Color(0xFF00C853);

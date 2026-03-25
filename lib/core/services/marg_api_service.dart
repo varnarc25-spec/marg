@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:http/http.dart' as http;
+import '../../features/gold_silver/models/augmont_rates_models.dart';
+import '../../shared/models/faq_item.dart';
+import '../../shared/models/trend_item.dart';
+import '../../shared/models/shop_product_item.dart';
 
 /// Client for marg_api: user register and onboarding.
 /// Set [baseUrl] to your API base (e.g. http://localhost:3000 or https://api.example.com).
@@ -65,6 +69,32 @@ class MargApiService {
     final err = dataMap?['error'];
     final message = err is Map ? (err['message'] ?? dataMap?['message']) : (err ?? dataMap?['message']);
     throw Exception(message is String ? message : 'Registration failed');
+  }
+
+  /// Ensure the user has a paper wallet (fintech app_wallets). Creates one if missing.
+  /// Call after login so the user always has a wallet. Requires [idToken].
+  /// Throws on 4xx/5xx so callers can log or handle (e.g. migrations not run).
+  Future<Map<String, dynamic>?> ensurePaperWallet({
+    required String idToken,
+    String? currency,
+  }) async {
+    final body = <String, dynamic>{};
+    if (currency != null && currency.isNotEmpty) body['currency'] = currency;
+    final res = await http.post(
+      Uri.parse('$_baseUrl/api/user/paper-wallet'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+      body: jsonEncode(body),
+    );
+    final data = jsonDecode(res.body) as Map<String, dynamic>?;
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      final d = data?['data'];
+      return d is Map<String, dynamic> ? d : null;
+    }
+    final message = data?['message'] ?? data?['error'] ?? 'Paper wallet failed (${res.statusCode})';
+    throw Exception(message is String ? message : 'Paper wallet failed (${res.statusCode})');
   }
 
   /// Get onboarding. Pass [idToken] when logged in, or [sessionId] when anonymous.
@@ -203,5 +233,197 @@ class MargApiService {
     }
     final message = data?['message'] ?? data?['error'] ?? 'OCR failed';
     throw Exception(message is String ? message : 'OCR failed');
+  }
+
+  /// GET /api/commodities/gold-silver — gold & silver rates in INR (gBuy, sBuy per gram).
+  /// Use data.rates.gBuy and data.rates.sBuy for gold/silver INR/gm; use global only for usdPerOz.
+  /// Returns { success, data: { rates: { gBuy, sBuy, gBuyGst, sBuyGst }, taxes, blockId, change }, global: { gold, silver } }.
+  Future<Map<String, dynamic>?> getGoldSilverRates() async {
+    final res = await http.get(
+      Uri.parse('$_baseUrl/api/commodities/gold-silver'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    final data = jsonDecode(res.body) as Map<String, dynamic>?;
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      return data;
+    }
+    return null;
+  }
+
+  /// GET /api/account/augmont/rates — live gold/silver rates + blockId (for buy/sell).
+  /// Requires [idToken]. Maps server's GET /rates payload into [AugmontRates].
+  Future<AugmontRates?> getAugmontRates({required String idToken}) async {
+    final res = await http.get(
+      Uri.parse('$_baseUrl/api/account/augmont/rates'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+    final data = jsonDecode(res.body) as Map<String, dynamic>?;
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      final d = data?['data'];
+      if (d is Map<String, dynamic>) {
+        return AugmontRates.fromJson(d);
+      }
+      return null;
+    }
+    return null;
+  }
+
+  /// GET /api/account/augmont/sip/rates — SIP rates (gBuy, sBuy + GST + blockId).
+  Future<AugmontSipRates?> getAugmontSipRates({required String idToken}) async {
+    final res = await http.get(
+      Uri.parse('$_baseUrl/api/account/augmont/sip/rates'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+    final data = jsonDecode(res.body) as Map<String, dynamic>?;
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      final d = data?['data'];
+      if (d is Map<String, dynamic>) {
+        return AugmontSipRates.fromJson(d);
+      }
+      return null;
+    }
+    return null;
+  }
+
+  /// Mock FAQ JSON for different sections (gold_buy, silver_buy, etc.).
+  /// In future this can call a real backend endpoint instead.
+  static const String _faqMockJson = '''
+{
+  "gold_buy": [
+    {
+      "question": "What is Digital Gold?",
+      "answer": "Digital gold lets you buy and hold gold online in small amounts with 24K 99.9% purity backing."
+    },
+    {
+      "question": "Can I convert my gold to coins or jewellery?",
+      "answer": "Yes, you can convert accumulated digital gold into coins or jewellery through supported partners."
+    },
+    {
+      "question": "Is my gold stored safely?",
+      "answer": "Your gold is stored in insured, secure vaults with the custodian appointed by the provider."
+    },
+    {
+      "question": "What are the minimum and maximum buy limits?",
+      "answer": "Minimum purchase is usually ₹1; maximum limits depend on KYC and provider policies."
+    },
+    {
+      "question": "How is the buy price decided?",
+      "answer": "Buy price is linked to live wholesale market rates plus applicable taxes and platform charges."
+    },
+    {
+      "question": "Can I sell my digital gold anytime?",
+      "answer": "You can typically sell your digital gold 24x7 at the prevailing live sell price, subject to liquidity windows."
+    },
+    {
+      "question": "Do I need full KYC to buy?",
+      "answer": "You can start with basic KYC for small amounts; full KYC may be required for higher limits and redemptions."
+    },
+    {
+      "question": "Are there any hidden charges?",
+      "answer": "All charges like GST and spread are shown upfront in the buy price; there are no hidden fees."
+    }
+  ]
+}
+''';
+
+  /// Get FAQs for a given [section] (e.g. 'gold_buy') using mock JSON.
+  Future<List<FaqItem>> getFaqs({required String section}) async {
+    final decoded = jsonDecode(_faqMockJson) as Map<String, dynamic>;
+    final list = decoded[section];
+    if (list is List) {
+      return list
+          .whereType<Map>()
+          .map((e) => FaqItem.fromJson(e.cast<String, dynamic>()))
+          .toList();
+    }
+    return const <FaqItem>[];
+  }
+
+  /// Mock trends JSON for different sections (gold_buy, silver_buy, etc.).
+  /// Each item has a title and contentType (article, guide, video, etc.).
+  static const String _trendsMockJson = '''
+{
+  "gold_buy": [
+    {
+      "title": "Digital Gold is for all financial goals",
+      "contentType": "article"
+    },
+    {
+      "title": "Top 5 benefits of investing in Digital Gold",
+      "contentType": "article"
+    },
+    {
+      "title": "How to grow your gold with Digital Gold SIP?",
+      "contentType": "guide"
+    },
+    {
+      "title": "Is Digital Gold safe compared to physical gold?",
+      "contentType": "article"
+    },
+    {
+      "title": "What taxes apply on Digital Gold?",
+      "contentType": "faq"
+    }
+  ]
+}
+''';
+
+  /// Get trends for a given [section] (e.g. 'gold_buy'). Optionally filter by [contentType].
+  Future<List<TrendItem>> getTrends({
+    required String section,
+    String? contentType,
+  }) async {
+    final decoded = jsonDecode(_trendsMockJson) as Map<String, dynamic>;
+    final list = decoded[section];
+    if (list is List) {
+      var items = list
+          .whereType<Map>()
+          .map((e) => TrendItem.fromJson(e.cast<String, dynamic>()))
+          .toList();
+      if (contentType != null && contentType.isNotEmpty) {
+        items = items
+            .where((t) => t.contentType.toLowerCase() == contentType.toLowerCase())
+            .toList();
+      }
+      return items;
+    }
+    return const <TrendItem>[];
+  }
+
+  /// Mock shop products JSON for different sections (gold_buy, silver_buy, etc.).
+  static const String _shopProductsMockJson = '''
+{
+  "gold_buy": [
+    {
+      "title": "Link Chain",
+      "meta": "7.0gms | 22K",
+      "price": "\u20b91,05,355.47"
+    },
+    {
+      "title": "Ring",
+      "meta": "5.0gms | 22K",
+      "price": "\u20b975,137.23"
+    }
+  ]
+}
+''';
+
+  /// Get shop products for a given [section] using mock JSON.
+  Future<List<ShopProductItem>> getShopProducts({required String section}) async {
+    final decoded = jsonDecode(_shopProductsMockJson) as Map<String, dynamic>;
+    final list = decoded[section];
+    if (list is List) {
+      return list
+          .whereType<Map>()
+          .map((e) => ShopProductItem.fromJson(e.cast<String, dynamic>()))
+          .toList();
+    }
+    return const <ShopProductItem>[];
   }
 }

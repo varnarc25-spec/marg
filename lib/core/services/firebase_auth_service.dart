@@ -3,12 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart'
-    show debugPrint, kDebugMode, defaultTargetPlatform, kIsWeb;
+show debugPrint, kDebugMode, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart' show TargetPlatform;
 import '../../firebase_options.dart';
 
-/// Real Firebase Auth Service
-/// Handles authentication using Firebase Authentication
 class FirebaseAuthService {
   FirebaseAuth? _auth;
   GoogleSignIn? _googleSignIn;
@@ -21,151 +19,134 @@ class FirebaseAuthService {
     if (!kIsWeb) _initializeGoogleSignIn();
   }
 
+  // ---------------------------------------------------------------------------
+  // Lazy getters — retry if the first constructor-time attempt failed
+  // (handles web race conditions where FirebaseAuth.instance may not be ready).
+  // ---------------------------------------------------------------------------
+
+  FirebaseAuth? get _firebaseAuth {
+    if (_auth != null) return _auth;
+    _initializeAuth();
+    return _auth;
+  }
+
+  GoogleSignIn get _gsi {
+    if (_googleSignIn != null) return _googleSignIn!;
+    _initializeGoogleSignIn();
+    return _googleSignIn!;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Initialization
+  // ---------------------------------------------------------------------------
+
+  void _initializeAuth() {
+    try {
+      if (Firebase.apps.isEmpty) {
+        debugPrint('⚠️ FirebaseAuthService: Firebase.apps is empty');
+        return;
+      }
+      _auth = FirebaseAuth.instance;
+    } catch (e) {
+      debugPrint('❌ FirebaseAuthService: FirebaseAuth.instance threw: $e');
+    }
+  }
+
   void _initializeGoogleSignIn() {
     try {
-      // Configure GoogleSignIn with client ID from firebase_options if available
       String? clientId;
-      if (defaultTargetPlatform == TargetPlatform.iOS) {
-        clientId = DefaultFirebaseOptions.ios.iosClientId;
-      } else if (defaultTargetPlatform == TargetPlatform.macOS) {
-        clientId = DefaultFirebaseOptions.macos.iosClientId;
+      if (!kIsWeb) {
+        if (defaultTargetPlatform == TargetPlatform.iOS) {
+          clientId = DefaultFirebaseOptions.ios.iosClientId;
+        } else if (defaultTargetPlatform == TargetPlatform.macOS) {
+          clientId = DefaultFirebaseOptions.macos.iosClientId;
+        }
       }
-      // For Android, client ID is usually in google-services.json
-      // GoogleSignIn will use it automatically, so we don't need to set it
-
-      if (clientId != null) {
-        _googleSignIn = GoogleSignIn(
-          scopes: ['email', 'profile'],
-          clientId: clientId,
-        );
-      } else {
-        _googleSignIn = GoogleSignIn(
-          scopes: ['email', 'profile'],
-        );
-      }
-    } catch (e) {
-      // Fallback to default initialization if configuration fails
-      debugPrint('⚠️ Could not configure GoogleSignIn with client ID: $e');
       _googleSignIn = GoogleSignIn(
         scopes: ['email', 'profile'],
+        clientId: clientId,
+      );
+    } catch (e) {
+      debugPrint('⚠️ Could not configure GoogleSignIn: $e');
+      _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  void _requireAuth() {
+    if (_firebaseAuth == null) {
+      throw Exception(
+        'Firebase Auth is not available. '
+        'Run "flutterfire configure" and restart the app.',
       );
     }
   }
 
-  void _initializeAuth() {
-    try {
-      // Check if Firebase is initialized before accessing FirebaseAuth
-      if (Firebase.apps.isEmpty) {
-        return; // Firebase not initialized, _auth will remain null
-      }
-      _auth = FirebaseAuth.instance;
-    } catch (e) {
-      // If FirebaseAuth.instance throws an error, _auth will remain null
-      // This is expected if Firebase is not properly initialized
-    }
-  }
-
-  /// Get current user
   User? getCurrentUser() {
-    if (_auth == null) return null;
     try {
-      return _auth!.currentUser;
-    } catch (e) {
+      return _firebaseAuth?.currentUser;
+    } catch (_) {
       return null;
     }
   }
 
-  /// Check if user is logged in
   bool isLoggedIn() {
-    if (_auth == null) return false;
     try {
-      return _auth!.currentUser != null;
-    } catch (e) {
-      // If Firebase isn't initialized or there's an error, return false
+      return _firebaseAuth?.currentUser != null;
+    } catch (_) {
       return false;
     }
   }
 
-  /// Send OTP to phone number
-  /// Returns verification ID for OTP verification
-  Future<String> sendPhoneOTP(String phoneNumber) async {
-    if (_auth == null) {
-      throw Exception(
-        'Firebase is not initialized. Please configure Firebase first.\n\n'
-        'To fix this:\n'
-        '1. Run: flutterfire configure\n'
-        '2. Or add GoogleService-Info.plist (iOS) and google-services.json (Android)',
-      );
-    }
+  Stream<User?> authStateChanges() {
+    if (_firebaseAuth == null) return Stream.value(null);
+    return _firebaseAuth!.authStateChanges();
+  }
+
+  Future<String?> getIdToken() async {
     try {
-      // Verify phone number format (should include country code)
-      if (!phoneNumber.startsWith('+')) {
-        throw Exception('Phone number must include country code (e.g., +91XXXXXXXXXX)');
-      }
-
-      // Send verification code
-      final confirmationResult = await _auth!.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        timeout: const Duration(seconds: 60),
-        verificationCompleted: (PhoneAuthCredential credential) {
-          // Auto-verification completed (Android only)
-          // This is handled automatically by Firebase
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          throw Exception(_getErrorMessage(e));
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          // Code sent successfully - verificationId is returned via Future
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Auto-retrieval timeout
-        },
-      );
-
-      // Wait for code to be sent and return verification ID
-      // Note: In real implementation, we need to handle this differently
-      // For now, we'll use a completer pattern or return the verification ID
-      // from the codeSent callback
-      throw Exception('Phone verification requires callback handling. Use verifyPhoneNumberWithCallback instead.');
-    } catch (e) {
-      throw Exception('Failed to send OTP: ${e.toString()}');
+      return await _firebaseAuth?.currentUser?.getIdToken();
+    } catch (_) {
+      return null;
     }
   }
 
-  /// Send OTP to phone number with callback
-  /// Returns verification ID via callback
-  ///
-  /// Note: You may see "Failed to initialize reCAPTCHA Enterprise config. Triggering the reCAPTCHA v2 verification."
-  /// in logs. This is expected when reCAPTCHA Enterprise is not set up in Firebase/Cloud Console.
-  /// Firebase falls back to reCAPTCHA v2 and phone auth works normally. To use Enterprise instead,
-  /// enable and configure it in Firebase Console (Authentication > Sign-in method > Phone).
+  // ---------------------------------------------------------------------------
+  // Phone Auth
+  // ---------------------------------------------------------------------------
+
+  Future<String> sendPhoneOTP(String phoneNumber) async {
+    _requireAuth();
+    if (!phoneNumber.startsWith('+')) {
+      throw Exception(
+          'Phone number must include country code (e.g., +91XXXXXXXXXX)');
+    }
+    throw Exception(
+        'Use sendPhoneOTPWithCallback for phone verification.');
+  }
+
   Future<String> sendPhoneOTPWithCallback(
     String phoneNumber,
     Function(String verificationId) onCodeSent,
   ) async {
-    if (_auth == null) {
+    _requireAuth();
+    if (!phoneNumber.startsWith('+')) {
       throw Exception(
-        'Firebase is not initialized. Please configure Firebase first.\n\n'
-        'To fix this:\n'
-        '1. Run: flutterfire configure\n'
-        '2. Or add GoogleService-Info.plist (iOS) and google-services.json (Android)',
-      );
+          'Phone number must include country code (e.g., +91XXXXXXXXXX)');
     }
-    try {
-      if (!phoneNumber.startsWith('+')) {
-        throw Exception('Phone number must include country code (e.g., +91XXXXXXXXXX)');
-      }
 
-      String? verificationId;
+    try {
       final completer = Completer<String>();
 
-      await _auth!.verifyPhoneNumber(
+      await _firebaseAuth!.verifyPhoneNumber(
         phoneNumber: phoneNumber,
         timeout: const Duration(seconds: 60),
         verificationCompleted: (PhoneAuthCredential credential) async {
-          // Auto-verification completed (Android only)
           try {
-            await _auth!.signInWithCredential(credential);
+            await _firebaseAuth!.signInWithCredential(credential);
             completer.complete(credential.verificationId ?? '');
           } catch (e) {
             completer.completeError(e);
@@ -175,141 +156,105 @@ class FirebaseAuthService {
           completer.completeError(Exception(_getErrorMessage(e)));
         },
         codeSent: (String vid, int? resendToken) {
-          verificationId = vid;
           onCodeSent(vid);
           completer.complete(vid);
         },
-        codeAutoRetrievalTimeout: (String vid) {
-          verificationId = vid;
-        },
+        codeAutoRetrievalTimeout: (_) {},
       );
 
       return completer.future;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_getErrorMessage(e));
     } catch (e) {
-      throw Exception('Failed to send OTP: ${e.toString()}');
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('recaptcha') ||
+          msg.contains('argumenterror') ||
+          msg.contains('recaptchaverifier')) {
+        throw Exception(
+          'Phone verification could not start. '
+          'On web, ensure you allow the security check. '
+          'You can also try Email sign-in.',
+        );
+      }
+      throw Exception(
+          'Could not send OTP. Please try again or use Email sign-in.');
     }
   }
 
-  /// Verify phone OTP
   Future<Map<String, dynamic>> verifyPhoneOTP({
     required String verificationId,
     required String smsCode,
   }) async {
-    if (_auth == null) {
-      throw Exception(
-        'Firebase is not initialized. Please configure Firebase first.\n\n'
-        'To fix this:\n'
-        '1. Run: flutterfire configure\n'
-        '2. Or add GoogleService-Info.plist (iOS) and google-services.json (Android)',
-      );
-    }
+    _requireAuth();
     try {
-      // Create phone auth credential
       final credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
         smsCode: smsCode,
       );
-
-      // Sign in with credential
-      final userCredential = await _auth!.signInWithCredential(credential);
-
-      if (userCredential.user == null) {
-        throw Exception('Authentication failed: No user returned');
-      }
-
+      final uc = await _firebaseAuth!.signInWithCredential(credential);
+      if (uc.user == null) throw Exception('Authentication failed');
       return {
-        'uid': userCredential.user!.uid,
-        'phoneNumber': userCredential.user!.phoneNumber,
-        'email': userCredential.user!.email,
+        'uid': uc.user!.uid,
+        'phoneNumber': uc.user!.phoneNumber,
+        'email': uc.user!.email,
       };
     } on FirebaseAuthException catch (e) {
       throw Exception(_getErrorMessage(e));
-    } catch (e) {
-      throw Exception('Failed to verify OTP: ${e.toString()}');
     }
   }
 
-  /// Sign in with email and password
+  // ---------------------------------------------------------------------------
+  // Email / Password Auth
+  // ---------------------------------------------------------------------------
+
   Future<Map<String, dynamic>> signInWithEmailPassword({
     required String email,
     required String password,
   }) async {
-    if (_auth == null) {
-      throw Exception(
-        'Firebase is not initialized. Please configure Firebase first.\n\n'
-        'To fix this:\n'
-        '1. Run: flutterfire configure\n'
-        '2. Or add GoogleService-Info.plist (iOS) and google-services.json (Android)',
-      );
-    }
+    _requireAuth();
     try {
-      final userCredential = await _auth!.signInWithEmailAndPassword(
+      final uc = await _firebaseAuth!.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
-
-      if (userCredential.user == null) {
-        throw Exception('Authentication failed: No user returned');
-      }
-
+      if (uc.user == null) throw Exception('Authentication failed');
       return {
-        'uid': userCredential.user!.uid,
-        'email': userCredential.user!.email,
-        'phoneNumber': userCredential.user!.phoneNumber,
+        'uid': uc.user!.uid,
+        'email': uc.user!.email,
+        'phoneNumber': uc.user!.phoneNumber,
       };
     } on FirebaseAuthException catch (e) {
       throw Exception(_getErrorMessage(e));
-    } catch (e) {
-      throw Exception('Failed to sign in: ${e.toString()}');
     }
   }
 
-  /// Sign up with email and password
   Future<Map<String, dynamic>> signUpWithEmailPassword({
     required String email,
     required String password,
   }) async {
-    if (_auth == null) {
-      throw Exception(
-        'Firebase is not initialized. Please configure Firebase first.\n\n'
-        'To fix this:\n'
-        '1. Run: flutterfire configure\n'
-        '2. Or add GoogleService-Info.plist (iOS) and google-services.json (Android)',
-      );
-    }
+    _requireAuth();
     try {
-      final userCredential = await _auth!.createUserWithEmailAndPassword(
+      final uc = await _firebaseAuth!.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
-
-      if (userCredential.user == null) {
-        throw Exception('Registration failed: No user returned');
-      }
-
+      if (uc.user == null) throw Exception('Registration failed');
       return {
-        'uid': userCredential.user!.uid,
-        'email': userCredential.user!.email,
-        'phoneNumber': userCredential.user!.phoneNumber,
+        'uid': uc.user!.uid,
+        'email': uc.user!.email,
+        'phoneNumber': uc.user!.phoneNumber,
       };
     } on FirebaseAuthException catch (e) {
       throw Exception(_getErrorMessage(e));
-    } catch (e) {
-      throw Exception('Failed to sign up: ${e.toString()}');
     }
   }
 
-  /// Sign in with Google
+  // ---------------------------------------------------------------------------
+  // Google Sign-In
+  // ---------------------------------------------------------------------------
+
   Future<Map<String, dynamic>> signInWithGoogle() async {
-    // Check if Firebase is initialized
-    if (_auth == null || Firebase.apps.isEmpty) {
-      throw Exception(
-        'Firebase is not initialized. Please configure Firebase first.\n\n'
-        'To fix this:\n'
-        '1. Run: flutterfire configure\n'
-        '2. Or add GoogleService-Info.plist (iOS) and google-services.json (Android)',
-      );
-    }
+    _requireAuth();
 
     try {
       if (_googleSignIn == null) {
@@ -355,97 +300,91 @@ class FirebaseAuthService {
           '2. Ensure the OAuth client ID matches your app configuration\n'
           '3. Run: flutterfire configure\n'
           '4. Restart the app',
+      UserCredential userCredential;
+
+      if (kIsWeb) {
+        // On web, use Firebase Auth's signInWithPopup directly.
+        // This avoids needing a separate OAuth web client ID for
+        // the google_sign_in package and works out of the box with
+        // the Firebase web config (authDomain, apiKey, etc.).
+        final provider = GoogleAuthProvider()
+          ..addScope('email')
+          ..addScope('profile');
+        userCredential =
+            await _firebaseAuth!.signInWithPopup(provider);
+      } else {
+        // Native platforms: use google_sign_in package
+        final googleUser = await _gsi.signIn();
+        if (googleUser == null) {
+          throw Exception('Google Sign-In was cancelled');
+        }
+
+        final googleAuth = await googleUser.authentication;
+        if (googleAuth.idToken == null) {
+          throw Exception(
+            'Google Sign-In failed: no ID token received. '
+            'Check Firebase Console > Authentication > Google provider.',
+          );
+        }
+
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
         );
+        userCredential =
+            await _firebaseAuth!.signInWithCredential(credential);
       }
 
-      // Create a new credential
-      // Note: idToken is required for Firebase Auth, accessToken is optional
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      // Sign in to Firebase with the Google credential
-      final userCredential = await _auth!.signInWithCredential(credential);
-
-      if (userCredential.user == null) {
-        throw Exception('Authentication failed: No user returned');
-      }
+      final user = userCredential.user;
+      if (user == null) throw Exception('Authentication failed');
 
       return {
-        'uid': userCredential.user!.uid,
-        'email': userCredential.user!.email,
-        'phoneNumber': userCredential.user!.phoneNumber,
+        'uid': user.uid,
+        'email': user.email,
+        'phoneNumber': user.phoneNumber,
+        'displayName': user.displayName,
       };
     } on FirebaseAuthException catch (e) {
       debugPrint('❌ Firebase Auth Exception: ${e.code} - ${e.message}');
       throw Exception(_getErrorMessage(e));
     } catch (e, stackTrace) {
-      debugPrint('❌ Google Sign-In error: $e');
       if (kDebugMode) {
-        debugPrint('Stack trace: $stackTrace');
+        debugPrint('❌ Google Sign-In error: $e');
+        debugPrint('Stack: $stackTrace');
       }
-      
-      // Check if it's an assertion error
-      if (e.toString().contains('assertion') || 
-          e.toString().contains('AssertionError')) {
-        throw Exception(
-          'Google Sign-In configuration error.\n\n'
-          'This usually means:\n'
-          '1. Missing or incorrect OAuth client ID configuration\n'
-          '2. Google Sign-In not enabled in Firebase Console\n'
-          '3. Missing configuration files (GoogleService-Info.plist or google-services.json)\n\n'
-          'To fix:\n'
-          '1. Ensure Google Sign-In is enabled in Firebase Console\n'
-          '2. Run: flutterfire configure\n'
-          '3. Restart the app',
-        );
+
+      final msg = e.toString();
+      if (msg.contains('popup_closed') ||
+          msg.contains('cancelled') ||
+          msg.contains('canceled')) {
+        throw Exception('Google Sign-In was cancelled');
       }
-      
-      // Check if it's a Firebase initialization error
-      if (e.toString().contains('no firebase app') || 
-          e.toString().contains('Firebase is not initialized')) {
-        throw Exception(
-          'Firebase is not configured. Please set up Firebase first.\n\n'
-          'Quick fix:\n'
-          '1. Run: flutterfire configure\n'
-          '2. Restart the app',
-        );
-      }
-      
-      throw Exception('Failed to sign in with Google: ${e.toString()}');
+      throw Exception('Failed to sign in with Google: $msg');
     }
   }
 
-  /// Send email verification link
-  Future<void> sendEmailVerification() async {
-    if (_auth == null) {
-      throw Exception(
-        'Firebase is not initialized. Please configure Firebase first.\n\n'
-        'To fix this:\n'
-        '1. Run: flutterfire configure\n'
-        '2. Or add GoogleService-Info.plist (iOS) and google-services.json (Android)',
-      );
-    }
-    try {
-      final user = _auth!.currentUser;
-      if (user == null) {
-        throw Exception('No user is currently signed in');
-      }
+  // ---------------------------------------------------------------------------
+  // Email verification
+  // ---------------------------------------------------------------------------
 
+  Future<void> sendEmailVerification() async {
+    _requireAuth();
+    try {
+      final user = _firebaseAuth!.currentUser;
+      if (user == null) throw Exception('No user is currently signed in');
       if (user.email == null) {
         throw Exception('User does not have an email address');
       }
-
       await user.sendEmailVerification();
     } on FirebaseAuthException catch (e) {
       throw Exception(_getErrorMessage(e));
-    } catch (e) {
-      throw Exception('Failed to send verification email: ${e.toString()}');
     }
   }
 
-  /// Sign out
+  // ---------------------------------------------------------------------------
+  // Sign out
+  // ---------------------------------------------------------------------------
+
   Future<void> signOut() async {
     try {
       if (_auth != null) {
@@ -455,7 +394,7 @@ class FirebaseAuthService {
         await _googleSignIn!.signOut();
       }
     } catch (e) {
-      throw Exception('Failed to sign out: ${e.toString()}');
+      throw Exception('Failed to sign out: $e');
     }
   }
 
@@ -479,7 +418,6 @@ class FirebaseAuthService {
     }
   }
 
-  /// Get error message from Firebase Auth Exception
   String _getErrorMessage(FirebaseAuthException e) {
     switch (e.code) {
       case 'weak-password':
@@ -501,9 +439,21 @@ class FirebaseAuthService {
       case 'too-many-requests':
         return 'Too many requests. Please try again later.';
       case 'operation-not-allowed':
-        return 'This operation is not allowed.';
+        return 'This sign-in method is not enabled. '
+            'Enable it in Firebase Console > Authentication > Sign-in method.';
       case 'user-disabled':
         return 'This user account has been disabled.';
+      case 'invalid-phone-number':
+        return 'Invalid phone number. Use a valid 10-digit number with country code.';
+      case 'captcha-check-failed':
+        return 'Verification check failed. Please try again.';
+      case 'missing-client-identifier':
+        return 'Phone auth is not set up for this app. Check Firebase configuration.';
+      case 'quota-exceeded':
+        return 'SMS quota exceeded. Try again later or use Email sign-in.';
+      case 'app-deleted':
+      case 'invalid-app-credential':
+        return 'App configuration error. Run: flutterfire configure';
       default:
         return e.message ?? 'An error occurred during authentication.';
     }

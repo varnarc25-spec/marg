@@ -3,6 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/services/marg_api_service.dart';
+import '../../core/config/api_config.dart';
+import '../models/faq_item.dart';
+import '../models/trend_item.dart';
+import '../models/shop_product_item.dart';
+import '../../features/gold_silver/models/augmont_rates_models.dart';
 import '../../data/repositories/mock_data_repository.dart';
 import '../../data/models/user_profile.dart';
 import '../../data/models/personal_data.dart';
@@ -211,12 +216,9 @@ class LanguageNotifier extends StateNotifier<String> {
   }
 }
 
-/// Marg API base URL (change for production). Used by MargApiService.
-const String margApiBaseUrl = 'http://localhost:3000';
-
 /// Marg API Service Provider
 final margApiServiceProvider = Provider<MargApiService>((ref) {
-  return MargApiService(baseUrl: margApiBaseUrl);
+  return MargApiService(baseUrl: ApiConfig.baseUrl);
 });
 
 /// Onboarding session ID for anonymous users (before login). Stored in prefs.
@@ -267,6 +269,68 @@ final personalDataFromApiProvider = FutureProvider<PersonalData?>((ref) async {
   } catch (_) {
     return null;
   }
+});
+
+/// Augmont live gold/silver rates (for buy/sell pages). Refreshes when provider is invalidated.
+/// When user is on gold-related pages, invalidate every hour to refetch (e.g. via Timer in the page).
+/// Returns [AugmontRates] (GET /rates payload) or null.
+final augmontRatesProvider = FutureProvider.autoDispose<AugmontRates?>((ref) async {
+  final authService = ref.watch(firebaseAuthServiceProvider);
+  if (!authService.isLoggedIn()) return null;
+  final user = authService.getCurrentUser();
+  if (user == null) return null;
+  try {
+    final idToken = await user.getIdToken();
+    if (idToken == null || idToken.isEmpty) return null;
+    final api = ref.watch(margApiServiceProvider);
+    return await api.getAugmontRates(idToken: idToken);
+  } catch (_) {
+    return null;
+  }
+});
+
+/// Augmont SIP rates (gBuy, sBuy + GST + blockId) for recurring products (Daily Gold/Silver, SIP UI).
+/// Wraps GET /sip/rates (via /api/account/augmont/sip/rates).
+final augmontSipRatesProvider = FutureProvider.autoDispose<AugmontSipRates?>((ref) async {
+  final authService = ref.watch(firebaseAuthServiceProvider);
+  if (!authService.isLoggedIn()) return null;
+  final user = authService.getCurrentUser();
+  if (user == null) return null;
+  try {
+    final idToken = await user.getIdToken();
+    if (idToken == null || idToken.isEmpty) return null;
+    final api = ref.watch(margApiServiceProvider);
+    return await api.getAugmontSipRates(idToken: idToken);
+  } catch (_) {
+    return null;
+  }
+});
+
+/// FAQs for a given section (e.g. 'gold_buy') using mock JSON via [MargApiService].
+final faqProvider = FutureProvider.family<List<FaqItem>, String>((ref, section) async {
+  final api = ref.watch(margApiServiceProvider);
+  return api.getFaqs(section: section);
+});
+
+/// Trends/articles for a given section (e.g. 'gold_buy'), optionally filtered by contentType.
+class TrendsQuery {
+  final String section;
+  final String? contentType;
+
+  const TrendsQuery({required this.section, this.contentType});
+}
+
+final trendsProvider =
+    FutureProvider.family<List<TrendItem>, TrendsQuery>((ref, query) async {
+  final api = ref.watch(margApiServiceProvider);
+  return api.getTrends(section: query.section, contentType: query.contentType);
+});
+
+/// Shop products for a given section (e.g. 'gold_buy') from mock JSON.
+final shopProductsProvider =
+    FutureProvider.family<List<ShopProductItem>, String>((ref, section) async {
+  final api = ref.watch(margApiServiceProvider);
+  return api.getShopProducts(section: section);
 });
 
 /// User Session Provider

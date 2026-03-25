@@ -4,6 +4,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../widgets/home_widgets.dart';
+import '../../../../shared/widgets/marg_header.dart';
 import 'hub_detail_screen.dart';
 import 'gold_silver_all_services_screen.dart';
 import 'wealth_home_screen.dart';
@@ -126,7 +127,14 @@ class HomeScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            _buildMargHeader(context, l10n),
+            MargHeader(
+              l10n: l10n,
+              onAiTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AiAssistantScreen()),
+                );
+              },
+            ),
             const HomeHeader(),
             Expanded(
               child: ListView(

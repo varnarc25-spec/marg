@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -110,28 +110,27 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
       // Register user in marg_api (POST /api/user/register) for phone sign-in/signup
       debugPrint('MargApi REGISTER │ [Phone OTP] Attempting register after verify...');
-      try {
-        final authService = ref.read(firebaseAuthServiceProvider);
-        final idToken = await authService.getIdToken();
-        if (idToken == null) {
-          debugPrint('MargApi REGISTER │ [Phone OTP] Skipped: idToken is null');
-        } else {
-          debugPrint('MargApi REGISTER │ [Phone OTP] idToken (copy for Postman):');
-          debugPrint(idToken);
-          final api = ref.read(margApiServiceProvider);
+      final idToken = await ref.read(firebaseAuthServiceProvider).getIdToken();
+      if (idToken != null) {
+        final api = ref.read(margApiServiceProvider);
+        try {
           await api.register(
             idToken: idToken,
             name: widget.phoneNumber,
           );
-          debugPrint('MargApi REGISTER │ [Phone OTP] Register call completed');
+        } catch (e, st) {
+          debugPrint('MargApi │ [Phone OTP] register: $e');
+          if (kDebugMode) {
+            for (final line in st.toString().split('\n')) {
+              if (line.isNotEmpty) debugPrint('MargApi │   $line');
+            }
+          }
         }
-      } catch (e, st) {
-        debugPrint('MargApi REGISTER │ [Phone OTP] Error: $e');
-        debugPrint('MargApi REGISTER │ [Phone OTP] Full stack trace:');
-        for (final line in st.toString().split('\n')) {
-          if (line.isNotEmpty) debugPrint('MargApi REGISTER │   $line');
+        try {
+          await api.ensurePaperWallet(idToken: idToken);
+        } catch (e) {
+          debugPrint('MargApi │ [Phone OTP] ensurePaperWallet: $e');
         }
-        // "Failed to fetch" on web = usually CORS or API unreachable. Ensure marg_api is running and CORS allows your Flutter web origin (e.g. localhost).
       }
 
       // Claim anonymous onboarding if we have a session id
