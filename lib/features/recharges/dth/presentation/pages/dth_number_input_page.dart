@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../../core/theme/app_theme.dart';
+
+import '../../../../../core/theme/app_theme.dart';
 import '../providers/dth_recharge_provider.dart';
 import 'dth_plan_list_page.dart';
 
-/// Subscriber ID / VC number input for DTH recharge (mirrors [MobileNumberInputPage]).
+/// Subscriber ID / VC number input for DTH recharge.
 class DthNumberInputPage extends ConsumerStatefulWidget {
   const DthNumberInputPage({super.key});
 
@@ -15,6 +16,15 @@ class DthNumberInputPage extends ConsumerStatefulWidget {
 class _DthNumberInputPageState extends ConsumerState<DthNumberInputPage> {
   final _controller = TextEditingController();
   final _focus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    final existing = ref.read(dthSubscriberIdProvider);
+    if (existing.isNotEmpty) {
+      _controller.text = existing;
+    }
+  }
 
   @override
   void dispose() {
@@ -56,10 +66,33 @@ class _DthNumberInputPageState extends ConsumerState<DthNumberInputPage> {
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundColor: AppColors.primaryBlueLight,
-                  child: Text(
-                    op.name.isNotEmpty ? op.name.substring(0, 1).toUpperCase() : 'D',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                  ),
+                  child: op.logoUrl != null && op.logoUrl!.isNotEmpty
+                      ? ClipOval(
+                          child: Image.network(
+                            op.logoUrl!,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Text(
+                              op.name.isNotEmpty
+                                  ? op.name.substring(0, 1).toUpperCase()
+                                  : 'D',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Text(
+                          op.name.isNotEmpty
+                              ? op.name.substring(0, 1).toUpperCase()
+                              : 'D',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
                 title: Text(op.name),
                 subtitle: const Text('DTH'),
@@ -87,7 +120,7 @@ class _DthNumberInputPageState extends ConsumerState<DthNumberInputPage> {
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
+            child: FilledButton(
               onPressed: _proceed,
               child: const Text('View plans'),
             ),

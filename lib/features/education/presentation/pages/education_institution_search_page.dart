@@ -61,9 +61,11 @@ class _EducationInstitutionSearchPageState extends ConsumerState<EducationInstit
   void _search() async {
     setState(() => _loading = true);
     final list = await ref.read(educationRepositoryProvider).searchInstitutions(_queryController.text);
-    if (mounted) setState(() {
-      _results = list;
-      _loading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _results = list;
+        _loading = false;
+      });
+    }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../../../core/theme/app_theme.dart';
+import '../../data/electricity_api_exceptions.dart';
 import '../providers/electricity_provider.dart';
 import 'electricity_bill_breakdown_page.dart';
 
@@ -8,10 +10,12 @@ class ElectricityFetchBillPage extends ConsumerStatefulWidget {
   const ElectricityFetchBillPage({super.key});
 
   @override
-  ConsumerState<ElectricityFetchBillPage> createState() => _ElectricityFetchBillPageState();
+  ConsumerState<ElectricityFetchBillPage> createState() =>
+      _ElectricityFetchBillPageState();
 }
 
-class _ElectricityFetchBillPageState extends ConsumerState<ElectricityFetchBillPage> {
+class _ElectricityFetchBillPageState
+    extends ConsumerState<ElectricityFetchBillPage> {
   bool _loading = true;
   String? _error;
 
@@ -23,7 +27,7 @@ class _ElectricityFetchBillPageState extends ConsumerState<ElectricityFetchBillP
 
   Future<void> _fetchBill() async {
     final biller = ref.read(selectedElectricityBillerProvider);
-    final consumerId = ref.read(electricityConsumerIdProvider);
+    final consumerNumber = ref.read(electricityConsumerNumberProvider);
     if (biller == null) {
       setState(() {
         _loading = false;
@@ -31,14 +35,29 @@ class _ElectricityFetchBillPageState extends ConsumerState<ElectricityFetchBillP
       });
       return;
     }
-    final bill = await ref.read(electricityRepositoryProvider).fetchBill(biller.id, consumerId);
-    if (!mounted) return;
-    setState(() => _loading = false);
-    if (bill != null) {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final bill = await ref.read(electricityRepositoryProvider).fetchBill(
+            billerId: biller.id,
+            consumerNumber: consumerNumber.trim(),
+          );
+      if (!mounted) return;
       ref.read(fetchedElectricityBillProvider.notifier).state = bill;
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ElectricityBillBreakdownPage()));
-    } else {
-      setState(() => _error = 'Could not fetch bill');
+      await Navigator.pushReplacement(
+        context,
+        MaterialPageRoute<void>(
+          builder: (_) => const ElectricityBillBreakdownPage(),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = electricityApiUserMessage(e);
+      });
     }
   }
 
@@ -46,11 +65,36 @@ class _ElectricityFetchBillPageState extends ConsumerState<ElectricityFetchBillP
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(title: const Text('Fetch bill'), backgroundColor: AppColors.surfaceLight, foregroundColor: AppColors.textPrimary),
+      appBar: AppBar(
+        title: const Text('Fetch bill'),
+        backgroundColor: AppColors.surfaceLight,
+        foregroundColor: AppColors.textPrimary,
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(child: Text(_error!))
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(_error!, textAlign: TextAlign.center),
+                        const SizedBox(height: 16),
+                        FilledButton(
+                          onPressed: () {
+                            setState(() {
+                              _loading = true;
+                              _error = null;
+                            });
+                            _fetchBill();
+                          },
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
               : const Center(child: Text('Fetching...')),
     );
   }

@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:marg/features/insurance/health/data/models/health_network_hospital.dart';
+import 'package:marg/shared/providers/app_providers.dart';
+
 import '../providers/health_insurance_provider.dart';
 import 'health_insurance_select_plan_page.dart';
 import 'health_insurance_help_page.dart';
@@ -20,12 +25,19 @@ class _HealthInsuranceDetailsPageState
   final _pincodeController = TextEditingController();
   final List<TextEditingController> _parentAgeControllers = [];
 
+  Timer? _hospitalDebounce;
+  bool _loadingHospitals = false;
+  List<HealthNetworkHospital> _hospitals = const [];
+  String? _hospitalError;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _syncFormToControllers(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _syncFormToControllers();
+      final p = ref.read(healthDetailsFormProvider).pincode.trim();
+      if (p.length == 6) _scheduleHospitalLoad(p);
+    });
   }
 
   void _syncFormToControllers() {
@@ -46,12 +58,49 @@ class _HealthInsuranceDetailsPageState
 
   @override
   void dispose() {
+    _hospitalDebounce?.cancel();
     _elderAgeController.dispose();
     _pincodeController.dispose();
     for (final c in _parentAgeControllers) {
       c.dispose();
     }
     super.dispose();
+  }
+
+  void _scheduleHospitalLoad(String pin) {
+    _hospitalDebounce?.cancel();
+    if (pin.trim().length != 6) {
+      setState(() {
+        _hospitals = const [];
+        _hospitalError = null;
+        _loadingHospitals = false;
+      });
+      return;
+    }
+    setState(() {
+      _loadingHospitals = true;
+      _hospitalError = null;
+    });
+    _hospitalDebounce = Timer(const Duration(milliseconds: 500), () async {
+      final api = ref.read(healthInsuranceApiServiceProvider);
+      final auth = ref.read(firebaseAuthServiceProvider);
+      try {
+        final token = await auth.getIdToken();
+        final list = await api.getNetworkHospitals(pin.trim(), idToken: token);
+        if (!mounted) return;
+        setState(() {
+          _hospitals = list;
+          _loadingHospitals = false;
+        });
+      } catch (e) {
+        if (!mounted) return;
+        setState(() {
+          _hospitalError = e.toString();
+          _loadingHospitals = false;
+          _hospitals = const [];
+        });
+      }
+    });
   }
 
   @override
@@ -262,7 +311,9 @@ class _HealthInsuranceDetailsPageState
                         onChanged: (v) {
                           final f = ref.read(healthDetailsFormProvider);
                           final list = List<String?>.from(f.parentAges);
-                          while (list.length <= i) list.add(null);
+                          while (list.length <= i) {
+                            list.add(null);
+                          }
                           list[i] = v.isEmpty ? null : v;
                           ref.read(healthDetailsFormProvider.notifier).state = f
                               .copyWith(parentAges: list);
@@ -326,10 +377,72 @@ class _HealthInsuranceDetailsPageState
               ref.read(healthDetailsFormProvider.notifier).state = ref
                   .read(healthDetailsFormProvider)
                   .copyWith(pincode: v);
+              _scheduleHospitalLoad(v);
             },
             colorScheme: colorScheme,
             textTheme: textTheme,
           ),
+          if (_loadingHospitals) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Loading cashless hospitals…',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ] else if (_hospitalError != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Hospitals: ${_hospitalError!}',
+              style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+            ),
+          ] else if (_hospitals.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Cashless hospitals near you',
+              style: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 4),
+            ..._hospitals.take(5).map(
+                  (h) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      h.address != null && h.address!.isNotEmpty
+                          ? '${h.name} — ${h.address}'
+                          : h.name,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+            if (_hospitals.length > 5)
+              Text(
+                '+ ${_hospitals.length - 5} more',
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+          ],
           const SizedBox(height: 24),
 
           Text(
@@ -467,25 +580,27 @@ class _HealthInsuranceDetailsPageState
                 onPressed: canSubmit()
                     ? () {
                         final f = ref.read(healthDetailsFormProvider);
-                        ref.read(healthDetailsFormProvider.notifier).state = f
-                            .copyWith(
-                              elderAge: hasSelfOrSpouse
-                                  ? _elderAgeController.text.trim()
-                                  : null,
-                              pincode: _pincodeController.text.trim(),
-                              parentAges: hasParents
-                                  ? _parentAgeControllers
-                                        .map(
-                                          (c) => c.text.trim().isEmpty
-                                              ? null
-                                              : c.text.trim(),
-                                        )
-                                        .toList()
-                                  : f.parentAges,
+                        final updatedForm = f.copyWith(
+                          elderAge: hasSelfOrSpouse
+                              ? _elderAgeController.text.trim()
+                              : null,
+                          pincode: _pincodeController.text.trim(),
+                          parentAges: hasParents
+                              ? _parentAgeControllers
+                                    .map(
+                                      (c) => c.text.trim().isEmpty
+                                          ? null
+                                          : c.text.trim(),
+                                    )
+                                    .toList()
+                              : f.parentAges,
+                        );
+                        ref.read(healthDetailsFormProvider.notifier).state =
+                            updatedForm;
+                        ref.read(healthPlansProvider.notifier).fetchQuotedPlans(
+                              memberTypes: selectedMembers,
+                              form: updatedForm,
                             );
-                        ref
-                            .read(healthPlansProvider.notifier)
-                            .fetchPlans(selectedMembers);
                       }
                     : null,
                 style: FilledButton.styleFrom(

@@ -1,14 +1,20 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class BikeInsurancePaymentSuccessPage extends StatefulWidget {
   const BikeInsurancePaymentSuccessPage({
     super.key,
     required this.amountInRupees,
+    required this.transactionId,
+    required this.paymentDate,
+    required this.status,
+    this.paymentMethod,
   });
 
   final int amountInRupees;
+  final String transactionId;
+  final DateTime paymentDate;
+  final String status;
+  final String? paymentMethod;
 
   @override
   State<BikeInsurancePaymentSuccessPage> createState() =>
@@ -17,26 +23,6 @@ class BikeInsurancePaymentSuccessPage extends StatefulWidget {
 
 class _BikeInsurancePaymentSuccessPageState
     extends State<BikeInsurancePaymentSuccessPage> {
-  late final String _transactionId;
-  late final DateTime _paymentDate;
-
-  @override
-  void initState() {
-    super.initState();
-    _transactionId = _generateTransactionId();
-    _paymentDate = DateTime.now();
-  }
-
-  String _generateTransactionId() {
-    final rand = Random();
-    // 4 blocks of 4 digits each, e.g. 4352 2748 3920 1234
-    final blocks = List.generate(
-      4,
-      (_) => (rand.nextInt(9000) + 1000).toString(),
-    );
-    return blocks.join(' ');
-  }
-
   String _formatDate(DateTime d) {
     const months = [
       'January',
@@ -137,21 +123,21 @@ class _BikeInsurancePaymentSuccessPageState
                         children: [
                           _DetailRow(
                             label: 'Transaction ID',
-                            value: _transactionId,
+                            value: widget.transactionId,
                             textTheme: textTheme,
                             colorScheme: colorScheme,
                           ),
                           const SizedBox(height: 12),
                           _DetailRow(
                             label: 'Date',
-                            value: _formatDate(_paymentDate),
+                            value: _formatDate(widget.paymentDate),
                             textTheme: textTheme,
                             colorScheme: colorScheme,
                           ),
                           const SizedBox(height: 12),
                           _DetailRow(
                             label: 'Type of Transaction',
-                            value: 'Credit Card',
+                            value: widget.paymentMethod ?? 'Online',
                             textTheme: textTheme,
                             colorScheme: colorScheme,
                           ),
@@ -199,7 +185,7 @@ class _BikeInsurancePaymentSuccessPageState
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      'Success',
+                                      widget.status,
                                       style: textTheme.bodySmall?.copyWith(
                                         color: colorScheme.primary,
                                         fontWeight: FontWeight.w600,

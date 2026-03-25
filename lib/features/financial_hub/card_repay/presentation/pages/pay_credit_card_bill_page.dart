@@ -1,679 +1,291 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../../core/theme/app_theme.dart';
+import '../../data/card_repay_api_exceptions.dart';
 import '../../data/card_repay_data.dart';
+import '../../data/models/card_repay_biller.dart';
+import '../providers/card_repay_provider.dart';
+import 'pay_your_credit_card_bill_page.dart';
 import 'add_bank_credit_card_page.dart';
 
-/// Pay Credit Card Bill page: offer banner, bank grid, services, recommended card.
-/// Matches screenshot layout; uses app theme (bike insurance style).
-class PayCreditCardBillPage extends StatelessWidget {
+/// Financial Hub entry page for Credit Card Repay.
+class PayCreditCardBillPage extends ConsumerWidget {
   const PayCreditCardBillPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    final billersAsync = ref.watch(cardRepayBillersProvider);
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Pay Credit Card Bill',
-          style: textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
-        elevation: 0,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-        children: [
-          const SizedBox(height: 16),
-          _OfferBanner(colorScheme: colorScheme, textTheme: textTheme),
-          const SizedBox(height: 16),
-          _BankGridCard(colorScheme: colorScheme, textTheme: textTheme),
-          const SizedBox(height: 16),
-          _ServicesRow(colorScheme: colorScheme, textTheme: textTheme),
-          const SizedBox(height: 20),
-          _RecommendedSection(
-            colorScheme: colorScheme,
-            textTheme: textTheme,
-          ),
-          const SizedBox(height: 16),
-          _PaytmMoneyBanner(colorScheme: colorScheme, textTheme: textTheme),
-          const SizedBox(height: 20),
-          _RecommendedServicesRow(colorScheme: colorScheme, textTheme: textTheme),
-          const SizedBox(height: 24),
-          _FooterLogos(textTheme: textTheme),
-        ],
-      ),
-    );
-  }
-}
-
-class _OfferBanner extends StatelessWidget {
-  const _OfferBanner({required this.colorScheme, required this.textTheme});
-
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: colorScheme.secondary.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: colorScheme.secondary.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.flight_rounded,
-            size: 28,
-            color: colorScheme.secondary,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'Get a flight voucher worth ₹750',
-              style: textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSurface,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'View All',
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
+        title: const Text('Credit Card Repay'),
+        backgroundColor: AppColors.surfaceLight,
+        foregroundColor: AppColors.textPrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history_rounded),
+            tooltip: 'Payment history',
+            onPressed: () {
+              Navigator.push<void>(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => const PayYourCreditCardBillPage(showHistory: true),
                 ),
-                const SizedBox(width: 2),
-                Icon(Icons.arrow_forward_rounded, size: 18, color: colorScheme.primary),
-              ],
-            ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.account_balance_wallet_rounded),
+            tooltip: 'Saved cards',
+            onPressed: () {
+              Navigator.push<void>(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => const PayYourCreditCardBillPage(),
+                ),
+              );
+            },
           ),
         ],
       ),
-    );
-  }
-}
+      body: billersAsync.when(
+        data: (billers) {
+          final gridItems = billers.isNotEmpty
+              ? billers
+                  .map((b) => CardRepayBank(name: b.name, logoLetter: b.name.isNotEmpty ? b.name[0] : null))
+                  .toList()
+              : popularBanks;
 
-class _BankGridCard extends StatelessWidget {
-  const _BankGridCard({required this.colorScheme, required this.textTheme});
-
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    const crossAxisCount = 3;
-    final banks = popularBanks;
-    final items = [...banks, null];
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 12,
-            childAspectRatio: 0.85,
-          ),
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            final bank = items[index];
-            if (bank == null) {
-              return _ViewMoreBanksItem(colorScheme: colorScheme, textTheme: textTheme);
-            }
-            return _BankGridItem(
-              bank: bank,
-              colorScheme: colorScheme,
-              textTheme: textTheme,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => AddBankCreditCardPage(bankName: bank.name),
-                  ),
-                );
-              },
-            );
-          },
-        ),
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceLight,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.local_offer_rounded, color: AppColors.primaryBlue, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Unlock ₹40 cashback for FASTag',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                    TextButton(onPressed: () {}, child: const Text('View All')),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: gridItems.length + 1, // +1 for "View More"
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  mainAxisSpacing: 14,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 0.9,
+                ),
+                itemBuilder: (context, index) {
+                  if (index == gridItems.length) {
+                    return _ViewMoreBanksTile(onTap: () {});
+                  }
+                  final bank = gridItems[index];
+                  return _BankGridTile(
+                    bankName: bank.name,
+                    displayLetter: bank.displayLetter.toUpperCase(),
+                    onTap: () {
+                      // Find matching API biller if available, otherwise use a dummy id.
+                      CardRepayBiller? selected;
+                      if (billers.isNotEmpty) {
+                        selected = billers.firstWhere(
+                          (x) => x.name.toLowerCase() == bank.name.toLowerCase(),
+                          orElse: () => billers.first,
+                        );
+                      }
+                      if (selected == null) return;
+                      ref.read(selectedCardRepayBillerProvider.notifier).state = selected;
+                      Navigator.push<void>(
+                        context,
+                        MaterialPageRoute<void>(builder: (_) => const AddBankCreditCardPage()),
+                      );
+                    },
+                  );
+                },
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                height: 84,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: cardRepayServices.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (_, i) {
+                    final s = cardRepayServices[i];
+                    return Container(
+                      width: 170,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceLight,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: AppColors.backgroundLight,
+                            child: Icon(s.icon, color: AppColors.primaryBlue),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(s.title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                                Text(s.subtitle, style: Theme.of(context).textTheme.bodySmall),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 18),
+              _RecommendedCard(model: recommendedCreditCard),
+              const SizedBox(height: 12),
+            ],
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text(cardRepayApiUserMessage(e))),
       ),
     );
   }
 }
 
-class _BankGridItem extends StatelessWidget {
-  const _BankGridItem({
-    required this.bank,
-    required this.colorScheme,
-    required this.textTheme,
+class _BankGridTile extends StatelessWidget {
+  final String bankName;
+  final String displayLetter;
+  final VoidCallback onTap;
+
+  const _BankGridTile({
+    required this.bankName,
+    required this.displayLetter,
     required this.onTap,
   });
 
-  final CardRepayBank bank;
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 22,
+            backgroundColor: AppColors.surfaceLight,
+            child: Text(
+              displayLetter,
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            bankName,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ViewMoreBanksTile extends StatelessWidget {
   final VoidCallback onTap;
+  const _ViewMoreBanksTile({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: colorScheme.primaryContainer.withValues(alpha: 0.6),
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                bank.displayLetter,
-                style: textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              bank.name.length > 12 ? '${bank.name.substring(0, 10)}...' : bank.name,
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ViewMoreBanksItem extends StatelessWidget {
-  const _ViewMoreBanksItem({required this.colorScheme, required this.textTheme});
-
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {},
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Icon(Icons.arrow_forward_rounded, color: colorScheme.primary, size: 24),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'View More Banks',
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ServicesRow extends StatelessWidget {
-  const _ServicesRow({required this.colorScheme, required this.textTheme});
-
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 88,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: cardRepayServices.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, index) {
-          final service = cardRepayServices[index];
-          return Card(
-            child: InkWell(
-              onTap: () {},
-              borderRadius: BorderRadius.circular(16),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(service.icon, color: colorScheme.primary, size: 24),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          service.title,
-                          style: textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          service.subtitle,
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _RecommendedSection extends StatelessWidget {
-  const _RecommendedSection({
-    required this.colorScheme,
-    required this.textTheme,
-  });
-
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    final product = recommendedCreditCard;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'RECOMMENDED FOR YOU',
-          style: textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.accentOrange,
-            letterSpacing: 0.5,
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 22,
+            backgroundColor: AppColors.surfaceLight,
+            child: const Icon(Icons.chevron_right_rounded, size: 20),
           ),
-        ),
-        const SizedBox(height: 10),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.title,
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurface,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  product.tags,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: GridView.count(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        childAspectRatio: 2.8,
-                        children: product.benefits.map((b) {
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(b.icon, size: 18, color: colorScheme.primary),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  b.text,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Icon(Icons.credit_card_rounded, size: 56, color: colorScheme.primary),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                Center(
-                  child: Text(
-                    'JOINING FEE: ${product.joiningFee}',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: FilledButton(
-                    onPressed: () {},
-                    child: Text(product.ctaLabel),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Center(
-                  child: Text(
-                    'Terms and conditions applied',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          const SizedBox(height: 8),
+          Text(
+            'View More Banks',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-class _PaytmMoneyBanner extends StatelessWidget {
-  const _PaytmMoneyBanner({required this.colorScheme, required this.textTheme});
-
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
+class _RecommendedCard extends StatelessWidget {
+  final CardRepayRecommended model;
+  const _RecommendedCard({required this.model});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: colorScheme.primaryContainer.withValues(alpha: 0.25),
+      elevation: 0,
+      color: AppColors.surfaceLight,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(Icons.trending_up_rounded, color: colorScheme.primary),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Charges slashed for you!',
-                    style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
+            Text(model.title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 6),
+            Text(model.tags, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 10),
+            ...model.benefits.take(2).map((b) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  children: [
+                    Icon(b.icon, size: 18, color: AppColors.primaryBlue),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        b.text,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-                FilledButton(
-                  onPressed: () {},
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Text('Claim Now →'),
-                ),
-              ],
-            ),
+              );
+            }),
             const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _StrikePrice(label: 'ACCOUNT OPENING', oldPrice: '₹200', newPrice: '₹0'),
-                _StrikePrice(label: 'BROKERAGE*', oldPrice: '₹200', newPrice: '₹0'),
-                _StrikePrice(label: 'MTF INTEREST*', oldPrice: '₹200', newPrice: '₹0'),
-              ],
+            FilledButton.tonal(
+              onPressed: () {},
+              child: Text(model.ctaLabel),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _StrikePrice extends StatelessWidget {
-  const _StrikePrice({
-    required this.label,
-    required this.oldPrice,
-    required this.newPrice,
-  });
-
-  final String label;
-  final String oldPrice;
-  final String newPrice;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      children: [
-        Text(
-          label,
-          style: textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontSize: 11,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          oldPrice,
-          style: textTheme.bodySmall?.copyWith(
-            decoration: TextDecoration.lineThrough,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        Text(
-          newPrice,
-          style: textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _RecommendedServicesRow extends StatelessWidget {
-  const _RecommendedServicesRow({required this.colorScheme, required this.textTheme});
-
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Recommended Services',
-          style: textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: recommendedServicesList.map((s) {
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {},
-                    borderRadius: BorderRadius.circular(12),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: colorScheme.primaryContainer.withValues(alpha: 0.5),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(s.icon, color: colorScheme.primary, size: 24),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          s.label,
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurface,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-}
-
-class _FooterLogos extends StatelessWidget {
-  const _FooterLogos({required this.textTheme});
-
-  final TextTheme textTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Paytm',
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Text(
-            'Bharat Connect',
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Text(
-            'VISA',
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Text(
-            'RuPay',
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
       ),
     );
   }

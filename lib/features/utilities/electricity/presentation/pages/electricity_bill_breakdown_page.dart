@@ -1,16 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../../../core/theme/app_theme.dart';
+import '../../data/electricity_api_exceptions.dart';
+import '../../data/models/electricity_saved_account.dart';
 import '../providers/electricity_provider.dart';
 import 'electricity_autopay_page.dart';
 import 'electricity_payment_success_page.dart';
 
-/// Bill breakdown, Enable AutoPay, pay. TODO: AutoPay mandate API.
-class ElectricityBillBreakdownPage extends ConsumerWidget {
+/// Bill details + payment mode + account id, then `POST /pay`.
+class ElectricityBillBreakdownPage extends ConsumerStatefulWidget {
   const ElectricityBillBreakdownPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ElectricityBillBreakdownPage> createState() =>
+      _ElectricityBillBreakdownPageState();
+}
+
+class _ElectricityBillBreakdownPageState
+    extends ConsumerState<ElectricityBillBreakdownPage> {
+  static const _paymentModes = ['UPI', 'CARD', 'NETBANKING', 'WALLET'];
+  String _paymentMode = 'UPI';
+  final _accountIdController = TextEditingController();
+  bool _paying = false;
+
+  @override
+  void dispose() {
+    _accountIdController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final bill = ref.watch(fetchedElectricityBillProvider);
 
     if (bill == null) {
@@ -22,7 +43,11 @@ class ElectricityBillBreakdownPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(title: const Text('Bill details'), backgroundColor: AppColors.surfaceLight, foregroundColor: AppColors.textPrimary),
+      appBar: AppBar(
+        title: const Text('Bill details'),
+        backgroundColor: AppColors.surfaceLight,
+        foregroundColor: AppColors.textPrimary,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -32,13 +57,41 @@ class ElectricityBillBreakdownPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(bill.name, style: Theme.of(context).textTheme.titleMedium),
-                  Text('Consumer ID: ${bill.consumerId}'),
+                  Text(
+                    bill.consumerName,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text('Consumer number: ${bill.consumerNumber}'),
                   const SizedBox(height: 8),
-                  Text('Due: ${bill.dueDate.day}/${bill.dueDate.month}/${bill.dueDate.year}'),
-                  if (bill.breakdown.isNotEmpty) Text(bill.breakdown, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                  Text(
+                    'Due: ${bill.dueDate.day}/${bill.dueDate.month}/${bill.dueDate.year}',
+                  ),
+                  if (bill.billPeriod.isNotEmpty)
+                    Text('Bill period: ${bill.billPeriod}'),
+                  if (bill.breakdown.isNotEmpty)
+                    Text(
+                      bill.breakdown,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  if (bill.lateFee > 0 || bill.convenienceFee > 0) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      'Late fee: ₹${bill.lateFee} · Convenience: ₹${bill.convenienceFee}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
                   const SizedBox(height: 8),
-                  Text('Amount: ₹${bill.amount}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primaryBlue)),
+                  Text(
+                    'Amount: ₹${bill.amount}',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryBlue,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -49,20 +102,136 @@ class ElectricityBillBreakdownPage extends ConsumerWidget {
             title: const Text('Enable AutoPay'),
             subtitle: const Text('Pay automatically before due date'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ElectricityAutopayPage())),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute<void>(
+                builder: (_) => const ElectricityAutopayPage(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Payment',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            initialValue: _paymentMode,
+            decoration: const InputDecoration(
+              labelText: 'Payment mode',
+              border: OutlineInputBorder(),
+            ),
+            items: _paymentModes
+                .map((m) => DropdownMenuItem(value: m, child: Text(m)))
+                .toList(),
+            onChanged: (v) {
+              if (v != null) setState(() => _paymentMode = v);
+            },
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _accountIdController,
+            decoration: const InputDecoration(
+              labelText: 'Account ID',
+              hintText: 'Saved account / payment account id',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Consumer(
+            builder: (context, ref, _) {
+              final accountsAsync = ref.watch(electricitySavedAccountsProvider);
+              return accountsAsync.when(
+                data: (accounts) {
+                  if (accounts.isEmpty) return const SizedBox.shrink();
+                  return Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      onPressed: () async {
+                        final picked =
+                            await showModalBottomSheet<ElectricitySavedAccount>(
+                          context: context,
+                          showDragHandle: true,
+                          builder: (ctx) => SafeArea(
+                            child: ListView(
+                              shrinkWrap: true,
+                              children: accounts
+                                  .map(
+                                    (a) => ListTile(
+                                      title: Text(a.label ?? a.accountNumber),
+                                      subtitle: Text(a.accountNumber),
+                                      onTap: () => Navigator.pop(ctx, a),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ),
+                        );
+                        if (picked != null && mounted) {
+                          setState(() {
+                            _accountIdController.text = picked.id;
+                          });
+                        }
+                      },
+                      child: const Text('Use saved account'),
+                    ),
+                  );
+                },
+                loading: () => const SizedBox.shrink(),
+                error: (_, __) => const SizedBox.shrink(),
+              );
+            },
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () async {
-              final repo = ref.read(electricityRepositoryProvider);
-              final biller = ref.read(selectedElectricityBillerProvider);
-              if (biller == null) return;
-              final ok = await repo.payBill(billerId: biller.id, consumerId: bill.consumerId, amount: bill.amount);
-              if (context.mounted && ok) {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const ElectricityPaymentSuccessPage()));
-              }
-            },
-            child: const Text('Pay now'),
+          FilledButton(
+            onPressed: _paying
+                ? null
+                : () async {
+                    final biller = ref.read(selectedElectricityBillerProvider);
+                    if (biller == null) return;
+                    final accountId = _accountIdController.text.trim();
+                    if (accountId.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Enter account ID for payment'),
+                        ),
+                      );
+                      return;
+                    }
+                    setState(() => _paying = true);
+                    try {
+                      await ref.read(electricityRepositoryProvider).payBill(
+                            billerId: biller.id,
+                            bill: bill,
+                            paymentMode: _paymentMode,
+                            accountId: accountId,
+                          );
+                      ref.invalidate(electricityHistoryProvider);
+                      if (!context.mounted) return;
+                      await Navigator.push<void>(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => const ElectricityPaymentSuccessPage(),
+                        ),
+                      );
+                    } catch (e) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(electricityApiUserMessage(e)),
+                        ),
+                      );
+                    } finally {
+                      if (mounted) setState(() => _paying = false);
+                    }
+                  },
+            child: _paying
+                ? const SizedBox(
+                    height: 22,
+                    width: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Pay now'),
           ),
         ],
       ),

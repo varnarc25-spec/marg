@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_theme.dart';
-import 'flight_seat_selection_tab.dart';
-import 'flight_meal_selection_tab.dart';
-import 'flight_addons_tab.dart';
-import 'flight_review_sheet.dart';
+import '../widgets/flight_addons_tab.dart';
+import '../widgets/flight_meal_selection_tab.dart';
+import '../widgets/flight_review_sheet.dart';
+import '../widgets/flight_seat_selection_tab.dart';
 
 /// Seat / Meal / Add-ons page shown after the booking details step.
 class FlightSeatMealAddonsPage extends StatefulWidget {

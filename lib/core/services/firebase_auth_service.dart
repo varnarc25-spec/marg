@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart'
-    show debugPrint, kIsWeb, kDebugMode, defaultTargetPlatform;
+show debugPrint, kDebugMode, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart' show TargetPlatform;
 import '../../firebase_options.dart';
 
@@ -13,6 +13,10 @@ class FirebaseAuthService {
 
   FirebaseAuthService() {
     _initializeAuth();
+    // Prevent web startup crash when the `google-signin-client_id` meta tag
+    // is not configured yet. Google sign-in will still be available after
+    // fixing web configuration.
+    if (!kIsWeb) _initializeGoogleSignIn();
   }
 
   // ---------------------------------------------------------------------------
@@ -253,6 +257,49 @@ class FirebaseAuthService {
     _requireAuth();
 
     try {
+      if (_googleSignIn == null) {
+        _initializeGoogleSignIn();
+      }
+
+      if (_googleSignIn == null) {
+        throw Exception(
+          'Google sign-in is not configured. Please set the web client id first.',
+        );
+      }
+
+      // Trigger the Google Sign-In flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn!.signIn();
+      
+      if (googleUser == null) {
+        throw Exception('Google Sign-In was cancelled');
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Validate that we have the required tokens
+      if (googleAuth.idToken == null && googleAuth.accessToken == null) {
+        throw Exception(
+          'Google Sign-In failed: No authentication tokens received.\n\n'
+          'This may be due to:\n'
+          '1. Missing Google Sign-In configuration\n'
+          '2. Incorrect OAuth client ID setup\n'
+          '3. Network connectivity issues\n\n'
+          'Please check your Firebase console and ensure Google Sign-In is properly configured.',
+        );
+      }
+
+      // idToken is required for Firebase Auth
+      if (googleAuth.idToken == null) {
+        throw Exception(
+          'Google Sign-In failed: ID token is missing.\n\n'
+          'This usually means the OAuth client ID is not properly configured.\n\n'
+          'To fix:\n'
+          '1. Check Firebase Console > Authentication > Sign-in method > Google\n'
+          '2. Ensure the OAuth client ID matches your app configuration\n'
+          '3. Run: flutterfire configure\n'
+          '4. Restart the app',
       UserCredential userCredential;
 
       if (kIsWeb) {
@@ -340,16 +387,36 @@ class FirebaseAuthService {
 
   Future<void> signOut() async {
     try {
-      await _firebaseAuth?.signOut();
-      if (_googleSignIn != null) await _googleSignIn!.signOut();
+      if (_auth != null) {
+        await _auth!.signOut();
+      }
+      if (_googleSignIn != null) {
+        await _googleSignIn!.signOut();
+      }
     } catch (e) {
       throw Exception('Failed to sign out: $e');
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Error messages
-  // ---------------------------------------------------------------------------
+  /// Get auth state changes stream
+  Stream<User?> authStateChanges() {
+    if (_auth == null) {
+      return Stream.value(null);
+    }
+    return _auth!.authStateChanges();
+  }
+
+  /// Get user ID token. Use [forceRefresh] when calling protected APIs after idle.
+  Future<String?> getIdToken({bool forceRefresh = false}) async {
+    if (_auth == null) return null;
+    try {
+      final user = _auth!.currentUser;
+      if (user == null) return null;
+      return await user.getIdToken(forceRefresh);
+    } catch (e) {
+      return null;
+    }
+  }
 
   String _getErrorMessage(FirebaseAuthException e) {
     switch (e.code) {

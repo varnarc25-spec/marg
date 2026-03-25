@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_theme.dart';
-import '../../data/flight_booking_model.dart';
+import '../../data/models/flight_booking_model.dart';
 
 class FlightBookingDetailPage extends StatelessWidget {
   const FlightBookingDetailPage({super.key, required this.booking});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_theme.dart';
-import '../../data/flight_booking_model.dart';
+import '../../data/models/flight_booking_model.dart';
 import '../providers/flight_search_provider.dart';
 import 'travel_flight_page.dart';
 

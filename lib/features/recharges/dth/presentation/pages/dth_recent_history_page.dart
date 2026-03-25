@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../../core/theme/app_theme.dart';
+
+import '../../../../../core/theme/app_theme.dart';
 import '../../data/models/dth_operator.dart';
 import '../../data/models/dth_recharge_history_item.dart';
 import '../providers/dth_recharge_provider.dart';
 import 'dth_plan_list_page.dart';
 
-const Color _mobileRechargePurple = Color(0xFF6B2D91);
+const Color _accent = Color(0xFF6B2D91);
 
-/// Full-screen list of all DTH recharge recent transactions.
+/// Full list from `GET /api/recharges/dth/history`.
 class DthRecentHistoryPage extends ConsumerWidget {
   const DthRecentHistoryPage({super.key});
 
@@ -36,7 +37,7 @@ class DthRecentHistoryPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('Recent Recharges'),
+        title: const Text('DTH history'),
         backgroundColor: AppColors.surfaceLight,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
@@ -45,8 +46,11 @@ class DthRecentHistoryPage extends ConsumerWidget {
         data: (items) => items.isEmpty
             ? const Center(
                 child: Text(
-                  'No recent recharges',
-                  style: TextStyle(color: AppColors.textSecondary),
+                  'No data',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 16,
+                  ),
                 ),
               )
             : ListView.builder(
@@ -61,15 +65,11 @@ class DthRecentHistoryPage extends ConsumerWidget {
                     item: item,
                     formatDate: _formatDate,
                     onTap: () {
-                      ref.read(dthRechargeNumberProvider.notifier).state =
+                      ref.read(dthSubscriberIdProvider.notifier).state =
                           item.number;
-                      ref
-                          .read(selectedDthOperatorProvider.notifier)
-                          .state = DthOperator(
-                        id: item.operatorName.toLowerCase().replaceAll(
-                          ' ',
-                          '_',
-                        ),
+                      ref.read(selectedDthOperatorProvider.notifier).state =
+                          DthOperator(
+                        id: item.operatorName.toLowerCase().replaceAll(' ', '_'),
                         name: item.operatorName,
                       );
                       Navigator.of(context).push(
@@ -82,10 +82,10 @@ class DthRecentHistoryPage extends ConsumerWidget {
                 },
               ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(
+        error: (_, __) => const Center(
           child: Text(
-            'Error: $e',
-            style: const TextStyle(color: AppColors.textSecondary),
+            'No data',
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
           ),
         ),
       ),
@@ -94,15 +94,15 @@ class DthRecentHistoryPage extends ConsumerWidget {
 }
 
 class _RecentTile extends StatelessWidget {
-  final DthRechargeHistoryItem item;
-  final String Function(DateTime) formatDate;
-  final VoidCallback onTap;
-
   const _RecentTile({
     required this.item,
     required this.formatDate,
     required this.onTap,
   });
+
+  final DthRechargeHistoryItem item;
+  final String Function(DateTime) formatDate;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -114,13 +114,13 @@ class _RecentTile extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 22,
-              backgroundColor: _mobileRechargePurple.withValues(alpha: 0.12),
+              backgroundColor: _accent.withValues(alpha: 0.12),
               child: Text(
                 item.avatarText,
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: _mobileRechargePurple,
+                  color: _accent,
                 ),
               ),
             ),
@@ -148,7 +148,7 @@ class _RecentTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Last Recharge: ₹${item.amount.toInt()} on ${formatDate(item.date)}',
+                    '₹${item.amount.toInt()} · ${formatDate(item.date)} · ${item.status}',
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
@@ -156,13 +156,6 @@ class _RecentTile extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.more_vert_rounded,
-                color: AppColors.textSecondary,
-              ),
-              onPressed: () {},
             ),
           ],
         ),

@@ -1,14 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/bike_insurance_plan.dart';
+import '../../data/models/bike_vehicle_model.dart';
+import '../../data/models/bike_saved_account_model.dart';
+import '../providers/bike_biller_provider.dart';
+import '../providers/bike_accounts_provider.dart';
 import '../providers/bike_vehicle_provider.dart';
+import '../../../../../shared/providers/app_providers.dart';
 import 'bike_insurance_help_page.dart';
 import 'bike_insurance_payment_success_page.dart';
 
 /// Review selected plan and proceed to payment.
-class BikeInsuranceReviewPage extends ConsumerWidget {
+class BikeInsuranceReviewPage extends ConsumerStatefulWidget {
   const BikeInsuranceReviewPage({super.key});
 
-  static String _formatDate(DateTime d) {
+  @override
+  ConsumerState<BikeInsuranceReviewPage> createState() =>
+      _BikeInsuranceReviewPageState();
+}
+
+class _BikeInsuranceReviewPageState extends ConsumerState<BikeInsuranceReviewPage> {
+  bool _submitting = false;
+
+  static String _paymentModeFromAccountType(String accountType) {
+    final t = accountType.toLowerCase();
+    if (t.contains('upi')) return 'UPI';
+    if (t.contains('card') || t.contains('credit') || t.contains('debit')) {
+      return 'CARD';
+    }
+    // Fallback. Backend may support other modes; keep a reasonable default.
+    return 'UPI';
+  }
+
+  static String _formatDate(DateTime? d) {
+    if (d == null) return '—';
     const months = [
       'Jan',
       'Feb',
@@ -27,7 +52,7 @@ class BikeInsuranceReviewPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -117,6 +142,16 @@ class BikeInsuranceReviewPage extends ConsumerWidget {
                       color: colorScheme.onSurface,
                     ),
                   ),
+                  if (selectedPlan.insurerCode != null &&
+                      selectedPlan.insurerCode!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      selectedPlan.insurerCode!,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 4),
                   Text(
                     '1 Year Comprehensive',
@@ -150,6 +185,13 @@ class BikeInsuranceReviewPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _ReviewDetailRow(
+                    label: 'Registration No.',
+                    value: vehicle.registrationNumber,
+                    textTheme: textTheme,
+                    colorScheme: colorScheme,
+                  ),
+                  const SizedBox(height: 8),
                   _ReviewDetailRow(
                     label: 'Owner',
                     value: vehicle.ownerName,
@@ -267,16 +309,20 @@ class BikeInsuranceReviewPage extends ConsumerWidget {
               Expanded(
                 flex: 1,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => BikeInsurancePaymentSuccessPage(
-                          amountInRupees: totalPrice,
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text('BUY PLAN'),
+                  onPressed: _submitting
+                      ? null
+                      : () => _buyPlan(
+                            vehicle: vehicle,
+                            selectedPlan: selectedPlan,
+                            totalPrice: totalPrice,
+                          ),
+                  child: _submitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('BUY PLAN'),
                 ),
               ),
             ],
@@ -284,6 +330,81 @@ class BikeInsuranceReviewPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _buyPlan({
+    required BikeVehicleModel vehicle,
+    required BikeInsurancePlan selectedPlan,
+    required int totalPrice,
+  }) async {
+    setState(() => _submitting = true);
+    try {
+      final auth = ref.read(firebaseAuthServiceProvider);
+      if (!auth.isLoggedIn()) {
+        throw Exception('Please login again to continue');
+      }
+      final idToken = await auth.getIdToken();
+      if (idToken == null || idToken.isEmpty) {
+        throw Exception('Session expired. Please login again');
+      }
+      final accounts = await ref.read(bikeSavedAccountsProvider.future);
+      if (accounts.isEmpty) {
+        throw Exception('No saved payment accounts found.');
+      }
+
+      final selectedAccountId = ref.read(selectedBikeSavedAccountIdProvider);
+      final BikeSavedAccount selectedAccount = selectedAccountId == null
+          ? accounts.first
+          : accounts.firstWhere(
+              (a) => a.id == selectedAccountId,
+              orElse: () => accounts.first,
+            );
+
+      final paymentMode = _paymentModeFromAccountType(selectedAccount.accountType);
+
+      final api = ref.read(bikeInsuranceApiServiceProvider);
+      final bill = await api.fetchBill(
+        registrationNumber: vehicle.registrationNumber,
+        insurerCode: selectedPlan.insurerCode ?? selectedPlan.insurerName,
+        insurerId: selectedPlan.id,
+        amount: totalPrice,
+        idToken: idToken,
+      );
+      final payment = await api.pay(
+        bill: bill,
+        registrationNumber: vehicle.registrationNumber,
+        insurerCode: selectedPlan.insurerCode ?? selectedPlan.insurerName,
+        billerId: selectedPlan.id,
+        consumerName: vehicle.ownerName,
+        accountId: selectedAccount.id,
+        paymentMode: paymentMode,
+        idToken: idToken,
+      );
+
+      if (!mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => BikeInsurancePaymentSuccessPage(
+            amountInRupees: payment.amount,
+            transactionId: payment.transactionId,
+            paymentDate: payment.paymentDate,
+            status: payment.status,
+            paymentMethod: payment.paymentMethod,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString().replaceFirst('Exception: ', ''),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   static String _formatIdv(int idv) {

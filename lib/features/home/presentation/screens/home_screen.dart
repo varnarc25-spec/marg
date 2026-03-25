@@ -19,8 +19,11 @@ import '../../../scan/presentation/screens/scan_qr_screen.dart';
 import '../../../recharges/mobile/presentation/routes/mobile_recharge_routes.dart';
 import '../../../recharges/dth/presentation/routes/dth_recharge_routes.dart';
 import '../../../utilities/electricity/presentation/routes/electricity_routes.dart';
+import '../../../utilities/water/presentation/routes/water_routes.dart';
+import '../../../utilities/gas/presentation/routes/gas_routes.dart';
+import '../../../utilities/book_cylinder/presentation/routes/gas_routes.dart';
 import '../../../utilities/broadband/presentation/routes/broadband_routes.dart';
-import '../../../credit_card/presentation/routes/credit_card_routes.dart';
+import '../../../utilities/loan_repayment/presentation/routes/loan_repayment_routes.dart';
 import '../../../fastag/presentation/routes/fastag_routes.dart';
 import '../../../education/presentation/routes/education_routes.dart';
 import '../../../government_bills/presentation/routes/government_bills_routes.dart';
@@ -65,18 +68,32 @@ class HomeScreen extends ConsumerWidget {
         ),
       ),
       HomeIconGridItem(
+        Icons.plumbing_rounded,
+        l10n.homeRechargeWater,
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => WaterRoutes.entryPage()),
+        ),
+      ),
+      HomeIconGridItem(
+        Icons.propane_tank_rounded,
+        l10n.homeRechargeBookCylinder,
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => BookCylinderRoutes.entryPage()),
+        ),
+      ),
+      HomeIconGridItem(
+        Icons.gas_meter_rounded,
+        l10n.homeRechargePipedGas,
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => GasRoutes.entryPage()),
+        ),
+      ),
+      HomeIconGridItem(
         Icons.wifi_rounded,
         l10n.homeRechargeBroadband,
         onTap: () => Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (_) => BroadbandRoutes.entryPage())),
-      ),
-      HomeIconGridItem(
-        Icons.credit_card_rounded,
-        l10n.homeRechargeCreditCard,
-        onTap: () => Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => CreditCardRoutes.entryPage())),
       ),
       HomeIconGridItem(
         Icons.school_rounded,
@@ -97,7 +114,7 @@ class HomeScreen extends ConsumerWidget {
         l10n.homeRechargeLoanEmi,
         onTap: () => Navigator.of(
           context,
-        ).push(MaterialPageRoute(builder: (_) => CreditCardRoutes.entryPage())),
+        ).push(MaterialPageRoute(builder: (_) => LoanRepaymentRoutes.entryPage())),
       ),
     ];
   }
@@ -241,5 +258,68 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+Widget _buildMargHeader(BuildContext context, AppLocalizations l10n) {
+  return Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.06),
+          blurRadius: 6,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    child: Row(
+      children: [
+        Icon(Icons.eco_rounded, size: 28, color: AppColors.primaryBlue),
+        const SizedBox(width: 8),
+        Text(
+          l10n.appName,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryBlue,
+          ),
+        ),
+        const Spacer(),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const AiAssistantScreen()),
+            );
+          },
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          child: const Text(
+            'AI',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+        IconButton(
+          icon: const Icon(Icons.search_rounded, color: AppColors.textPrimary),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.notifications_outlined,
+            color: AppColors.textPrimary,
+          ),
+          onPressed: () {},
+        ),
+      ],
+    ),
+  );
 }
 

@@ -1,7 +1,13 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../data/bike_insurance_plan.dart';
-import '../../data/bike_insurance_service.dart';
-import '../../data/bike_vehicle_model.dart';
+import '../../data/models/bike_biller_model.dart';
+import '../../data/models/bike_vehicle_model.dart';
+import '../../data/services/bike_insurance_api_service.dart';
+import 'bike_biller_provider.dart';
 
 /// States for bike vehicle lookup.
 sealed class BikeVehicleState {}
@@ -24,25 +30,65 @@ class BikeVehicleError extends BikeVehicleState {
 }
 
 class BikeVehicleNotifier extends StateNotifier<BikeVehicleState> {
-  BikeVehicleNotifier(this._service) : super(BikeVehicleInitial());
+  BikeVehicleNotifier(this._api) : super(BikeVehicleInitial());
 
-  final BikeInsuranceService _service;
+  final BikeInsuranceApiService _api;
 
   Future<void> checkDetails(String vehicleNumber) async {
     if (vehicleNumber.trim().isEmpty) {
       state = BikeVehicleError('Please enter vehicle number');
       return;
     }
+
+    final normalized = BikeInsuranceApiService.normalizePlate(vehicleNumber);
+    if (normalized.length < 4) {
+      state = BikeVehicleError(
+        'Enter a valid registration number (at least 4 characters)',
+      );
+      return;
+    }
+    if (!RegExp(r'^[A-Z0-9]+$').hasMatch(normalized)) {
+      state = BikeVehicleError('Use only letters and numbers');
+      return;
+    }
+
     state = BikeVehicleLoading();
     try {
-      final vehicle = await _service.getVehicleDetails(vehicleNumber);
-      final plans = await _service.getPlans(vehicleNumber);
+      // Load insurers first; vehicle lookup is optional and can hang on some hosts.
+      final billers = await _api.fetchBillers();
+
+      if (billers.isEmpty) {
+        state = BikeVehicleError(
+          'No insurers available. Please try again later.',
+        );
+        return;
+      }
+
+      BikeVehicleModel? vehicleFromApi;
+      try {
+        vehicleFromApi = await _api
+            .fetchVehicleDetails(normalized)
+            .timeout(const Duration(seconds: 18));
+      } on TimeoutException catch (_) {
+        vehicleFromApi = null;
+      } catch (e) {
+        // Network / parse issues should not block plan list if billers loaded.
+        vehicleFromApi = null;
+        debugPrint('BikeVehicleNotifier vehicle lookup skipped: $e');
+      }
+
+      final vehicle =
+          vehicleFromApi ?? BikeVehicleModel.registrationOnly(normalized);
+      final sortedBillers = List<BikeBiller>.from(billers)
+        ..sort((a, b) => a.name.compareTo(b.name));
+      final plans = BikeInsurancePlan.fromBillers(sortedBillers, normalized);
+
       state = BikeVehicleSuccess(vehicle, plans);
     } catch (e) {
       state = BikeVehicleError(
         e is Exception
             ? e.toString().replaceFirst('Exception: ', '')
-            : 'Vehicle not found',
+            : 'Something went wrong',
       );
     }
   }
@@ -52,15 +98,11 @@ class BikeVehicleNotifier extends StateNotifier<BikeVehicleState> {
   }
 }
 
-final bikeInsuranceServiceProvider = Provider<BikeInsuranceService>((ref) {
-  return BikeInsuranceService();
-});
-
 final bikeVehicleProvider =
     StateNotifierProvider<BikeVehicleNotifier, BikeVehicleState>((ref) {
-      final service = ref.watch(bikeInsuranceServiceProvider);
-      return BikeVehicleNotifier(service);
-    });
+  final api = ref.watch(bikeInsuranceApiServiceProvider);
+  return BikeVehicleNotifier(api);
+});
 
 /// Selected plan for review/payment step.
 final selectedBikePlanProvider = StateProvider<BikeInsurancePlan?>(

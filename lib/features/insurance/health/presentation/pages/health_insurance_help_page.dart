@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:marg/shared/providers/app_providers.dart';
 
-/// Health Insurance help/info hub: list of topics and My Tickets button. Opened from app bar help icon.
-class HealthInsuranceHelpPage extends StatelessWidget {
+import '../providers/health_insurance_provider.dart';
+
+/// Health Insurance help/info hub: list of topics and expert callback. Opened from app bar help icon.
+class HealthInsuranceHelpPage extends ConsumerStatefulWidget {
   const HealthInsuranceHelpPage({super.key});
 
+  @override
+  ConsumerState<HealthInsuranceHelpPage> createState() =>
+      _HealthInsuranceHelpPageState();
+}
+
+class _HealthInsuranceHelpPageState extends ConsumerState<HealthInsuranceHelpPage> {
   static const List<String> _helpItems = [
     'Getting Started with Health Insurance',
     'Choosing the Right Insurance Plan',
@@ -15,6 +25,48 @@ class HealthInsuranceHelpPage extends StatelessWidget {
     'e-Insurance Account',
     'Support',
   ];
+
+  final _phoneController = TextEditingController();
+  bool _submitting = false;
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _requestCallback() async {
+    setState(() => _submitting = true);
+    try {
+      final api = ref.read(healthInsuranceApiServiceProvider);
+      final auth = ref.read(firebaseAuthServiceProvider);
+      final token = await auth.getIdToken();
+      final result = await api.requestCallback(
+        {
+          if (_phoneController.text.trim().isNotEmpty)
+            'phone': _phoneController.text.trim(),
+        },
+        idToken: token,
+      );
+      if (!mounted) return;
+      final extra = result.requestId != null
+          ? ' (${result.status ?? 'PENDING'} · ${result.requestId})'
+          : '';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${result.message}$extra'),
+        ),
+      );
+      _phoneController.clear();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,9 +137,56 @@ class HealthInsuranceHelpPage extends StatelessWidget {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Talk to an expert',
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Leave your number for a health advisor to call you (POST /callback).',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    hintText: 'Phone (optional)',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: _submitting ? null : _requestCallback,
+                    child: _submitting
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Request a call'),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               itemCount: _helpItems.length,
               separatorBuilder: (_, __) => const SizedBox(height: 4),
               itemBuilder: (context, index) {

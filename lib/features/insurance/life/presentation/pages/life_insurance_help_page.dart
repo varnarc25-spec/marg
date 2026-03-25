@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:marg/shared/providers/app_providers.dart';
 
-/// Term Life Insurance help/info hub: list of topics and My Tickets button. Opened from app bar help icon.
-class LifeInsuranceHelpPage extends StatelessWidget {
+import '../../data/life_insurance_api_exceptions.dart';
+import '../providers/life_insurance_provider.dart';
+
+/// Term Life Insurance help/info hub + advisor callback (`POST /api/insurance/life/callback`).
+class LifeInsuranceHelpPage extends ConsumerStatefulWidget {
   const LifeInsuranceHelpPage({super.key});
 
+  @override
+  ConsumerState<LifeInsuranceHelpPage> createState() =>
+      _LifeInsuranceHelpPageState();
+}
+
+class _LifeInsuranceHelpPageState extends ConsumerState<LifeInsuranceHelpPage> {
   static const List<String> _helpItems = [
     'About Term Life Insurance',
     'Buying Term Life Insurance',
@@ -13,6 +24,47 @@ class LifeInsuranceHelpPage extends StatelessWidget {
     'e-Insurance Account',
     'Support',
   ];
+
+  final _phoneController = TextEditingController();
+  bool _submitting = false;
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _requestCallback() async {
+    setState(() => _submitting = true);
+    try {
+      final api = ref.read(lifeInsuranceApiServiceProvider);
+      final auth = ref.read(firebaseAuthServiceProvider);
+      final token = await auth.getIdToken();
+      final result = await api.requestCallback(
+        {
+          if (_phoneController.text.trim().isNotEmpty)
+            'phone': _phoneController.text.trim(),
+          'source': 'life_help_page',
+        },
+        idToken: token,
+      );
+      if (!mounted) return;
+      final extra = result.requestId != null
+          ? ' (${result.status ?? 'PENDING'} · ${result.requestId})'
+          : '';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${result.message}$extra')),
+      );
+      _phoneController.clear();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(lifeInsuranceApiUserMessage(e))),
+      );
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,9 +135,49 @@ class LifeInsuranceHelpPage extends StatelessWidget {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Book an advisor call',
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    hintText: 'Phone (optional)',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: _submitting ? null : _requestCallback,
+                    child: _submitting
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Request a call'),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               itemCount: _helpItems.length,
               separatorBuilder: (_, __) => const SizedBox(height: 4),
               itemBuilder: (context, index) {

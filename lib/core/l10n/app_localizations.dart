@@ -149,7 +149,10 @@ class AppLocalizations {
     'homeRechargeMobile': 'Mobile Recharge',
     'homeRechargeDth': 'DTH Recharge',
     'homeRechargeFastag': 'FASTag Recharge',
-    'homeRechargeElectricity': 'Electricity, Water & Gas',
+    'homeRechargeElectricity': 'Electricity',
+    'homeRechargeWater': 'Water',
+    'homeRechargeBookCylinder': 'Book a Cylinder',
+    'homeRechargePipedGas': 'Piped Gas',
     'homeRechargeBroadband': 'Broadband & Internet',
     'homeRechargeCreditCard': 'Credit Card Bill',
     'homeRechargeSchoolFees': 'School & Fee Payment',
@@ -172,7 +175,7 @@ class AppLocalizations {
     'homeTravelBus': 'Bus',
     'homeTravelTrain': 'Train',
     'homeTravelHotel': 'Hotel',
-    'homeIconCardRepay': 'Card Repay',
+    'homeIconCardRepay': 'Credit Card Repay',
     'homeIconSavings': 'Budget',
     'homeIconInvest': 'Invest',
     'homeIconExchange': 'Exchange',
@@ -1978,6 +1981,9 @@ class AppLocalizations {
   String get homeRechargeDth => _t('homeRechargeDth');
   String get homeRechargeFastag => _t('homeRechargeFastag');
   String get homeRechargeElectricity => _t('homeRechargeElectricity');
+  String get homeRechargeWater => _t('homeRechargeWater');
+  String get homeRechargeBookCylinder => _t('homeRechargeBookCylinder');
+  String get homeRechargePipedGas => _t('homeRechargePipedGas');
   String get homeRechargeBroadband => _t('homeRechargeBroadband');
   String get homeRechargeCreditCard => _t('homeRechargeCreditCard');
   String get homeRechargeSchoolFees => _t('homeRechargeSchoolFees');

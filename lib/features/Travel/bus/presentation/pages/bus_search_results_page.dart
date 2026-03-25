@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_theme.dart';
-import '../../data/bus_list_data.dart';
+import '../../data/models/bus_list_data.dart';
+import '../widgets/bus_filter_chip.dart';
+import '../widgets/bus_result_card.dart';
 import 'bus_filter_by_page.dart';
 
 /// Bus search results page: route header, date, Filters/Sort/AI Filters/Departure chips,
@@ -77,7 +79,9 @@ class _BusSearchResultsPageState extends State<BusSearchResultsPage> {
   }
 
   int get _minPrice =>
-      _buses.isEmpty ? 0 : _buses.map((e) => e.price).reduce((a, b) => a < b ? a : b);
+      _buses.isEmpty
+          ? 0
+          : _buses.map((e) => e.price).reduce((a, b) => a < b ? a : b);
 
   String _formatPrice(int price) {
     final s = price.toString();
@@ -149,13 +153,12 @@ class _BusSearchResultsPageState extends State<BusSearchResultsPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Filter / Sort / AI Filters / Departure chips
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
-                _FilterChip(
+                BusFilterChipWidget(
                   icon: Icons.tune_rounded,
                   label: 'Filters',
                   selected: false,
@@ -164,7 +167,7 @@ class _BusSearchResultsPageState extends State<BusSearchResultsPage> {
                   textTheme: textTheme,
                 ),
                 const SizedBox(width: 8),
-                _FilterChip(
+                BusFilterChipWidget(
                   icon: Icons.keyboard_arrow_down_rounded,
                   label: _sortChipLabel(),
                   selected: true,
@@ -173,18 +176,18 @@ class _BusSearchResultsPageState extends State<BusSearchResultsPage> {
                   textTheme: textTheme,
                 ),
                 const SizedBox(width: 8),
-                _FilterChip(
+                BusFilterChipWidget(
                   icon: Icons.auto_awesome_rounded,
                   label: 'AI Filters',
                   selected: false,
                   borderColor: AppColors.accentOrange,
-                  onTap: () => setState(() => _aiFiltersActive = !_aiFiltersActive),
+                  onTap: () =>
+                      setState(() => _aiFiltersActive = !_aiFiltersActive),
                   colorScheme: colorScheme,
                   textTheme: textTheme,
                 ),
                 const SizedBox(width: 8),
-                _FilterChip(
-                  icon: null,
+                BusFilterChipWidget(
                   label: 'Departure',
                   selected: false,
                   onTap: () {},
@@ -194,7 +197,6 @@ class _BusSearchResultsPageState extends State<BusSearchResultsPage> {
               ],
             ),
           ),
-          // Summary bar: X Buses found, Starting from ₹X
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -221,341 +223,18 @@ class _BusSearchResultsPageState extends State<BusSearchResultsPage> {
             ),
           ),
           const SizedBox(height: 12),
-          // Bus list
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
               itemCount: _buses.length,
               separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, i) => _BusResultCard(
+              itemBuilder: (context, i) => BusResultCard(
                 bus: _buses[i],
                 colorScheme: colorScheme,
                 textTheme: textTheme,
                 formatPrice: _formatPrice,
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    required this.colorScheme,
-    required this.textTheme,
-    this.icon,
-    this.borderColor,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-  final IconData? icon;
-  final Color? borderColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: selected
-          ? colorScheme.primary.withValues(alpha: 0.15)
-          : colorScheme.surface,
-      borderRadius: BorderRadius.circular(20),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: borderColor ??
-                  (selected ? colorScheme.primary : colorScheme.outline.withValues(alpha: 0.3)),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (icon != null) ...[
-                Icon(
-                  icon,
-                  size: 18,
-                  color: borderColor ?? (selected ? colorScheme.primary : colorScheme.onSurface),
-                ),
-                const SizedBox(width: 6),
-              ],
-              Text(
-                label,
-                style: textTheme.labelLarge?.copyWith(
-                  color: borderColor ?? (selected ? colorScheme.primary : colorScheme.onSurface),
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _BusResultCard extends StatelessWidget {
-  const _BusResultCard({
-    required this.bus,
-    required this.colorScheme,
-    required this.textTheme,
-    required this.formatPrice,
-  });
-
-  final BusResultItem bus;
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-  final String Function(int) formatPrice;
-
-  @override
-  Widget build(BuildContext context) {
-    final hasOperatorBlock = bus.busesAvailable != null;
-
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Operator icon placeholder
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.directions_bus_rounded,
-                    color: colorScheme.primary,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        bus.operatorName,
-                        style: textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (hasOperatorBlock) ...[
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Text(
-                              '${bus.busesAvailable} Buses Available',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'View All',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.primary,
-                                fontWeight: FontWeight.w600,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                      if (bus.discountTag != null) ...[
-                        const SizedBox(height: 6),
-                        _DiscountChip(
-                          label: bus.discountTag!,
-                          colorScheme: colorScheme,
-                          textTheme: textTheme,
-                          isGreen: true,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                Text(
-                  formatPrice(bus.price),
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-            if (!hasOperatorBlock) ...[
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  if (bus.rating != null) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentGreen.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.star_rounded, size: 14, color: AppColors.accentGreen),
-                          const SizedBox(width: 4),
-                          Text(
-                            bus.rating!.toStringAsFixed(1),
-                            style: textTheme.labelMedium?.copyWith(
-                              color: AppColors.accentGreen,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  Expanded(
-                    child: Text(
-                      bus.busType,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  if (bus.extraDiscountTag != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        bus.extraDiscountTag!,
-                        style: textTheme.labelSmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${bus.departureTime} - ${bus.arrivalTime}',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                '(${bus.duration})',
-                style: textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${bus.seatsLeft} Seats Left',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'Bus Details',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Material(
-                        color: colorScheme.primary,
-                        borderRadius: BorderRadius.circular(20),
-                        child: InkWell(
-                          onTap: () {},
-                          borderRadius: BorderRadius.circular(20),
-                          child: const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(Icons.add_rounded, color: Colors.white, size: 20),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-            if (hasOperatorBlock) ...[
-              const SizedBox(height: 8),
-              Text(
-                formatPrice(bus.price),
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DiscountChip extends StatelessWidget {
-  const _DiscountChip({
-    required this.label,
-    required this.colorScheme,
-    required this.textTheme,
-    this.isGreen = false,
-  });
-
-  final String label;
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-  final bool isGreen;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isGreen ? AppColors.accentGreen : colorScheme.primary;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        border: Border.all(color: color.withValues(alpha: 0.6)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.percent_rounded, size: 14, color: color),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: textTheme.labelSmall?.copyWith(color: color),
           ),
         ],
       ),

@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../providers/bike_biller_provider.dart';
+import '../providers/bike_accounts_provider.dart';
 import '../providers/bike_vehicle_provider.dart';
-import 'find_your_bike_page.dart';
+import '../widgets/bike_home_find_plans_section.dart';
+import '../widgets/bike_home_footer_link.dart';
+import '../widgets/bike_home_payment_history_preview.dart';
+import '../widgets/bike_home_payment_history_utils.dart';
+import '../widgets/bike_home_saved_accounts_preview.dart';
+import '../widgets/bike_home_steps_progress.dart';
+import '../widgets/bike_home_testimonial_card.dart';
+import '../widgets/bike_home_trusted_partners.dart';
 import 'bike_insurance_help_page.dart';
+import 'bike_insurance_payment_history_page.dart';
+import 'bike_insurance_saved_accounts_page.dart';
+import 'find_your_bike_page.dart';
 
 /// Bike Insurance main page: vehicle input, Find Plans. On success navigates to Select Plan page.
 class BikeInsuranceHomePage extends ConsumerStatefulWidget {
@@ -95,7 +108,7 @@ Lowest price on PhonePe platform. By proceeding, I consent to the terms and cond
           ),
           const SizedBox(height: 8),
           Text(
-            'Choose from 20+ Insurers!',
+            'Choose from trusted insurers!',
             style: textTheme.bodyLarge?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -122,7 +135,7 @@ Lowest price on PhonePe platform. By proceeding, I consent to the terms and cond
                 color: colorScheme.onSurface,
               ),
               decoration: InputDecoration(
-                hintText: 'Eg. KA01KA1234',
+                hintText: 'Enter your vehicle registration number',
                 hintStyle: textTheme.bodyLarge?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -134,13 +147,146 @@ Lowest price on PhonePe platform. By proceeding, I consent to the terms and cond
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          _FindPlansSection(
+          const SizedBox(height: 16),
+          BikeHomeFindPlansSection(
             vehicleState: ref.watch(bikeVehicleProvider),
             onFindPlans: () {
               final number = _vehicleNumberController.text;
               ref.read(bikeVehicleNumberProvider.notifier).state = number;
               ref.read(bikeVehicleProvider.notifier).checkDetails(number);
+            },
+          ),
+          Consumer(
+            builder: (context, ref, _) {
+              final async = ref.watch(
+                bikePaymentHistoryProvider(
+                  const BikePaymentHistoryQuery(limit: 50, offset: 0),
+                ),
+              );
+              return async.when(
+                data: (items) {
+                  final paidItems =
+                      items.where(bikeHomeIsPaidLikeHistoryStatus).toList();
+
+                  if (paidItems.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return BikeHomePaymentHistoryPreview(
+                    items: paidItems.take(3).toList(),
+                    onViewAll: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              const BikeInsurancePaymentHistoryPage(),
+                        ),
+                      );
+                    },
+                    colorScheme: colorScheme,
+                    textTheme: textTheme,
+                  );
+                },
+                loading: () => const SizedBox.shrink(),
+                error: (e, __) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Could not load payment history.',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.error,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      if (e.toString().isNotEmpty)
+                        Text(
+                          e.toString().replaceFirst('Exception: ', ''),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      const SizedBox(height: 12),
+                      FilledButton.icon(
+                        onPressed: () => ref.invalidate(
+                          bikePaymentHistoryProvider(
+                            const BikePaymentHistoryQuery(limit: 50, offset: 0),
+                          ),
+                        ),
+                        icon: const Icon(Icons.refresh_rounded, size: 20),
+                        label: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 20),
+          Consumer(
+            builder: (context, ref, _) {
+              final async = ref.watch(bikeSavedAccountsProvider);
+              final selectedId = ref.watch(selectedBikeSavedAccountIdProvider);
+
+              return async.when(
+                data: (accounts) {
+                  if (accounts.isEmpty) return const SizedBox.shrink();
+                  return BikeHomeSavedAccountsPreview(
+                    accounts: accounts.take(3).toList(),
+                    selectedId: selectedId,
+                    onSelect: (id) =>
+                        ref
+                                .read(
+                                  selectedBikeSavedAccountIdProvider.notifier,
+                                )
+                                .state =
+                            id,
+                    onViewAll: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              const BikeInsuranceSavedAccountsPage(),
+                        ),
+                      );
+                    },
+                    colorScheme: colorScheme,
+                    textTheme: textTheme,
+                  );
+                },
+                loading: () => const SizedBox.shrink(),
+                error: (e, __) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Could not load saved accounts.',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.error,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      if (e.toString().isNotEmpty)
+                        Text(
+                          e.toString().replaceFirst('Exception: ', ''),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      const SizedBox(height: 12),
+                      FilledButton.icon(
+                        onPressed: () =>
+                            ref.invalidate(bikeSavedAccountsProvider),
+                        icon: const Icon(Icons.refresh_rounded, size: 20),
+                        label: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -248,7 +394,7 @@ Lowest price on PhonePe platform. By proceeding, I consent to the terms and cond
                         'Rajkumar',
                         colorScheme.primary,
                       );
-                return _TestimonialCard(
+                return BikeHomeTestimonialCard(
                   quote: testimonial.$1,
                   author: testimonial.$2,
                   avatarColor: testimonial.$3,
@@ -266,7 +412,22 @@ Lowest price on PhonePe platform. By proceeding, I consent to the terms and cond
             ),
           ),
           const SizedBox(height: 12),
-          _TrustedPartnersGrid(),
+          Consumer(
+            builder: (context, ref, _) {
+              final async = ref.watch(bikeBillersProvider);
+              return async.when(
+                data: (billers) => BikeHomeTrustedPartnersFromApi(billers: billers),
+                loading: () => const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                error: (e, _) => BikeHomeTrustedPartnersLoadFailed(
+                  message: e.toString().replaceFirst('Exception: ', ''),
+                  onRetry: () => ref.invalidate(bikeBillersProvider),
+                ),
+              );
+            },
+          ),
           const SizedBox(height: 24),
           Text(
             'Faster Insurance, Fewer Steps',
@@ -276,7 +437,7 @@ Lowest price on PhonePe platform. By proceeding, I consent to the terms and cond
             ),
           ),
           const SizedBox(height: 20),
-          _StepsProgress(currentStep: 1),
+          const BikeHomeStepsProgress(currentStep: 1),
           const SizedBox(height: 24),
           Container(
             padding: const EdgeInsets.all(16),
@@ -297,10 +458,10 @@ Lowest price on PhonePe platform. By proceeding, I consent to the terms and cond
             spacing: 16,
             runSpacing: 8,
             children: [
-              _FooterLink(label: 'T&Cs', onTap: () {}),
-              _FooterLink(label: 'Privacy Policy', onTap: () {}),
-              _FooterLink(label: 'Grievance Policy', onTap: () {}),
-              _FooterLink(label: 'KYC Consent', onTap: () {}),
+              BikeHomeFooterLink(label: 'T&Cs', onTap: () {}),
+              BikeHomeFooterLink(label: 'Privacy Policy', onTap: () {}),
+              BikeHomeFooterLink(label: 'Grievance Policy', onTap: () {}),
+              BikeHomeFooterLink(label: 'KYC Consent', onTap: () {}),
             ],
           ),
           const SizedBox(height: 16),
@@ -312,271 +473,6 @@ Lowest price on PhonePe platform. By proceeding, I consent to the terms and cond
           ),
           const SizedBox(height: 24),
         ],
-      ),
-    );
-  }
-}
-
-class _FindPlansSection extends StatelessWidget {
-  const _FindPlansSection({
-    required this.vehicleState,
-    required this.onFindPlans,
-  });
-
-  final BikeVehicleState vehicleState;
-  final VoidCallback onFindPlans;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: vehicleState is BikeVehicleLoading ? null : onFindPlans,
-            child: const Text('Find Plans'),
-          ),
-        ),
-        if (vehicleState is BikeVehicleLoading) ...[
-          const SizedBox(height: 16),
-          const Center(child: CircularProgressIndicator()),
-        ],
-        if (vehicleState is BikeVehicleError) ...[
-          const SizedBox(height: 12),
-          Text(
-            (vehicleState as BikeVehicleError).message,
-            style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-class _TestimonialCard extends StatelessWidget {
-  final String quote;
-  final String author;
-  final Color avatarColor;
-
-  const _TestimonialCard({
-    required this.quote,
-    required this.author,
-    required this.avatarColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-    final initial = author.isNotEmpty ? author[0].toUpperCase() : '?';
-
-    return Card(
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.75,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: avatarColor,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: Text(
-                      initial,
-                      style: textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.surface,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Icon(
-                  Icons.format_quote_rounded,
-                  size: 24,
-                  color: colorScheme.primary.withValues(alpha: 0.6),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              quote,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
-                height: 1.4,
-              ),
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              author,
-              style: textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TrustedPartnersGrid extends StatelessWidget {
-  final List<String> _partners = [
-    'ACKO',
-    'Bajaj General',
-    'Generali',
-    'The New India Assurance',
-    'Oriental Insurance',
-    'IndusInd General',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 3,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 1.4,
-      children: _partners.map((name) {
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Center(
-              child: Text(
-                name,
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _StepsProgress extends StatelessWidget {
-  final int currentStep;
-
-  const _StepsProgress({required this.currentStep});
-
-  static const _stepLabels = [
-    'Choose plan',
-    'Submit details',
-    'Complete KYC',
-    'Get your policy',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
-    return Row(
-      children: List.generate(4, (index) {
-        final isActive = index + 1 <= currentStep;
-        final isLast = index == 3;
-        return Expanded(
-          child: Row(
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isActive
-                          ? colorScheme.primary
-                          : colorScheme.surfaceContainerHighest,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${index + 1}',
-                        style: textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: isActive
-                              ? colorScheme.onPrimary
-                              : colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _stepLabels[index],
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-              if (!isLast)
-                Expanded(
-                  child: Container(
-                    height: 2,
-                    margin: const EdgeInsets.only(bottom: 28),
-                    color: colorScheme.surfaceContainerHighest,
-                  ),
-                ),
-            ],
-          ),
-        );
-      }),
-    );
-  }
-}
-
-class _FooterLink extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const _FooterLink({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return TextButton(
-      onPressed: onTap,
-      style: TextButton.styleFrom(
-        foregroundColor: colorScheme.primary,
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        minimumSize: Size.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: colorScheme.primary,
-          fontWeight: FontWeight.w500,
-        ),
       ),
     );
   }

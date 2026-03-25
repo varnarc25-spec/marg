@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../data/flight_city_model.dart';
-import '../../data/flight_list_data.dart';
+import '../../data/models/flight_city_model.dart';
+import '../../data/models/flight_list_data.dart';
 
 /// Page to select From or To city/airport. No category tabs.
 /// Structure aligned with bike insurance selection (search/input + section lists).
@@ -173,7 +173,9 @@ class _CityInputField extends StatelessWidget {
           color: colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: focused ? colorScheme.primary : colorScheme.outline.withValues(alpha: 0.4),
+            color: focused
+                ? Colors.grey
+                : colorScheme.outline.withValues(alpha: 0.4),
             width: focused ? 2 : 1,
           ),
         ),
@@ -182,9 +184,22 @@ class _CityInputField extends StatelessWidget {
           style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurfaceVariant),
+            hintStyle: textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
             border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: colorScheme.primary, width: 0),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
         ),
       ),
@@ -215,7 +230,11 @@ class _RecentSearchTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            Icon(Icons.history_rounded, size: 22, color: colorScheme.onSurfaceVariant),
+            Icon(
+              Icons.history_rounded,
+              size: 22,
+              color: colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -230,7 +249,9 @@ class _RecentSearchTile extends StatelessWidget {
                   ),
                   Text(
                     subtitle,
-                    style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -267,7 +288,11 @@ class _PopularCityTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            Icon(Icons.location_on_rounded, size: 22, color: colorScheme.onSurface),
+            Icon(
+              Icons.location_on_rounded,
+              size: 22,
+              color: colorScheme.onSurface,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -282,7 +307,9 @@ class _PopularCityTile extends StatelessWidget {
                   ),
                   Text(
                     airport,
-                    style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -291,7 +318,9 @@ class _PopularCityTile extends StatelessWidget {
             ),
             Text(
               code,
-              style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),

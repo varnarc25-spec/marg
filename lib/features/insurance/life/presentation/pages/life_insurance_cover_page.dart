@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/life_insurance_plan.dart';
+import 'package:marg/shared/providers/app_providers.dart';
+
+import '../../data/life_insurance_api_exceptions.dart';
 import '../providers/life_insurance_provider.dart';
+import '../widgets/life_cover_amount_format.dart';
 import 'life_insurance_help_page.dart';
+import 'life_insurance_plans_page.dart';
 
 /// Recommended cover page: Congratulations, sum assured slider, cover till age, Talk To Us, Continue.
 class LifeInsuranceCoverPage extends ConsumerStatefulWidget {
@@ -14,12 +18,55 @@ class LifeInsuranceCoverPage extends ConsumerStatefulWidget {
 }
 
 class _LifeInsuranceCoverPageState extends ConsumerState<LifeInsuranceCoverPage> {
-  static const int minLakhs = 25;
-  static const int maxLakhs = 300;
-
-  static String _formatCover(int lakhs) {
-    if (lakhs >= 100) return '₹${lakhs ~/ 100} Crore';
-    return '₹$lakhs Lakh';
+  Future<void> _talkToUs() async {
+    final phoneController = TextEditingController();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Talk to us'),
+        content: TextField(
+          controller: phoneController,
+          keyboardType: TextInputType.phone,
+          decoration: const InputDecoration(
+            hintText: 'Phone (optional)',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Request call'),
+          ),
+        ],
+      ),
+    );
+    final phone = phoneController.text.trim();
+    phoneController.dispose();
+    if (ok != true || !mounted) return;
+    try {
+      final api = ref.read(lifeInsuranceApiServiceProvider);
+      final auth = ref.read(firebaseAuthServiceProvider);
+      final token = await auth.getIdToken();
+      final result = await api.requestCallback(
+        {
+          if (phone.isNotEmpty) 'phone': phone,
+          'source': 'life_cover_talk_to_us',
+        },
+        idToken: token,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.message)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(lifeInsuranceApiUserMessage(e))),
+      );
+    }
   }
 
   @override
@@ -74,7 +121,10 @@ class _LifeInsuranceCoverPageState extends ConsumerState<LifeInsuranceCoverPage>
       );
     }
 
-    final result = (coverState as LifeCoverSuccess).result;
+    final LifeCoverSuccess successState = coverState;
+    final result = successState.result;
+    final minLakhs = result.minCoverLakhs;
+    final maxLakhs = result.maxCoverLakhs;
     final currentLakhs = (selectedLakhs ?? result.recommendedCoverLakhs)
         .clamp(minLakhs, maxLakhs);
 
@@ -158,7 +208,7 @@ class _LifeInsuranceCoverPageState extends ConsumerState<LifeInsuranceCoverPage>
               const SizedBox(height: 8),
               Center(
                 child: Text(
-                  'Based on the details provided, you are eligible for up to ${_formatCover(result.maxCoverLakhs)} cover amount',
+                  'Based on the details provided, you are eligible for up to ${formatLifeCoverAmount(result.maxCoverLakhs)} cover amount',
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -180,7 +230,7 @@ class _LifeInsuranceCoverPageState extends ConsumerState<LifeInsuranceCoverPage>
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        _formatCover(currentLakhs),
+                        formatLifeCoverAmount(currentLakhs),
                         style: textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurface,
@@ -206,7 +256,8 @@ class _LifeInsuranceCoverPageState extends ConsumerState<LifeInsuranceCoverPage>
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'Ideal recommended cover is ${_formatCover(result.recommendedCoverLakhs)}, which is 10x of income',
+                                'Ideal recommended cover is ${formatLifeCoverAmount(result.recommendedCoverLakhs)}'
+                                '${result.idealCoverRationale != null ? ' — ${result.idealCoverRationale}' : ''}',
                                 style: textTheme.bodySmall?.copyWith(
                                   color: colorScheme.onSurface,
                                 ),
@@ -238,13 +289,13 @@ class _LifeInsuranceCoverPageState extends ConsumerState<LifeInsuranceCoverPage>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Min ₹25 Lakh',
+                            'Min ${formatLifeCoverAmount(minLakhs)}',
                             style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                           Text(
-                            'Max ₹3 Crore',
+                            'Max ${formatLifeCoverAmount(maxLakhs)}',
                             style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -305,7 +356,7 @@ class _LifeInsuranceCoverPageState extends ConsumerState<LifeInsuranceCoverPage>
               borderRadius: BorderRadius.circular(12),
               color: colorScheme.primary,
               child: InkWell(
-                onTap: () {},
+                onTap: _talkToUs,
                 borderRadius: BorderRadius.circular(12),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -350,9 +401,10 @@ class _LifeInsuranceCoverPageState extends ConsumerState<LifeInsuranceCoverPage>
             width: double.infinity,
             child: FilledButton(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Continue to plan selection'),
+                ref.read(lifePlansProvider.notifier).reset();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const LifeInsurancePlansPage(),
                   ),
                 );
               },
