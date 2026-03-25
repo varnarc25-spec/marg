@@ -15,6 +15,9 @@ import '../../../learning/presentation/screens/learning_hub_screen.dart';
 import '../../../messages_notifications/presentation/screens/notification_list_screen.dart';
 import '../../../payments/presentation/screens/add_promo_screen.dart';
 import '../../../scan/presentation/screens/scan_qr_screen.dart';
+import '../../services_catalog_helpers.dart';
+import '../../../../core/utils/services_catalog_utils.dart';
+import '../utils/recharges_bills_hub.dart';
 // Recharges & Bills feature entries (feature-scoped navigation)
 import '../../../recharges/mobile/presentation/routes/mobile_recharge_routes.dart';
 import '../../../recharges/dth/presentation/routes/dth_recharge_routes.dart';
@@ -70,9 +73,9 @@ class HomeScreen extends ConsumerWidget {
       HomeIconGridItem(
         Icons.plumbing_rounded,
         l10n.homeRechargeWater,
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => WaterRoutes.entryPage()),
-        ),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => WaterRoutes.entryPage())),
       ),
       HomeIconGridItem(
         Icons.propane_tank_rounded,
@@ -84,9 +87,9 @@ class HomeScreen extends ConsumerWidget {
       HomeIconGridItem(
         Icons.gas_meter_rounded,
         l10n.homeRechargePipedGas,
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => GasRoutes.entryPage()),
-        ),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => GasRoutes.entryPage())),
       ),
       HomeIconGridItem(
         Icons.wifi_rounded,
@@ -112,9 +115,9 @@ class HomeScreen extends ConsumerWidget {
       HomeIconGridItem(
         Icons.account_balance_rounded,
         l10n.homeRechargeLoanEmi,
-        onTap: () => Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => LoanRepaymentRoutes.entryPage())),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => LoanRepaymentRoutes.entryPage()),
+        ),
       ),
     ];
   }
@@ -122,6 +125,68 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = ref.watch(l10nProvider);
+    final catalogAsync = ref.watch(servicesCatalogProvider);
+    final rechargesItems = watchRechargesBillsHubItems(context, ref);
+
+    final List<HomeIconGridItem>? digigoldItems = catalogAsync
+        .whenOrNull<List<HomeIconGridItem>>(
+          data: (catalog) {
+            return mappedCatalogItemsByCategorySlug<HomeIconGridItem>(
+              catalog,
+              categorySlug: 'digigold',
+              itemMapper: (e) => HomeIconGridItem(
+                iconForCatalogItem(e),
+                e.name,
+                onTap: () => navigateToServiceBySlug(context, e.slug),
+              ),
+            );
+          },
+        );
+
+    final List<HomeIconGridItem>? insuranceItems = catalogAsync
+        .whenOrNull<List<HomeIconGridItem>>(
+          data: (catalog) {
+            return mappedCatalogItemsByCategory<HomeIconGridItem>(
+              catalog,
+              category: 'insurance',
+              itemMapper: (e) => HomeIconGridItem(
+                iconForCatalogItem(e),
+                e.name,
+                onTap: () => navigateToServiceBySlug(context, e.slug),
+              ),
+            );
+          },
+        );
+
+    final List<HomeIconGridItem>? travelItems = catalogAsync
+        .whenOrNull<List<HomeIconGridItem>>(
+          data: (catalog) {
+            return mappedCatalogItemsByCategory<HomeIconGridItem>(
+              catalog,
+              category: 'travel',
+              itemMapper: (e) => HomeIconGridItem(
+                iconForCatalogItem(e),
+                e.name,
+                onTap: () => navigateToServiceBySlug(context, e.slug),
+              ),
+            );
+          },
+        );
+    final List<HomeIconGridItem>? financialItems = catalogAsync
+        .whenOrNull<List<HomeIconGridItem>>(
+          data: (catalog) {
+            return mappedCatalogItemsByCategory<HomeIconGridItem>(
+              catalog,
+              category: 'financial',
+              itemMapper: (e) => HomeIconGridItem(
+                iconForCatalogItem(e),
+                e.name,
+                onTap: () => navigateToServiceBySlug(context, e.slug),
+              ),
+            );
+          },
+        );
+
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
@@ -149,16 +214,14 @@ class HomeScreen extends ConsumerWidget {
                         MaterialPageRoute(
                           builder: (_) => HubDetailScreen(
                             title: l10n.homeHubRechargesBills,
-                            items: _rechargesBillsItems(context, l10n),
+                            items: rechargesItems,
                           ),
                         ),
                       );
                     },
                   ),
                   const SizedBox(height: 12),
-                  HomeRechargesBillsHub(
-                    items: _rechargesBillsItems(context, l10n),
-                  ),
+                  HomeRechargesBillsHub(items: rechargesItems),
                   const SizedBox(height: 24),
                   HomeSectionTitle(
                     title: l10n.homeHubGoldSilver,
@@ -172,20 +235,28 @@ class HomeScreen extends ConsumerWidget {
                     },
                   ),
                   const SizedBox(height: 12),
-                  const HomeGoldSilverHub(),
-                  const SizedBox(height: 24),
-                  const HomeInsuranceBanner(),
-                  HomeSectionTitle(title: l10n.homeHubInsurance),
-                  const SizedBox(height: 12),
-                  const HomeInsuranceHub(),
-                  const SizedBox(height: 24),
-                  HomeSectionTitle(title: l10n.homeHubTravel),
-                  const SizedBox(height: 12),
-                  const HomeTravelHub(),
-                  const SizedBox(height: 24),
-                  HomeSectionTitle(title: l10n.homeHubFinancial),
-                  const SizedBox(height: 12),
-                  const HomeFinancialHub(),
+                  HomeGoldSilverHub(items: digigoldItems),
+                  if (insuranceItems != null) ...[
+                    const SizedBox(height: 24),
+                    const HomeInsuranceBanner(),
+                    HomeSectionTitle(title: l10n.homeHubInsurance),
+                    const SizedBox(height: 12),
+                    HomeInsuranceHub(items: insuranceItems),
+                  ],
+                  if (travelItems != null) ...[
+                    HomeSectionTitle(title: l10n.homeHubTravel),
+                    const SizedBox(height: 12),
+                    HomeTravelHub(items: travelItems),
+                  ],
+                  if (financialItems != null) ...[
+                    HomeSectionTitle(title: l10n.homeHubFinancial),
+                    const SizedBox(height: 12),
+                    HomeTravelHub(items: financialItems),
+                  ],
+                  // const SizedBox(height: 24),
+                  // HomeSectionTitle(title: l10n.homeHubFinancial),
+                  // const SizedBox(height: 12),
+                  // const HomeFinancialHub(),
                   const SizedBox(height: 24),
                   HomeSectionTitle(title: l10n.homeHubConvenient),
                   const SizedBox(height: 12),
@@ -322,4 +393,3 @@ Widget _buildMargHeader(BuildContext context, AppLocalizations l10n) {
     ),
   );
 }
-

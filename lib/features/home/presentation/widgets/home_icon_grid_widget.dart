@@ -7,6 +7,7 @@ import '../../../../shared/widgets/app_icon_tile.dart';
 class HomeIconGrid extends StatelessWidget {
   final List<HomeIconGridItem> items;
   final int columns;
+
   /// When non-null, only the first [maxItems] items are displayed (e.g. 4 on home screen).
   final int? maxItems;
 
@@ -19,13 +20,17 @@ class HomeIconGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayItems = maxItems != null ? items.take(maxItems!).toList() : items;
+    final displayItems = maxItems != null
+        ? items.take(maxItems!).toList()
+        : items;
     final rows = <Widget>[];
     for (var i = 0; i < displayItems.length; i += columns) {
       final rowItems = displayItems.skip(i).take(columns).toList();
       rows.add(
         Padding(
-          padding: EdgeInsets.only(bottom: i + columns < displayItems.length ? 16 : 0),
+          padding: EdgeInsets.only(
+            bottom: i + columns < displayItems.length ? 16 : 0,
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: List.generate(columns, (j) {
@@ -67,10 +72,7 @@ class HomeIconGrid extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: rows,
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: rows),
     );
   }
 }

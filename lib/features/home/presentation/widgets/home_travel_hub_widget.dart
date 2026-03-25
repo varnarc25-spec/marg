@@ -9,57 +9,52 @@ import '../../../travel/hotels/presentation/pages/travel_hotels_page.dart';
 
 /// Travel hub: Flight, Bus, Train, Hotel.
 class HomeTravelHub extends ConsumerWidget {
-  const HomeTravelHub({super.key});
+  const HomeTravelHub({super.key, required this.items});
+
+  final List<HomeIconGridItem> items;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = ref.watch(l10nProvider);
-    final items = [
-      HomeIconGridItem(
-        Icons.flight_rounded,
-        l10n.homeTravelFlight,
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const TravelFlightPage(),
-            ),
-          );
-        },
-      ),
-      HomeIconGridItem(
-        Icons.directions_bus_rounded,
-        l10n.homeTravelBus,
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const TravelBusPage(),
-            ),
-          );
-        },
-      ),
-      HomeIconGridItem(
-        Icons.train_rounded,
-        l10n.homeTravelTrain,
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const TravelTrainPage(),
-            ),
-          );
-        },
-      ),
-      HomeIconGridItem(
-        Icons.hotel_rounded,
-        l10n.homeTravelHotel,
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const TravelHotelsPage(),
-            ),
-          );
-        },
-      ),
-    ];
-    return HomeIconGrid(items: items, columns: 4);
+    // final l10n = ref.watch(l10nProvider);
+    // final items = [
+    //   HomeIconGridItem(
+    //     Icons.flight_rounded,
+    //     l10n.homeTravelFlight,
+    //     onTap: () {
+    //       Navigator.of(
+    //         context,
+    //       ).push(MaterialPageRoute(builder: (_) => const TravelFlightPage()));
+    //     },
+    //   ),
+    //   HomeIconGridItem(
+    //     Icons.directions_bus_rounded,
+    //     l10n.homeTravelBus,
+    //     onTap: () {
+    //       Navigator.of(
+    //         context,
+    //       ).push(MaterialPageRoute(builder: (_) => const TravelBusPage()));
+    //     },
+    //   ),
+    //   HomeIconGridItem(
+    //     Icons.train_rounded,
+    //     l10n.homeTravelTrain,
+    //     onTap: () {
+    //       Navigator.of(
+    //         context,
+    //       ).push(MaterialPageRoute(builder: (_) => const TravelTrainPage()));
+    //     },
+    //   ),
+    //   HomeIconGridItem(
+    //     Icons.hotel_rounded,
+    //     l10n.homeTravelHotel,
+    //     onTap: () {
+    //       Navigator.of(
+    //         context,
+    //       ).push(MaterialPageRoute(builder: (_) => const TravelHotelsPage()));
+    //     },
+    //   ),
+    // ];
+    // return HomeIconGrid(items: items, columns: 4);
+    return HomeIconGrid(items: items, columns: 4, maxItems: 4);
   }
 }

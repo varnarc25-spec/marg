@@ -13,7 +13,10 @@ class HomeConvenientHub extends ConsumerWidget {
     final items = [
       HomeIconGridItem(Icons.business_rounded, l10n.homeIconCityServices),
       HomeIconGridItem(Icons.card_giftcard_rounded, l10n.homeIconRewards),
-      HomeIconGridItem(Icons.family_restroom_rounded, l10n.homeIconFamilyCenter),
+      HomeIconGridItem(
+        Icons.family_restroom_rounded,
+        l10n.homeIconFamilyCenter,
+      ),
       HomeIconGridItem(Icons.eco_rounded, l10n.homeIconCreditLife),
     ];
     return HomeIconGrid(items: items, columns: 4, maxItems: 4);

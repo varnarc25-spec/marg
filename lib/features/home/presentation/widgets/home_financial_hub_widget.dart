@@ -20,9 +20,7 @@ class HomeFinancialHub extends ConsumerWidget {
         l10n.homeIconCardRepay,
         onTap: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const PayCreditCardBillPage(),
-            ),
+            MaterialPageRoute(builder: (_) => const PayCreditCardBillPage()),
           );
         },
       ),
@@ -30,33 +28,27 @@ class HomeFinancialHub extends ConsumerWidget {
         Icons.savings_rounded,
         l10n.homeIconSavings,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const MybudgetPage(),
-            ),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const MybudgetPage()));
         },
       ),
       HomeIconGridItem(
         Icons.trending_up_rounded,
         l10n.homeIconInvest,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const InvestPage(),
-            ),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const InvestPage()));
         },
       ),
       HomeIconGridItem(
         Icons.currency_bitcoin_rounded,
         l10n.homeIconExchange,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const CryptoWalletPage(),
-            ),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const CryptoWalletPage()));
         },
       ),
     ];

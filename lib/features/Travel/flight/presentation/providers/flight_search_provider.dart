@@ -5,6 +5,7 @@ import '../../data/models/flight_city_model.dart';
 import '../../data/models/flight_result_model.dart';
 import '../../data/services/flight_search_service.dart';
 import '../../data/services/flight_api_service.dart';
+import '../../../../../shared/providers/app_providers.dart';
 
 /// Flight search service (mock, kept as fallback/demo).
 final flightSearchServiceProvider = Provider<FlightSearchService>((ref) {
@@ -13,7 +14,8 @@ final flightSearchServiceProvider = Provider<FlightSearchService>((ref) {
 
 /// Real flight API service backed by FlightAPI.io (one-way, INR).
 final flightApiServiceProvider = Provider<FlightApiService>((ref) {
-  return FlightApiService();
+  final httpClient = ref.watch(loggingHttpClientProvider);
+  return FlightApiService(httpClient: httpClient);
 });
 
 /// From city/airport selection. Default: Chennai (MAA).

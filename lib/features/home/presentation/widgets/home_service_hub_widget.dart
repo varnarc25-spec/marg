@@ -95,7 +95,11 @@ class HomeServiceMessageTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textSecondary),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 14,
+                color: AppColors.textSecondary,
+              ),
             ],
           ),
         ),
@@ -142,21 +146,28 @@ class HomeInsurancePromoCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Row(
-                  children: List.generate(3, (_) => Container(
-                    margin: const EdgeInsets.only(right: 6),
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryBlue.withValues(alpha: 0.6),
-                      shape: BoxShape.circle,
+                  children: List.generate(
+                    3,
+                    (_) => Container(
+                      margin: const EdgeInsets.only(right: 6),
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryBlue.withValues(alpha: 0.6),
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  )),
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 16),
-          const Icon(Icons.umbrella_rounded, size: 48, color: AppColors.primaryBlue),
+          const Icon(
+            Icons.umbrella_rounded,
+            size: 48,
+            color: AppColors.primaryBlue,
+          ),
         ],
       ),
     );

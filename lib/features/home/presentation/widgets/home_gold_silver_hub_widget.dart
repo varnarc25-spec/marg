@@ -6,19 +6,23 @@ import 'home_icon_grid_widget.dart';
 
 /// Gold & Silver hub: Buy Gold, Daily Gold Savings, Buy 999 Silver, Daily Silver Savings.
 class HomeGoldSilverHub extends ConsumerWidget {
-  const HomeGoldSilverHub({super.key});
+  const HomeGoldSilverHub({super.key, this.items});
+
+  /// Optional API-driven items. When null/empty, falls back to the default
+  /// hardcoded tiles (using localized labels).
+  final List<HomeIconGridItem>? items;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = ref.watch(l10nProvider);
-    final items = [
+    final defaultItems = <HomeIconGridItem>[
       HomeIconGridItem(
         Icons.monetization_on_rounded,
         l10n.homeGoldBuyGold,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const BuyGoldPage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const BuyGoldPage()));
         },
       ),
       HomeIconGridItem(
@@ -34,9 +38,9 @@ class HomeGoldSilverHub extends ConsumerWidget {
         Icons.diamond_rounded,
         l10n.homeGoldBuy999Silver,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const BuySilver999Page()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const BuySilver999Page()));
         },
       ),
       HomeIconGridItem(
@@ -49,6 +53,10 @@ class HomeGoldSilverHub extends ConsumerWidget {
         },
       ),
     ];
-    return HomeIconGrid(items: items, columns: 4);
+
+    final displayItems = (items == null || items!.isEmpty)
+        ? defaultItems
+        : items!;
+    return HomeIconGrid(items: displayItems, columns: 4, maxItems: 4);
   }
 }

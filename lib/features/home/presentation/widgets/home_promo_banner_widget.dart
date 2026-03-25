@@ -4,11 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 /// Promotional banner at top of home: car insurance offer with CTA.
 /// Reddish-brown gradient, headline, "Insure now" button, and disclaimer.
 class HomePromoBanner extends StatelessWidget {
-  const HomePromoBanner({
-    super.key,
-    this.onInsureTap,
-    this.onHelpTap,
-  });
+  const HomePromoBanner({super.key, this.onInsureTap, this.onHelpTap});
 
   final VoidCallback? onInsureTap;
   final VoidCallback? onHelpTap;
@@ -23,11 +19,7 @@ class HomePromoBanner extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF8B4513),
-            Color(0xFFA0522D),
-            Color(0xFFCD5C5C),
-          ],
+          colors: [Color(0xFF8B4513), Color(0xFFA0522D), Color(0xFFCD5C5C)],
         ),
         boxShadow: [
           BoxShadow(
@@ -68,7 +60,10 @@ class HomePromoBanner extends StatelessWidget {
                             onTap: onInsureTap ?? () {},
                             borderRadius: BorderRadius.circular(24),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -81,7 +76,11 @@ class HomePromoBanner extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 6),
-                                  const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                                  const Icon(
+                                    Icons.arrow_forward_rounded,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
                                 ],
                               ),
                             ),
@@ -100,7 +99,11 @@ class HomePromoBanner extends StatelessWidget {
               top: 12,
               child: IconButton(
                 onPressed: onHelpTap ?? () {},
-                icon: const Icon(Icons.help_outline_rounded, color: Colors.white70, size: 22),
+                icon: const Icon(
+                  Icons.help_outline_rounded,
+                  color: Colors.white70,
+                  size: 22,
+                ),
                 style: IconButton.styleFrom(
                   backgroundColor: Colors.white.withValues(alpha: 0.2),
                   padding: const EdgeInsets.all(6),
@@ -135,20 +138,36 @@ class _BannerIllustration extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Icon(Icons.shield_rounded, size: 56, color: Colors.lightBlue.shade200.withValues(alpha: 0.9)),
+          Icon(
+            Icons.shield_rounded,
+            size: 56,
+            color: Colors.lightBlue.shade200.withValues(alpha: 0.9),
+          ),
           Positioned(
             bottom: 8,
-            child: Icon(Icons.directions_car_rounded, size: 40, color: Colors.orange.shade300),
+            child: Icon(
+              Icons.directions_car_rounded,
+              size: 40,
+              color: Colors.orange.shade300,
+            ),
           ),
           Positioned(
             top: 12,
             right: 4,
-            child: Icon(Icons.attach_money_rounded, size: 20, color: Colors.green.shade200),
+            child: Icon(
+              Icons.attach_money_rounded,
+              size: 20,
+              color: Colors.green.shade200,
+            ),
           ),
           Positioned(
             top: 20,
             left: 2,
-            child: Icon(Icons.attach_money_rounded, size: 16, color: Colors.green.shade200),
+            child: Icon(
+              Icons.attach_money_rounded,
+              size: 16,
+              color: Colors.green.shade200,
+            ),
           ),
         ],
       ),

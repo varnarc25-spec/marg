@@ -6,7 +6,7 @@ import '../../../../shared/providers/app_providers.dart';
 import '../../../../data/models/user_session.dart';
 import 'language_selection_screen.dart';
 import 'splash_screen_links.dart';
-import '../../../home/presentation/screens/home_screen.dart';
+import '../../../home/presentation/screens/homescreen1.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
 
 /// Splash Screen - First screen users see
@@ -39,9 +39,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
     _controller.forward();
   }
 
@@ -60,15 +61,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     }
   }
 
-  List<SplashScreenLink> get _linksInSelectedMenu =>
-      _selectedMenu == null
-          ? []
-          : _allLinks.where((e) => e.category == _selectedMenu).toList();
+  List<SplashScreenLink> get _linksInSelectedMenu => _selectedMenu == null
+      ? []
+      : _allLinks.where((e) => e.category == _selectedMenu).toList();
 
   void _openScreen(Widget screen) {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => screen),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => screen));
   }
 
   void _openSelectedLink() {
@@ -222,7 +222,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
@@ -240,13 +243,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                                 value: _selectedMenu,
                                 isExpanded: true,
                                 dropdownColor: AppColors.primaryBlue,
-                                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                                style: const TextStyle(color: Colors.white, fontSize: 14),
+                                icon: const Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.white,
+                                ),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
                                 items: _menuCategories
-                                    .map((c) => DropdownMenuItem<String>(
-                                          value: c,
-                                          child: Text(c),
-                                        ))
+                                    .map(
+                                      (c) => DropdownMenuItem<String>(
+                                        value: c,
+                                        child: Text(c),
+                                      ),
+                                    )
                                     .toList(),
                                 onChanged: (v) {
                                   setState(() {
@@ -262,21 +273,34 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                             flex: 3,
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<SplashScreenLink>(
-                                value: _selectedLink != null && linksInMenu.contains(_selectedLink)
+                                value:
+                                    _selectedLink != null &&
+                                        linksInMenu.contains(_selectedLink)
                                     ? _selectedLink
-                                    : (linksInMenu.isEmpty ? null : linksInMenu.first),
+                                    : (linksInMenu.isEmpty
+                                          ? null
+                                          : linksInMenu.first),
                                 isExpanded: true,
                                 dropdownColor: AppColors.primaryBlue,
-                                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                                style: const TextStyle(color: Colors.white, fontSize: 14),
+                                icon: const Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.white,
+                                ),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
                                 items: linksInMenu
-                                    .map((link) => DropdownMenuItem<SplashScreenLink>(
-                                          value: link,
-                                          child: Text(
-                                            link.label,
-                                            overflow: TextOverflow.ellipsis,
+                                    .map(
+                                      (link) =>
+                                          DropdownMenuItem<SplashScreenLink>(
+                                            value: link,
+                                            child: Text(
+                                              link.label,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
-                                        ))
+                                    )
                                     .toList(),
                                 onChanged: (v) {
                                   setState(() {
@@ -292,7 +316,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       SizedBox(
                         width: double.infinity,
                         child: FilledButton.icon(
-                          onPressed: _selectedLink != null ? _openSelectedLink : null,
+                          onPressed: _selectedLink != null
+                              ? _openSelectedLink
+                              : null,
                           icon: const Icon(Icons.open_in_new, size: 18),
                           label: const Text('Go'),
                           style: FilledButton.styleFrom(
@@ -334,7 +360,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 10, color: Colors.white70),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 10,
+                          color: Colors.white70,
+                        ),
                         onTap: () => _openScreen(link.createScreen()),
                       );
                     },

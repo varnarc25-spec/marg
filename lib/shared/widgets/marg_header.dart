@@ -7,6 +7,7 @@ import '../../core/l10n/app_localizations.dart';
 class MargHeader extends StatelessWidget {
   final AppLocalizations l10n;
   final Widget? leading;
+  final VoidCallback? onHome1Tap;
   final VoidCallback? onAiTap;
   final VoidCallback? onSearchTap;
   final VoidCallback? onNotificationTap;
@@ -15,6 +16,7 @@ class MargHeader extends StatelessWidget {
     super.key,
     required this.l10n,
     this.leading,
+    this.onHome1Tap,
     this.onAiTap,
     this.onSearchTap,
     this.onNotificationTap,
@@ -50,6 +52,13 @@ class MargHeader extends StatelessWidget {
                 ),
           ),
           const Spacer(),
+          if (onHome1Tap != null)
+            IconButton(
+              tooltip: 'Home 1',
+              icon: const Icon(Icons.looks_one_rounded),
+              color: AppColors.textPrimary,
+              onPressed: onHome1Tap,
+            ),
           TextButton(
             onPressed: onAiTap,
             style: TextButton.styleFrom(

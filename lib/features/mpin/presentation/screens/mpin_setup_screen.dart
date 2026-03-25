@@ -4,7 +4,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../../../core/theme/app_theme.dart';
 import '../../../../../shared/providers/app_providers.dart';
 import '../../../../../core/services/mock_mpin_service.dart';
-import '../../../home/presentation/screens/home_screen.dart';
+import '../../../home/presentation/screens/homescreen1.dart';
 
 /// MPIN Setup Screen
 /// Allows users to set up a 4-digit MPIN for transaction authorization
@@ -104,7 +104,7 @@ class _MpinSetupScreenState extends ConsumerState<MpinSetupScreen> {
 
       // Navigate to home after success
       await Future.delayed(const Duration(seconds: 1));
-      
+
       if (!mounted) return;
 
       Navigator.of(context).pushAndRemoveUntil(
@@ -133,9 +133,7 @@ class _MpinSetupScreenState extends ConsumerState<MpinSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Set Up MPIN'),
-      ),
+      appBar: AppBar(title: const Text('Set Up MPIN')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -240,9 +238,9 @@ class _MpinSetupScreenState extends ConsumerState<MpinSetupScreen> {
                 const SizedBox(height: 16),
                 Text(
                   'Re-enter MPIN',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),

@@ -37,7 +37,11 @@ class HomeHeader extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.search_rounded, size: 22, color: AppColors.textSecondary),
+                      Icon(
+                        Icons.search_rounded,
+                        size: 22,
+                        color: AppColors.textSecondary,
+                      ),
                       const SizedBox(width: 10),
                       Text(
                         l10n.homeSearchHint,
@@ -58,7 +62,11 @@ class HomeHeader extends ConsumerWidget {
                   color: AppColors.primaryBlue,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.add_rounded, color: Colors.white, size: 26),
+                child: const Icon(
+                  Icons.add_rounded,
+                  color: Colors.white,
+                  size: 26,
+                ),
               ),
             ],
           ),

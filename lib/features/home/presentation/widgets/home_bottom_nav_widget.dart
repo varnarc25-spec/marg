@@ -141,7 +141,9 @@ class HomeBottomNavItem extends StatelessWidget {
             Icon(
               icon,
               size: 24,
-              color: isSelected ? AppColors.primaryBlue : AppColors.textSecondary,
+              color: isSelected
+                  ? AppColors.primaryBlue
+                  : AppColors.textSecondary,
             ),
             const SizedBox(height: 4),
             Text(
@@ -149,7 +151,9 @@ class HomeBottomNavItem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? AppColors.primaryBlue : AppColors.textSecondary,
+                color: isSelected
+                    ? AppColors.primaryBlue
+                    : AppColors.textSecondary,
               ),
             ),
           ],

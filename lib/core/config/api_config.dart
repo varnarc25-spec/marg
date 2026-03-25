@@ -9,7 +9,7 @@ enum ApiEnvironment { local, server }
 class ApiConfig {
   /// Change this to [ApiEnvironment.server] when you want to hard‑point
   /// the app at the deployed backend during development.
-  static const ApiEnvironment environment = ApiEnvironment.local;
+  static const ApiEnvironment environment = ApiEnvironment.server;
 
   /// Optional: allow overriding the base URL via `--dart-define`.
   /// Example:

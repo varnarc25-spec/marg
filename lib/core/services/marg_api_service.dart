@@ -5,15 +5,22 @@ import '../../features/gold_silver/models/augmont_rates_models.dart';
 import '../../shared/models/faq_item.dart';
 import '../../shared/models/trend_item.dart';
 import '../../shared/models/shop_product_item.dart';
+import '../../shared/models/services_catalog.dart';
+import '../../features/home/data/models/app_banner_model.dart';
 
 /// Client for marg_api: user register and onboarding.
 /// Set [baseUrl] to your API base (e.g. http://localhost:3000 or https://api.example.com).
 class MargApiService {
-  MargApiService({String? baseUrl}) : _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+  MargApiService({
+    String? baseUrl,
+    http.Client? httpClient,
+  })  : _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), ''),
+        _http = httpClient ?? http.Client();
 
   static const String _defaultBaseUrl = 'http://localhost:3000';
 
   final String _baseUrl;
+  final http.Client _http;
 
   String get baseUrl => _baseUrl;
 
@@ -39,7 +46,7 @@ class MargApiService {
 
     http.Response res;
     try {
-      res = await http.post(
+      res = await _http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: body,
@@ -80,7 +87,7 @@ class MargApiService {
   }) async {
     final body = <String, dynamic>{};
     if (currency != null && currency.isNotEmpty) body['currency'] = currency;
-    final res = await http.post(
+    final res = await _http.post(
       Uri.parse('$_baseUrl/api/user/paper-wallet'),
       headers: {
         'Content-Type': 'application/json',
@@ -109,7 +116,7 @@ class MargApiService {
     final headers = <String, String>{'Content-Type': 'application/json'};
     if (idToken != null) headers['Authorization'] = 'Bearer $idToken';
 
-    final res = await http.get(uri, headers: headers);
+    final res = await _http.get(uri, headers: headers);
     final data = jsonDecode(res.body) as Map<String, dynamic>?;
     if (res.statusCode >= 200 && res.statusCode < 300) {
       final d = data?['data'];
@@ -132,7 +139,7 @@ class MargApiService {
     final headers = <String, String>{'Content-Type': 'application/json'};
     if (idToken != null) headers['Authorization'] = 'Bearer $idToken';
 
-    final res = await http.post(
+    final res = await _http.post(
       Uri.parse('$_baseUrl/api/user/onboarding'),
       headers: headers,
       body: jsonEncode(payload),
@@ -148,7 +155,7 @@ class MargApiService {
     required String idToken,
     required String sessionId,
   }) async {
-    final res = await http.post(
+    final res = await _http.post(
       Uri.parse('$_baseUrl/api/user/onboarding/claim'),
       headers: {
         'Content-Type': 'application/json',
@@ -164,7 +171,7 @@ class MargApiService {
 
   /// Get personal data for the authenticated user. Requires [idToken].
   Future<Map<String, dynamic>?> getPersonalData({required String idToken}) async {
-    final res = await http.get(
+    final res = await _http.get(
       Uri.parse('$_baseUrl/api/user/personal-data'),
       headers: {
         'Content-Type': 'application/json',
@@ -184,7 +191,7 @@ class MargApiService {
     required String idToken,
     required Map<String, dynamic> payload,
   }) async {
-    final res = await http.put(
+    final res = await _http.put(
       Uri.parse('$_baseUrl/api/user/personal-data'),
       headers: {
         'Content-Type': 'application/json',
@@ -239,7 +246,7 @@ class MargApiService {
   /// Use data.rates.gBuy and data.rates.sBuy for gold/silver INR/gm; use global only for usdPerOz.
   /// Returns { success, data: { rates: { gBuy, sBuy, gBuyGst, sBuyGst }, taxes, blockId, change }, global: { gold, silver } }.
   Future<Map<String, dynamic>?> getGoldSilverRates() async {
-    final res = await http.get(
+    final res = await _http.get(
       Uri.parse('$_baseUrl/api/commodities/gold-silver'),
       headers: {'Content-Type': 'application/json'},
     );
@@ -253,7 +260,7 @@ class MargApiService {
   /// GET /api/account/augmont/rates — live gold/silver rates + blockId (for buy/sell).
   /// Requires [idToken]. Maps server's GET /rates payload into [AugmontRates].
   Future<AugmontRates?> getAugmontRates({required String idToken}) async {
-    final res = await http.get(
+    final res = await _http.get(
       Uri.parse('$_baseUrl/api/account/augmont/rates'),
       headers: {
         'Content-Type': 'application/json',
@@ -273,7 +280,7 @@ class MargApiService {
 
   /// GET /api/account/augmont/sip/rates — SIP rates (gBuy, sBuy + GST + blockId).
   Future<AugmontSipRates?> getAugmontSipRates({required String idToken}) async {
-    final res = await http.get(
+    final res = await _http.get(
       Uri.parse('$_baseUrl/api/account/augmont/sip/rates'),
       headers: {
         'Content-Type': 'application/json',
@@ -285,6 +292,68 @@ class MargApiService {
       final d = data?['data'];
       if (d is Map<String, dynamic>) {
         return AugmontSipRates.fromJson(d);
+      }
+      return null;
+    }
+    return null;
+  }
+
+  /// GET /api/banners — dynamic promos per [pageSlug] (e.g. home, travel).
+  /// No auth. Returns empty list on error or non-200.
+  Future<List<AppBanner>> getBannersForPage({
+    required String pageSlug,
+    String variant = 'default',
+  }) async {
+    final uri = Uri.parse('$_baseUrl/api/banners').replace(
+      queryParameters: <String, String>{
+        'page_slug': pageSlug,
+        if (variant.isNotEmpty) 'variant': variant,
+      },
+    );
+    try {
+      final res = await _http.get(
+        uri,
+        headers: const {'Content-Type': 'application/json'},
+      );
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        return const <AppBanner>[];
+      }
+      final map = jsonDecode(res.body);
+      if (map is! Map<String, dynamic>) return const <AppBanner>[];
+      final data = map['data'];
+      if (data is! List) return const <AppBanner>[];
+      final out = <AppBanner>[];
+      for (var i = 0; i < data.length; i++) {
+        final raw = data[i];
+        if (raw is! Map) continue;
+        final row = Map<String, dynamic>.from(raw as Map);
+        final b = AppBanner.tryParse(row);
+        if (b != null) {
+          out.add(b);
+        } else if (kDebugMode) {
+          debugPrint('MargApi BANNERS │ skipped invalid row at index $i');
+        }
+      }
+      return out;
+    } catch (e, st) {
+      debugPrint('MargApi BANNERS │ $e');
+      debugPrint('$st');
+      return const <AppBanner>[];
+    }
+  }
+
+  /// GET /api/services/catalog — services catalog for home (suggested + categories).
+  /// No auth required. Returns [ServicesCatalog] or null on error.
+  Future<ServicesCatalog?> getServicesCatalog() async {
+    final res = await _http.get(
+      Uri.parse('$_baseUrl/api/services/catalog'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    final data = jsonDecode(res.body) as Map<String, dynamic>?;
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      final d = data?['data'];
+      if (d is Map<String, dynamic>) {
+        return ServicesCatalog.fromJson(d);
       }
       return null;
     }

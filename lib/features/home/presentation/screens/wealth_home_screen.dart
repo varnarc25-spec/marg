@@ -7,7 +7,7 @@ import '../../../../shared/providers/app_providers.dart';
 import '../../../accounts/presentation/screens/my_account_screen.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
 import '../../../myportfolio/presentation/screens/my_portfolio_screen.dart';
-import 'home_screen.dart';
+import 'homescreen1.dart';
 import '../../../mywallet/presentation/screens/my_wallet_screen.dart';
 
 /// Wealth / Home screen: total assets, watchlist, top gainers, promo, news, bottom nav.
@@ -877,10 +877,7 @@ class _WatchlistSectionState extends State<_WatchlistSection> {
           ),
         ),
         const SizedBox(height: 12),
-        _WatchlistTabContent(
-          l10n: l10n,
-          tabIndex: _selectedIndex,
-        ),
+        _WatchlistTabContent(l10n: l10n, tabIndex: _selectedIndex),
       ],
     );
   }
@@ -891,10 +888,7 @@ class _WatchlistTabContent extends StatefulWidget {
   final AppLocalizations l10n;
   final int tabIndex;
 
-  const _WatchlistTabContent({
-    required this.l10n,
-    required this.tabIndex,
-  });
+  const _WatchlistTabContent({required this.l10n, required this.tabIndex});
 
   @override
   State<_WatchlistTabContent> createState() => _WatchlistTabContentState();
@@ -1096,7 +1090,10 @@ class _WatchlistTabContentState extends State<_WatchlistTabContent> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.add_rounded, color: AppColors.primaryBlue),
+                leading: const Icon(
+                  Icons.add_rounded,
+                  color: AppColors.primaryBlue,
+                ),
                 title: Text(widget.l10n.wealthWatchlistNewList),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -1182,12 +1179,13 @@ class _WatchlistTabContentState extends State<_WatchlistTabContent> {
                         children: [
                           Text(
                             '$watchlistNum',
-                            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: isSelected
-                                  ? WealthHomeScreen._wealthPurple
-                                  : AppColors.textSecondary,
-                            ),
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: isSelected
+                                      ? WealthHomeScreen._wealthPurple
+                                      : AppColors.textSecondary,
+                                ),
                           ),
                           const SizedBox(height: 4),
                           Container(
@@ -1217,7 +1215,9 @@ class _WatchlistTabContentState extends State<_WatchlistTabContent> {
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: WealthHomeScreen._wealthPurple.withValues(alpha: 0.12),
+                      color: WealthHomeScreen._wealthPurple.withValues(
+                        alpha: 0.12,
+                      ),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -1254,9 +1254,8 @@ class _WatchlistTabContentState extends State<_WatchlistTabContent> {
                         Expanded(
                           child: Text(
                             widget.l10n.wealthWatchlistSearchHint,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: AppColors.textSecondary),
                           ),
                         ),
                       ],
@@ -1286,11 +1285,11 @@ class _WatchlistTabContentState extends State<_WatchlistTabContent> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                    '${_selectedWatchlistIndex + 1} ($totalItems/$totalCount)',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                  '${_selectedWatchlistIndex + 1} ($totalItems/$totalCount)',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.textSecondary,
                   ),
+                ),
                 TextButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.add_rounded, size: 18),
@@ -1314,9 +1313,7 @@ class _WatchlistTabContentState extends State<_WatchlistTabContent> {
             itemCount: groups.length,
             separatorBuilder: (_, __) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
-              return _WatchlistGroupWidget(
-                group: groups[index],
-              );
+              return _WatchlistGroupWidget(group: groups[index]);
             },
           ),
         ],
@@ -1385,7 +1382,9 @@ class _WatchlistGroupWidget extends StatelessWidget {
                   : group.name,
               style: theme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: group.exchange != null ? accentColor : AppColors.textPrimary,
+                color: group.exchange != null
+                    ? accentColor
+                    : AppColors.textPrimary,
               ),
             ),
             if (group.exchange != null) ...[
@@ -1406,19 +1405,31 @@ class _WatchlistGroupWidget extends StatelessWidget {
             ],
             if (!group.showBuySell) ...[
               IconButton(
-                icon: Icon(Icons.keyboard_arrow_up_rounded, size: 20, color: AppColors.textSecondary),
+                icon: Icon(
+                  Icons.keyboard_arrow_up_rounded,
+                  size: 20,
+                  color: AppColors.textSecondary,
+                ),
                 onPressed: () {},
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               ),
               IconButton(
-                icon: Icon(Icons.open_in_full_rounded, size: 18, color: AppColors.textSecondary),
+                icon: Icon(
+                  Icons.open_in_full_rounded,
+                  size: 18,
+                  color: AppColors.textSecondary,
+                ),
                 onPressed: () {},
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               ),
               IconButton(
-                icon: Icon(Icons.edit_outlined, size: 18, color: AppColors.textSecondary),
+                icon: Icon(
+                  Icons.edit_outlined,
+                  size: 18,
+                  color: AppColors.textSecondary,
+                ),
                 onPressed: () {},
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
@@ -1426,7 +1437,9 @@ class _WatchlistGroupWidget extends StatelessWidget {
             ],
             IconButton(
               icon: Icon(
-                group.showBuySell ? Icons.filter_list_rounded : Icons.bar_chart_rounded,
+                group.showBuySell
+                    ? Icons.filter_list_rounded
+                    : Icons.bar_chart_rounded,
                 size: 20,
                 color: AppColors.textSecondary,
               ),
@@ -1436,20 +1449,32 @@ class _WatchlistGroupWidget extends StatelessWidget {
             ),
             if (group.showBuySell) ...[
               IconButton(
-                icon: Icon(Icons.show_chart_rounded, size: 20, color: AppColors.textSecondary),
+                icon: Icon(
+                  Icons.show_chart_rounded,
+                  size: 20,
+                  color: AppColors.textSecondary,
+                ),
                 onPressed: () {},
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               ),
               IconButton(
-                icon: Icon(Icons.delete_outline_rounded, size: 20, color: AppColors.textSecondary),
+                icon: Icon(
+                  Icons.delete_outline_rounded,
+                  size: 20,
+                  color: AppColors.textSecondary,
+                ),
                 onPressed: () {},
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               ),
             ],
             IconButton(
-              icon: Icon(Icons.more_vert_rounded, size: 20, color: AppColors.textSecondary),
+              icon: Icon(
+                Icons.more_vert_rounded,
+                size: 20,
+                color: AppColors.textSecondary,
+              ),
               onPressed: () {},
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
@@ -1458,9 +1483,7 @@ class _WatchlistGroupWidget extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         // Instrument rows
-        ...group.items.map(
-          (item) => _WatchlistInstrumentRow(item: item),
-        ),
+        ...group.items.map((item) => _WatchlistInstrumentRow(item: item)),
       ],
     );
   }

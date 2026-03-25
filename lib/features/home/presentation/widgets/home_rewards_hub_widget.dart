@@ -23,7 +23,8 @@ class HomeRewardsHub extends StatelessWidget {
         Expanded(
           child: _RewardCard(
             icon: Icons.emoji_events_rounded,
-            text: 'Get rewards of up to 200 points with every new friend you invite!',
+            text:
+                'Get rewards of up to 200 points with every new friend you invite!',
             badge: 'CVR2242',
             badgeAlign: Alignment.centerRight,
             badgeColor: AppColors.accentGreen,
@@ -69,7 +70,9 @@ class _RewardCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryBlue.withValues(alpha: isGradient ? 0.25 : 0.3),
+            color: AppColors.primaryBlue.withValues(
+              alpha: isGradient ? 0.25 : 0.3,
+            ),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

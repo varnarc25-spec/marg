@@ -106,14 +106,6 @@ class FirebaseAuthService {
     return _firebaseAuth!.authStateChanges();
   }
 
-  Future<String?> getIdToken() async {
-    try {
-      return await _firebaseAuth?.currentUser?.getIdToken();
-    } catch (_) {
-      return null;
-    }
-  }
-
   // ---------------------------------------------------------------------------
   // Phone Auth
   // ---------------------------------------------------------------------------
@@ -257,63 +249,17 @@ class FirebaseAuthService {
     _requireAuth();
 
     try {
-      if (_googleSignIn == null) {
-        _initializeGoogleSignIn();
-      }
-
-      if (_googleSignIn == null) {
-        throw Exception(
-          'Google sign-in is not configured. Please set the web client id first.',
-        );
-      }
-
-      // Trigger the Google Sign-In flow
-      final GoogleSignInAccount? googleUser = await _googleSignIn!.signIn();
-      
-      if (googleUser == null) {
-        throw Exception('Google Sign-In was cancelled');
-      }
-
-      // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      // Validate that we have the required tokens
-      if (googleAuth.idToken == null && googleAuth.accessToken == null) {
-        throw Exception(
-          'Google Sign-In failed: No authentication tokens received.\n\n'
-          'This may be due to:\n'
-          '1. Missing Google Sign-In configuration\n'
-          '2. Incorrect OAuth client ID setup\n'
-          '3. Network connectivity issues\n\n'
-          'Please check your Firebase console and ensure Google Sign-In is properly configured.',
-        );
-      }
-
-      // idToken is required for Firebase Auth
-      if (googleAuth.idToken == null) {
-        throw Exception(
-          'Google Sign-In failed: ID token is missing.\n\n'
-          'This usually means the OAuth client ID is not properly configured.\n\n'
-          'To fix:\n'
-          '1. Check Firebase Console > Authentication > Sign-in method > Google\n'
-          '2. Ensure the OAuth client ID matches your app configuration\n'
-          '3. Run: flutterfire configure\n'
-          '4. Restart the app',
-      UserCredential userCredential;
+      late final UserCredential userCredential;
 
       if (kIsWeb) {
-        // On web, use Firebase Auth's signInWithPopup directly.
-        // This avoids needing a separate OAuth web client ID for
-        // the google_sign_in package and works out of the box with
-        // the Firebase web config (authDomain, apiKey, etc.).
         final provider = GoogleAuthProvider()
           ..addScope('email')
           ..addScope('profile');
-        userCredential =
-            await _firebaseAuth!.signInWithPopup(provider);
+        userCredential = await _firebaseAuth!.signInWithPopup(provider);
       } else {
-        // Native platforms: use google_sign_in package
+        if (_googleSignIn == null) {
+          _initializeGoogleSignIn();
+        }
         final googleUser = await _gsi.signIn();
         if (googleUser == null) {
           throw Exception('Google Sign-In was cancelled');
@@ -398,19 +344,12 @@ class FirebaseAuthService {
     }
   }
 
-  /// Get auth state changes stream
-  Stream<User?> authStateChanges() {
-    if (_auth == null) {
-      return Stream.value(null);
-    }
-    return _auth!.authStateChanges();
-  }
-
   /// Get user ID token. Use [forceRefresh] when calling protected APIs after idle.
   Future<String?> getIdToken({bool forceRefresh = false}) async {
-    if (_auth == null) return null;
+    final auth = _firebaseAuth;
+    if (auth == null) return null;
     try {
-      final user = _auth!.currentUser;
+      final user = auth.currentUser;
       if (user == null) return null;
       return await user.getIdToken(forceRefresh);
     } catch (e) {

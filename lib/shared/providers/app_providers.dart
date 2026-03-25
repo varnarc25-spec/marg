@@ -1,13 +1,16 @@
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/services/marg_api_service.dart';
+import '../../core/services/logging_http_client.dart';
 import '../../core/config/api_config.dart';
 import '../models/faq_item.dart';
 import '../models/trend_item.dart';
 import '../models/shop_product_item.dart';
 import '../../features/gold_silver/models/augmont_rates_models.dart';
+import '../../shared/models/services_catalog.dart';
 import '../../data/repositories/mock_data_repository.dart';
 import '../../data/models/user_profile.dart';
 import '../../data/models/personal_data.dart';
@@ -217,8 +220,17 @@ class LanguageNotifier extends StateNotifier<String> {
 }
 
 /// Marg API Service Provider
+final loggingHttpClientProvider = Provider.autoDispose<http.Client>((ref) {
+  final client = LoggingHttpClient();
+  ref.onDispose(() {
+    client.close();
+  });
+  return client;
+});
+
 final margApiServiceProvider = Provider<MargApiService>((ref) {
-  return MargApiService(baseUrl: ApiConfig.baseUrl);
+  final client = ref.watch(loggingHttpClientProvider);
+  return MargApiService(baseUrl: ApiConfig.baseUrl, httpClient: client);
 });
 
 /// Onboarding session ID for anonymous users (before login). Stored in prefs.
@@ -269,6 +281,12 @@ final personalDataFromApiProvider = FutureProvider<PersonalData?>((ref) async {
   } catch (_) {
     return null;
   }
+});
+
+/// Services catalog from GET /api/services/catalog (suggested + categories). No auth. Cached per session.
+final servicesCatalogProvider = FutureProvider.autoDispose<ServicesCatalog?>((ref) async {
+  final api = ref.watch(margApiServiceProvider);
+  return api.getServicesCatalog();
 });
 
 /// Augmont live gold/silver rates (for buy/sell pages). Refreshes when provider is invalidated.

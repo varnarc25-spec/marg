@@ -5,7 +5,7 @@ import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../../data/datasources/languages_asset_datasource.dart';
 import '../../data/models/language_option.dart';
-import '../../../home/presentation/screens/home_screen.dart';
+import '../../../home/presentation/screens/homescreen1.dart';
 import 'user_goal_selection_screen.dart';
 
 /// Language Selection Screen
@@ -15,10 +15,12 @@ class LanguageSelectionScreen extends ConsumerStatefulWidget {
   const LanguageSelectionScreen({super.key});
 
   @override
-  ConsumerState<LanguageSelectionScreen> createState() => _LanguageSelectionScreenState();
+  ConsumerState<LanguageSelectionScreen> createState() =>
+      _LanguageSelectionScreenState();
 }
 
-class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScreen> {
+class _LanguageSelectionScreenState
+    extends ConsumerState<LanguageSelectionScreen> {
   List<LanguageOption> _options = [];
   bool _loading = true;
   String _selectedCode = 'en';
@@ -60,17 +62,17 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
   void _onLanguageSelected(String code) {
     setState(() => _selectedCode = code);
     ref.read(languageProvider.notifier).setLanguage(code);
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const UserGoalSelectionScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const UserGoalSelectionScreen()));
   }
 
   Future<void> _onSkip() async {
     await ref.read(onboardingCompleteProvider.notifier).completeOnboarding();
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
   }
 
   @override
@@ -112,10 +114,7 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
               const SizedBox(height: 8),
               Text(
                 l10n.changeLanguageLater,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 28),
@@ -134,12 +133,17 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
                                     child: Padding(
                                       padding: EdgeInsets.only(
                                         right: 7,
-                                        bottom: i + 2 < _options.length ? 14 : 0,
+                                        bottom: i + 2 < _options.length
+                                            ? 14
+                                            : 0,
                                       ),
                                       child: LanguageGridTile(
                                         option: _options[i],
-                                        selected: _selectedCode == _options[i].code,
-                                        onTap: () => _onLanguageSelected(_options[i].code),
+                                        selected:
+                                            _selectedCode == _options[i].code,
+                                        onTap: () => _onLanguageSelected(
+                                          _options[i].code,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -147,13 +151,19 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
                                     child: Padding(
                                       padding: EdgeInsets.only(
                                         left: 7,
-                                        bottom: i + 2 < _options.length ? 14 : 0,
+                                        bottom: i + 2 < _options.length
+                                            ? 14
+                                            : 0,
                                       ),
                                       child: i + 1 < _options.length
                                           ? LanguageGridTile(
                                               option: _options[i + 1],
-                                              selected: _selectedCode == _options[i + 1].code,
-                                              onTap: () => _onLanguageSelected(_options[i + 1].code),
+                                              selected:
+                                                  _selectedCode ==
+                                                  _options[i + 1].code,
+                                              onTap: () => _onLanguageSelected(
+                                                _options[i + 1].code,
+                                              ),
                                             )
                                           : const SizedBox.shrink(),
                                     ),

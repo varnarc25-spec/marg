@@ -8,7 +8,7 @@ import 'core/theme/app_theme.dart';
 import 'shared/providers/app_providers.dart';
 import 'features/onboarding/presentation/screens/app_splash_screen.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
-import 'features/home/presentation/screens/home_screen.dart';
+import 'features/home/presentation/screens/homescreen1.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,10 +39,14 @@ void main() async {
           debugPrint('   Stack: $initStack');
         }
         firebaseInitialized = false;
-        debugPrint('⚠️ Continuing without Firebase. Some features may not work.');
+        debugPrint(
+          '⚠️ Continuing without Firebase. Some features may not work.',
+        );
         debugPrint('💡 To enable Firebase Auth:');
         debugPrint('   1. Run: flutterfire configure');
-        debugPrint('   2. Or add GoogleService-Info.plist (iOS) and google-services.json (Android)');
+        debugPrint(
+          '   2. Or add GoogleService-Info.plist (iOS) and google-services.json (Android)',
+        );
       }
     } else {
       firebaseInitialized = true;
@@ -56,20 +60,20 @@ void main() async {
       debugPrint('Stack trace: $stackTrace');
       debugPrint('💡 To enable Firebase Auth:');
       debugPrint('   1. Run: flutterfire configure');
-      debugPrint('   2. Or add GoogleService-Info.plist (iOS) and google-services.json (Android)');
+      debugPrint(
+        '   2. Or add GoogleService-Info.plist (iOS) and google-services.json (Android)',
+      );
     }
   }
 
   // Store Firebase initialization status globally (optional - for checking later)
   if (!firebaseInitialized) {
-    debugPrint('⚠️ WARNING: Firebase is not initialized. Google Sign-In and other Firebase features will not work.');
+    debugPrint(
+      '⚠️ WARNING: Firebase is not initialized. Google Sign-In and other Firebase features will not work.',
+    );
   }
 
-  runApp(
-    const ProviderScope(
-      child: MargApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MargApp()));
 }
 
 /// Main App Widget
