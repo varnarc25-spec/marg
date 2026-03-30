@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:marg/core/services/firebase_auth_service.dart';
 import 'package:marg/shared/providers/app_providers.dart';
@@ -93,8 +92,7 @@ class HealthPlansNotifier extends StateNotifier<HealthPlansState> {
           return;
         }
       } catch (e) {
-        debugPrint('Health pincode validation skipped: $e');
-      }
+              }
 
       final selectionBody = form.toSelectionBody(memberTypes);
       final quoteBody = form.toPlansSearchBody(
@@ -105,15 +103,13 @@ class HealthPlansNotifier extends StateNotifier<HealthPlansState> {
       try {
         await _api.submitSelection(selectionBody, idToken: token);
       } catch (e) {
-        debugPrint('Health selection optional: $e');
-      }
+              }
 
       List<HealthInsurancePlan> plans;
       try {
         plans = await _api.getPlansWithBody(quoteBody, idToken: token);
       } catch (e) {
-        debugPrint('Health POST /plans failed, fallback partners: $e');
-        plans = await _api.getPartners(idToken: token);
+                plans = await _api.getPartners(idToken: token);
       }
 
       if (plans.isEmpty) {
@@ -164,8 +160,7 @@ class HealthPlansNotifier extends StateNotifier<HealthPlansState> {
       try {
         plans = await _api.getPlansWithBody(quoteBody, idToken: token);
       } catch (e) {
-        debugPrint('Health POST /plans (cover) failed, fallback partners: $e');
-        plans = await _api.getPartners(idToken: token);
+                plans = await _api.getPartners(idToken: token);
       }
 
       if (plans.isEmpty) {

@@ -12,10 +12,8 @@ import 'package:http/http.dart' as http;
 /// - Logs response body only (truncated).
 /// - Avoids logging request headers/body to reduce risk of leaking secrets.
 class LoggingHttpClient extends http.BaseClient {
-  LoggingHttpClient({
-    http.Client? inner,
-    this.maxBodyChars = 2000,
-  }) : _inner = inner ?? http.Client();
+  LoggingHttpClient({http.Client? inner, this.maxBodyChars = 2000})
+    : _inner = inner ?? http.Client();
 
   final http.Client _inner;
   final int maxBodyChars;
@@ -29,7 +27,6 @@ class LoggingHttpClient extends http.BaseClient {
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     final startedAt = DateTime.now();
     final requestLine = 'HTTP -> ${request.method} ${request.url}';
-    debugPrint(requestLine);
 
     final streamedResponse = await _inner.send(request);
 
@@ -38,17 +35,15 @@ class LoggingHttpClient extends http.BaseClient {
     final elapsedMs = DateTime.now().difference(startedAt).inMilliseconds;
 
     final bodyText = _decodeBody(bytes);
-    final preview = bodyText == null ? '<non-text response>' : _truncate(bodyText);
+    final preview = bodyText == null
+        ? '<non-text response>'
+        : _truncate(bodyText);
 
     final responseLine =
         'HTTP <- ${streamedResponse.statusCode} (${elapsedMs}ms) ${request.method} ${request.url}';
-    debugPrint(responseLine);
     final bodyLine = 'HTTP body: $preview';
-    debugPrint(bodyLine);
 
-    await _appendDailyLog(
-      '$requestLine\n$responseLine\n$bodyLine',
-    );
+    await _appendDailyLog('$requestLine\n$responseLine\n$bodyLine');
 
     return http.StreamedResponse(
       Stream.value(bytes),
@@ -126,4 +121,3 @@ class LoggingHttpClient extends http.BaseClient {
     _inner.close();
   }
 }
-

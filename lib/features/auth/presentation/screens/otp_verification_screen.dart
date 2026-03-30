@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -90,11 +89,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
           verificationId: widget.verificationId,
           smsCode: otp,
         );
-        debugPrint('📱 Phone OTP login response: $userData');
-        debugPrint('   uid: ${userData['uid']}');
-        debugPrint('   phoneNumber: ${userData['phoneNumber']}');
-        debugPrint('   email: ${userData['email']}');
-      } else {
+                                      } else {
         // Email OTP verification is not directly supported
         throw Exception('Email OTP verification is not supported. Please use phone OTP or email/password.');
       }
@@ -109,7 +104,6 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       );
 
       // Register user in marg_api (POST /api/user/register) for phone sign-in/signup
-      debugPrint('MargApi REGISTER │ [Phone OTP] Attempting register after verify...');
       final idToken = await ref.read(firebaseAuthServiceProvider).getIdToken();
       if (idToken != null) {
         final api = ref.read(margApiServiceProvider);
@@ -118,19 +112,10 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
             idToken: idToken,
             name: widget.phoneNumber,
           );
-        } catch (e, st) {
-          debugPrint('MargApi │ [Phone OTP] register: $e');
-          if (kDebugMode) {
-            for (final line in st.toString().split('\n')) {
-              if (line.isNotEmpty) debugPrint('MargApi │   $line');
-            }
-          }
-        }
+        } catch (_) {}
         try {
           await api.ensurePaperWallet(idToken: idToken);
-        } catch (e) {
-          debugPrint('MargApi │ [Phone OTP] ensurePaperWallet: $e');
-        }
+        } catch (_) {}
       }
 
       // Claim anonymous onboarding if we have a session id

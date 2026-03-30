@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart'
-show debugPrint, kDebugMode, defaultTargetPlatform, kIsWeb;
+    show debugPrint, kDebugMode, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart' show TargetPlatform;
 import '../../firebase_options.dart';
 
@@ -43,13 +43,10 @@ class FirebaseAuthService {
   void _initializeAuth() {
     try {
       if (Firebase.apps.isEmpty) {
-        debugPrint('⚠️ FirebaseAuthService: Firebase.apps is empty');
         return;
       }
       _auth = FirebaseAuth.instance;
-    } catch (e) {
-      debugPrint('❌ FirebaseAuthService: FirebaseAuth.instance threw: $e');
-    }
+    } catch (e) {}
   }
 
   void _initializeGoogleSignIn() {
@@ -67,7 +64,6 @@ class FirebaseAuthService {
         clientId: clientId,
       );
     } catch (e) {
-      debugPrint('⚠️ Could not configure GoogleSignIn: $e');
       _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
     }
   }
@@ -114,10 +110,10 @@ class FirebaseAuthService {
     _requireAuth();
     if (!phoneNumber.startsWith('+')) {
       throw Exception(
-          'Phone number must include country code (e.g., +91XXXXXXXXXX)');
+        'Phone number must include country code (e.g., +91XXXXXXXXXX)',
+      );
     }
-    throw Exception(
-        'Use sendPhoneOTPWithCallback for phone verification.');
+    throw Exception('Use sendPhoneOTPWithCallback for phone verification.');
   }
 
   Future<String> sendPhoneOTPWithCallback(
@@ -127,7 +123,8 @@ class FirebaseAuthService {
     _requireAuth();
     if (!phoneNumber.startsWith('+')) {
       throw Exception(
-          'Phone number must include country code (e.g., +91XXXXXXXXXX)');
+        'Phone number must include country code (e.g., +91XXXXXXXXXX)',
+      );
     }
 
     try {
@@ -169,7 +166,8 @@ class FirebaseAuthService {
         );
       }
       throw Exception(
-          'Could not send OTP. Please try again or use Email sign-in.');
+        'Could not send OTP. Please try again or use Email sign-in.',
+      );
     }
   }
 
@@ -277,8 +275,7 @@ class FirebaseAuthService {
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
-        userCredential =
-            await _firebaseAuth!.signInWithCredential(credential);
+        userCredential = await _firebaseAuth!.signInWithCredential(credential);
       }
 
       final user = userCredential.user;
@@ -291,13 +288,9 @@ class FirebaseAuthService {
         'displayName': user.displayName,
       };
     } on FirebaseAuthException catch (e) {
-      debugPrint('❌ Firebase Auth Exception: ${e.code} - ${e.message}');
       throw Exception(_getErrorMessage(e));
     } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('❌ Google Sign-In error: $e');
-        debugPrint('Stack: $stackTrace');
-      }
+      if (kDebugMode) {}
 
       final msg = e.toString();
       if (msg.contains('popup_closed') ||

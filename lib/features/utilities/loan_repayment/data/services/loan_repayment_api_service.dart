@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../loan_repayment_api_exceptions.dart';
@@ -89,8 +88,7 @@ class LoanRepaymentApiService {
 
   Future<List<LoanRepaymentBiller>> getBillers({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/billers');
-    debugPrint('LoanRepaymentApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     return raw
@@ -101,32 +99,28 @@ class LoanRepaymentApiService {
 
   Future<LoanRepaymentBill> fetchBill(Map<String, dynamic> body, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/fetch-bill');
-    debugPrint('LoanRepaymentApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return LoanRepaymentBill.fromApiJson(_dataMap(decoded));
   }
 
   Future<Map<String, dynamic>> pay(Map<String, dynamic> body, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/pay');
-    debugPrint('LoanRepaymentApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
 
   Future<Map<String, dynamic>> getPaymentStatus(String id, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/status/${Uri.encodeComponent(id)}');
-    debugPrint('LoanRepaymentApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
 
   Future<List<LoanRepaymentHistoryItem>> getHistory({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/history');
-    debugPrint('LoanRepaymentApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     return raw
@@ -137,8 +131,7 @@ class LoanRepaymentApiService {
 
   Future<List<LoanRepaymentSavedAccount>> getAccounts({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-    debugPrint('LoanRepaymentApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     return raw
@@ -152,8 +145,7 @@ class LoanRepaymentApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-    debugPrint('LoanRepaymentApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return LoanRepaymentSavedAccount.fromApiJson(_dataMap(decoded));
   }
@@ -164,16 +156,14 @@ class LoanRepaymentApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}');
-    debugPrint('LoanRepaymentApi PUT $uri');
-    final res = await _http.put(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.put(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return LoanRepaymentSavedAccount.fromApiJson(_dataMap(decoded));
   }
 
   Future<void> deleteAccount(String id, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}');
-    debugPrint('LoanRepaymentApi DELETE $uri');
-    final res = await _http.delete(uri, headers: _headers(idToken));
+        final res = await _http.delete(uri, headers: _headers(idToken));
     if (res.body.isEmpty) {
       if (res.statusCode < 200 || res.statusCode >= 300) throw LoanRepaymentApiException();
       return;

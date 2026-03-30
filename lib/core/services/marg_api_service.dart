@@ -1,12 +1,13 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:http/http.dart' as http;
 import '../../features/gold_silver/models/augmont_rates_models.dart';
 import '../../shared/models/faq_item.dart';
 import '../../shared/models/trend_item.dart';
 import '../../shared/models/shop_product_item.dart';
 import '../../shared/models/services_catalog.dart';
+import '../../shared/models/hub_menu_item.dart';
 import '../../features/home/data/models/app_banner_model.dart';
+import '../../shared/models/hub_carousel_slide.dart';
 
 /// Client for marg_api: user register and onboarding.
 /// Set [baseUrl] to your API base (e.g. http://localhost:3000 or https://api.example.com).
@@ -35,15 +36,6 @@ class MargApiService {
     if (name != null && name.isNotEmpty) payload['name'] = name;
     final body = jsonEncode(payload);
 
-    debugPrint('MargApi REGISTER │ POST $url');
-    debugPrint('MargApi REGISTER │ Payload: name=${name ?? "(none)"}, idToken.length=${idToken.length}');
-    // Copy token from terminal to test in Postman (debug only)
-    if (kDebugMode) {
-      debugPrint('MargApi REGISTER │ --- idToken for Postman (copy next line) ---');
-      debugPrint(idToken);
-      debugPrint('MargApi REGISTER │ --- end idToken ---');
-    }
-
     http.Response res;
     try {
       res = await _http.post(
@@ -51,12 +43,7 @@ class MargApiService {
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
-    } catch (e, st) {
-      debugPrint('MargApi REGISTER │ Request threw: $e');
-      debugPrint('MargApi REGISTER │ Full stack trace:');
-      for (final line in st.toString().split('\n')) {
-        if (line.isNotEmpty) debugPrint('MargApi REGISTER │   $line');
-      }
+    } catch (_) {
       rethrow;
     }
 
@@ -66,8 +53,6 @@ class MargApiService {
     } catch (_) {
       data = res.body;
     }
-    debugPrint('MargApi REGISTER │ Response: statusCode=${res.statusCode}');
-    debugPrint('MargApi REGISTER │ Response body: $data');
 
     final dataMap = data is Map<String, dynamic> ? data : null;
     if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -229,13 +214,10 @@ class MargApiService {
     final streamed = await request.send();
     final res = await http.Response.fromStream(streamed);
     final data = jsonDecode(res.body) as Map<String, dynamic>?;
-    debugPrint('MargApi OCR │ statusCode=${res.statusCode}');
-    debugPrint('MargApi OCR │ response: $data');
-    if (res.statusCode >= 200 && res.statusCode < 300) {
+            if (res.statusCode >= 200 && res.statusCode < 300) {
       final d = data?['data'];
       if (d is Map<String, dynamic>) {
-        debugPrint('MargApi OCR │ data: $d');
-      }
+              }
       return d is Map<String, dynamic> ? d : null;
     }
     final message = data?['message'] ?? data?['error'] ?? 'OCR failed';
@@ -326,19 +308,63 @@ class MargApiService {
       for (var i = 0; i < data.length; i++) {
         final raw = data[i];
         if (raw is! Map) continue;
-        final row = Map<String, dynamic>.from(raw as Map);
+        final row = Map<String, dynamic>.from(raw);
         final b = AppBanner.tryParse(row);
         if (b != null) {
           out.add(b);
-        } else if (kDebugMode) {
-          debugPrint('MargApi BANNERS │ skipped invalid row at index $i');
         }
       }
       return out;
-    } catch (e, st) {
-      debugPrint('MargApi BANNERS │ $e');
-      debugPrint('$st');
+    } catch (_) {
       return const <AppBanner>[];
+    }
+  }
+
+  /// GET /api/hub-ads-slides — hub carousel slides for [section] (e.g. recharges-bills).
+  /// Optional [category] narrows to that category; empty category in DB matches all.
+  /// Returns empty on error; caller may fall back to local samples.
+  Future<List<HubCarouselSlide>> getHubAdsSlides({
+    required String section,
+    String? category,
+  }) async {
+    final qp = <String, String>{'section': section};
+    final c = category?.trim();
+    if (c != null && c.isNotEmpty) {
+      qp['category'] = c;
+    }
+    final uri = Uri.parse('$_baseUrl/api/hub-ads-slides').replace(
+      queryParameters: qp,
+    );
+    try {
+      final res = await _http.get(
+        uri,
+        headers: const {'Content-Type': 'application/json'},
+      );
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        return const <HubCarouselSlide>[];
+      }
+      final decoded = jsonDecode(res.body);
+      if (decoded is! Map) {
+        return const <HubCarouselSlide>[];
+      }
+      final map = Map<String, dynamic>.from(decoded);
+      final dynamic data = map['data'];
+      List<HubCarouselSlide> slides = const [];
+
+      if (data is Map) {
+        slides = HubCarouselResponse.parseSlides(
+          Map<String, dynamic>.from(data),
+        );
+      } else if (data is List) {
+        slides = HubCarouselResponse.parseSlides(data);
+      }
+      if (slides.isEmpty && map['slides'] is List) {
+        slides = HubCarouselResponse.parseSlides(map['slides']);
+      }
+
+      return slides;
+    } catch (_) {
+      return const <HubCarouselSlide>[];
     }
   }
 
@@ -358,6 +384,33 @@ class MargApiService {
       return null;
     }
     return null;
+  }
+
+  /// GET /api/services/menu-items?section_slug= — menu rows for a hub section.
+  /// Returns null on error or empty payload.
+  Future<MenuItemsBySection?> getMenuItemsBySection({
+    required String sectionSlug,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/api/services/menu-items').replace(
+      queryParameters: <String, String>{'section_slug': sectionSlug.trim()},
+    );
+    try {
+      final res = await _http.get(
+        uri,
+        headers: const {'Content-Type': 'application/json'},
+      );
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        return null;
+      }
+      final decoded = jsonDecode(res.body);
+      if (decoded is! Map) return null;
+      final map = Map<String, dynamic>.from(decoded);
+      final dynamic data = map['data'];
+      if (data is! Map) return null;
+      return MenuItemsBySection.fromJson(Map<String, dynamic>.from(data));
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Mock FAQ JSON for different sections (gold_buy, silver_buy, etc.).

@@ -1,4 +1,5 @@
 import '../../domain/entities/home_section.dart';
+import 'home_section_category_model.dart';
 import 'service_item_model.dart';
 
 class HomeSectionModel {
@@ -7,31 +8,55 @@ class HomeSectionModel {
     required this.slug,
     required this.layout,
     required this.viewAll,
-    required this.items,
+    required this.categories,
   });
 
   final String title;
   final String slug;
   final String layout;
   final bool viewAll;
-  final List<ServiceItemModel> items;
+  final List<HomeSectionCategoryModel> categories;
 
   factory HomeSectionModel.fromJson(Map<String, dynamic> json) {
+    final rawCategories = json['categories'];
     final rawItems = json['items'];
+    final List<HomeSectionCategoryModel> categories;
+    if (rawCategories is List && rawCategories.isNotEmpty) {
+      categories = rawCategories
+          .whereType<Map>()
+          .map(
+            (m) => HomeSectionCategoryModel.fromJson(
+              m.cast<String, dynamic>(),
+            ),
+          )
+          .toList();
+    } else if (rawItems is List && rawItems.isNotEmpty) {
+      final flat = rawItems
+          .whereType<Map>()
+          .map(
+            (item) =>
+                ServiceItemModel.fromJson(item.cast<String, dynamic>()),
+          )
+          .toList();
+      categories = [
+        HomeSectionCategoryModel(
+          id: '',
+          name: '',
+          slug: '',
+          displayOrder: 0,
+          items: flat,
+        ),
+      ];
+    } else {
+      categories = const <HomeSectionCategoryModel>[];
+    }
+
     return HomeSectionModel(
       title: ((json['title'] ?? json['name']) ?? '') as String,
       slug: (json['slug'] ?? '') as String,
       layout: (json['layout'] ?? 'grid') as String,
       viewAll: (json['view_all'] ?? false) as bool,
-      items: rawItems is List
-          ? rawItems
-                .whereType<Map>()
-                .map(
-                  (item) =>
-                      ServiceItemModel.fromJson(item.cast<String, dynamic>()),
-                )
-                .toList()
-          : const <ServiceItemModel>[],
+      categories: categories,
     );
   }
 
@@ -41,7 +66,7 @@ class HomeSectionModel {
       'slug': slug,
       'layout': layout,
       'view_all': viewAll,
-      'items': items.map((e) => e.toJson()).toList(),
+      'categories': categories.map((e) => e.toJson()).toList(),
     };
   }
 
@@ -51,7 +76,7 @@ class HomeSectionModel {
       slug: slug,
       layout: layout,
       viewAll: viewAll,
-      items: items.map((e) => e.toEntity()).toList(growable: false),
+      categories: categories.map((e) => e.toEntity()).toList(growable: false),
     );
   }
 }

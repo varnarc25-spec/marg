@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/utils/services_catalog_utils.dart';
+import '../../../../shared/models/hub_carousel_slide.dart';
+import '../../../../shared/models/hub_menu_item.dart';
 import '../../../../shared/models/services_catalog.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../../../credit_card/presentation/routes/credit_card_routes.dart';
@@ -22,6 +24,7 @@ import '../widgets/home_icon_grid_widget.dart';
 bool isRechargesBillsHomeSectionSlug(String slug) {
   switch (slug.toLowerCase()) {
     case 'recharge-home':
+    case 'recharge-bill-payment':
     case 'recharges-bills':
     case 'recharges_bills':
       return true;
@@ -29,6 +32,53 @@ bool isRechargesBillsHomeSectionSlug(String slug) {
       return false;
   }
 }
+
+/// Query keys for [GET /api/hub-ads-slides] — tries home section slug first, then aliases
+/// so admin can label slides `recharges-bills` while homescreen1 uses `recharge-home`, etc.
+List<String> hubAdsSectionQueryKeys(String homeSectionSlug) {
+  final s = homeSectionSlug.trim();
+  if (s.isEmpty) return const [];
+  final keys = <String>{s};
+  if (isRechargesBillsHomeSectionSlug(s)) {
+    keys.addAll(const [
+      'recharge-bill-payment',
+      'recharges-bills',
+      'recharges_bills',
+      'recharge-home',
+    ]);
+  }
+  return keys.toList();
+}
+
+/// Loads hub promo slides from the API (tries [hubAdsSectionQueryKeys]); falls back to [HubCarouselSample].
+final hubAdsSlidesForSectionProvider = FutureProvider.autoDispose
+    .family<List<HubCarouselSlide>, String>((ref, homeSectionSlug) async {
+      final candidates = hubAdsSectionQueryKeys(homeSectionSlug);
+      if (candidates.isEmpty) return const <HubCarouselSlide>[];
+      final api = ref.watch(margApiServiceProvider);
+      for (final section in candidates) {
+        final slides = await api.getHubAdsSlides(section: section);
+        if (slides.isNotEmpty) {
+          return slides;
+        }
+      }
+      return HubCarouselSample.slides;
+    });
+
+/// Loads [GET /api/services/menu-items] using [hubAdsSectionQueryKeys] until a non-empty list is returned.
+final hubMenuItemsBySectionProvider = FutureProvider.autoDispose
+    .family<List<HubMenuItem>, String>((ref, homeSectionSlug) async {
+      final candidates = hubAdsSectionQueryKeys(homeSectionSlug);
+      if (candidates.isEmpty) return const <HubMenuItem>[];
+      final api = ref.watch(margApiServiceProvider);
+      for (final section in candidates) {
+        final res = await api.getMenuItemsBySection(sectionSlug: section);
+        if (res != null && res.items.isNotEmpty) {
+          return res.items;
+        }
+      }
+      return const <HubMenuItem>[];
+    });
 
 /// API home section slugs for Gold & Silver — same destination as [HomeScreen] View all.
 bool isGoldSilverHomeSectionSlug(String slug) {
@@ -85,9 +135,9 @@ List<HomeIconGridItem> defaultRechargesBillsItems(
     HomeIconGridItem(
       Icons.tv_rounded,
       l10n.homeRechargeDth,
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => DthRechargeRoutes.entryPage()),
-      ),
+      onTap: () => Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => DthRechargeRoutes.entryPage())),
     ),
     HomeIconGridItem(
       Icons.directions_car_rounded,
@@ -99,9 +149,9 @@ List<HomeIconGridItem> defaultRechargesBillsItems(
     HomeIconGridItem(
       Icons.bolt_rounded,
       l10n.homeRechargeElectricity,
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => ElectricityRoutes.entryPage()),
-      ),
+      onTap: () => Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => ElectricityRoutes.entryPage())),
     ),
     HomeIconGridItem(
       Icons.wifi_rounded,
@@ -168,9 +218,11 @@ List<HomeIconGridItem> watchRechargesBillsHubItems(
   WidgetRef ref,
 ) {
   final l10n = ref.watch(l10nProvider);
-  return ref.watch(servicesCatalogProvider).whenOrNull<List<HomeIconGridItem>>(
-        data: (catalog) => _itemsFromCatalog(context, catalog),
-      ) ??
+  return ref
+          .watch(servicesCatalogProvider)
+          .whenOrNull<List<HomeIconGridItem>>(
+            data: (catalog) => _itemsFromCatalog(context, catalog),
+          ) ??
       defaultRechargesBillsItems(context, l10n);
 }
 
@@ -180,21 +232,53 @@ List<HomeIconGridItem> resolveRechargesBillsHubItems(
   WidgetRef ref,
 ) {
   final l10n = ref.read(l10nProvider);
-  return ref.read(servicesCatalogProvider).whenOrNull<List<HomeIconGridItem>>(
-        data: (catalog) => _itemsFromCatalog(context, catalog),
-      ) ??
+  return ref
+          .read(servicesCatalogProvider)
+          .whenOrNull<List<HomeIconGridItem>>(
+            data: (catalog) => _itemsFromCatalog(context, catalog),
+          ) ??
       defaultRechargesBillsItems(context, l10n);
 }
 
-void openRechargesBillsHubDetail(BuildContext context, WidgetRef ref) {
-  final l10n = ref.read(l10nProvider);
-  final items = resolveRechargesBillsHubItems(context, ref);
+/// Pushes [HubDetailScreen] ([hub_detail_screen.dart]): carousel loads via
+/// [hubAdsSlidesForSectionProvider] when [adsSectionSlug] is set.
+void pushHubDetailScreen(
+  BuildContext context, {
+  required String title,
+  required List<HomeIconGridItem> items,
+  String? adsSectionSlug,
+
+  /// When set, loads menu items from [hubMenuItemsBySectionProvider] and shows them grouped by category.
+  String? menuSectionSlug,
+  List<HubCarouselSlide> carouselSlides = const [],
+}) {
   Navigator.of(context).push(
-    MaterialPageRoute(
+    MaterialPageRoute<void>(
+      settings: const RouteSettings(name: '/hub/recharges-bills'),
       builder: (_) => HubDetailScreen(
-        title: l10n.homeHubRechargesBills,
+        title: title,
         items: items,
+        adsSectionSlug: adsSectionSlug,
+        menuSectionSlug: menuSectionSlug,
+        carouselSlides: carouselSlides,
       ),
     ),
+  );
+}
+
+void openRechargesBillsHubDetail(
+  BuildContext context,
+  WidgetRef ref, {
+  String sectionSlug = 'recharge-bill-payment',
+}) {
+  final l10n = ref.read(l10nProvider);
+  final items = resolveRechargesBillsHubItems(context, ref);
+  if (!context.mounted) return;
+  pushHubDetailScreen(
+    context,
+    title: l10n.homeHubRechargesBills,
+    items: items,
+    adsSectionSlug: sectionSlug,
+    menuSectionSlug: sectionSlug,
   );
 }

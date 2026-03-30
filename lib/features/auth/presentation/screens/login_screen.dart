@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -132,16 +131,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         final api = ref.read(margApiServiceProvider);
         try {
           await api.register(idToken: idToken, name: email);
-        } catch (e) {
-          if (kDebugMode) debugPrint('MargApi │ register: $e');
+        } catch (_) {
           // Continue – user may already exist
         }
         // Always ensure wallet exists (runs even if register failed, e.g. user already registered)
         try {
           await api.ensurePaperWallet(idToken: idToken);
-        } catch (e) {
-          if (kDebugMode) debugPrint('MargApi │ ensurePaperWallet: $e');
-        }
+        } catch (_) {}
       }
 
       // Claim anonymous onboarding to this user if we have a session id
@@ -207,14 +203,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         final name = userData['email'] as String? ?? userData['displayName'] as String?;
         try {
           await api.register(idToken: idToken, name: name);
-        } catch (e) {
-          if (kDebugMode) debugPrint('MargApi │ register: $e');
-        }
+        } catch (_) {}
         try {
           await api.ensurePaperWallet(idToken: idToken);
-        } catch (e) {
-          if (kDebugMode) debugPrint('MargApi │ ensurePaperWallet: $e');
-        }
+        } catch (_) {}
       }
 
       // Claim anonymous onboarding if we have a session id

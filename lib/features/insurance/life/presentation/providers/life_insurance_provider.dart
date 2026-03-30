@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:marg/core/services/firebase_auth_service.dart';
 import 'package:marg/shared/providers/app_providers.dart';
@@ -113,8 +112,7 @@ class LifeCoverNotifier extends StateNotifier<LifeCoverState> {
     } on LifeApiUnsuccessfulResponse {
       state = LifeCoverError('Not found');
     } catch (e) {
-      debugPrint('Life calculate-cover API failed, using local fallback: $e');
-      try {
+            try {
         final result = await _fallback.getRecommendedCover(
           dateOfBirth: dateOfBirth,
           annualIncome: annualIncome,
@@ -247,8 +245,7 @@ class LifePlansNotifier extends StateNotifier<LifePlansState> {
           idToken: token,
         );
       } catch (e) {
-        debugPrint('Life recommendation optional: $e');
-      }
+              }
 
       final plansBody = lifePlansSearchBody(
         dateOfBirth: dateOfBirth,

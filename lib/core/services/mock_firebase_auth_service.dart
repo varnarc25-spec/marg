@@ -42,8 +42,7 @@ class MockFirebaseAuthService {
     final verificationId = 'mock_verification_id_${DateTime.now().millisecondsSinceEpoch}';
 
     // Log OTP for testing (in production, this would be sent via SMS)
-    print('📱 Mock OTP for $phoneNumber: $otp');
-
+    
     return verificationId;
   }
 
@@ -91,8 +90,7 @@ class MockFirebaseAuthService {
     final verificationId = 'mock_verification_id_${DateTime.now().millisecondsSinceEpoch}';
 
     // Log OTP for testing (in production, this would be sent via email)
-    print('📧 Mock OTP for $email: $otp');
-
+    
     return verificationId;
   }
 

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../life_insurance_api_exceptions.dart';
@@ -99,8 +98,7 @@ class LifeInsuranceApiService {
   /// GET `/api/insurance/life/partners`
   Future<List<LifePartner>> getPartners({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/partners');
-    debugPrint('LifeInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load life partners', res.statusCode, res.body);
     }
@@ -120,8 +118,7 @@ class LifeInsuranceApiService {
   /// GET `/api/insurance/life/promos`
   Future<List<LifePromoBanner>> getPromos({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/promos');
-    debugPrint('LifeInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load promos', res.statusCode, res.body);
     }
@@ -134,8 +131,7 @@ class LifeInsuranceApiService {
   /// GET `/api/insurance/life/benefits`
   Future<List<LifeBenefitItem>> getBenefits({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/benefits');
-    debugPrint('LifeInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load benefits', res.statusCode, res.body);
     }
@@ -155,8 +151,7 @@ class LifeInsuranceApiService {
   /// GET `/api/insurance/life/config`
   Future<Map<String, dynamic>> getConfig({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/config');
-    debugPrint('LifeInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load config', res.statusCode, res.body);
     }
@@ -174,8 +169,7 @@ class LifeInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/calculate-cover');
-    debugPrint('LifeInsuranceApi POST $uri body=$body');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -247,8 +241,7 @@ class LifeInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/recommendation');
-    debugPrint('LifeInsuranceApi POST $uri');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -271,8 +264,7 @@ class LifeInsuranceApiService {
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/plans')
         .replace(queryParameters: query);
-    debugPrint('LifeInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load plans', res.statusCode, res.body);
     }
@@ -287,8 +279,7 @@ class LifeInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/plans');
-    debugPrint('LifeInsuranceApi POST $uri body=$body');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -309,8 +300,7 @@ class LifeInsuranceApiService {
         final p = _parsePlanRow(rows[i], i);
         if (p != null) out.add(p);
       } catch (e, st) {
-        debugPrint('LifeInsuranceApi skip plan: $e\n$st');
-      }
+              }
     }
     return out;
   }
@@ -372,8 +362,7 @@ class LifeInsuranceApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/insurance/life/plans/${Uri.encodeComponent(planId)}',
     );
-    debugPrint('LifeInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Plan details failed', res.statusCode, res.body);
     }
@@ -391,8 +380,7 @@ class LifeInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/plans/compare');
-    debugPrint('LifeInsuranceApi POST $uri');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -414,8 +402,7 @@ class LifeInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/callback');
-    debugPrint('LifeInsuranceApi POST $uri');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),

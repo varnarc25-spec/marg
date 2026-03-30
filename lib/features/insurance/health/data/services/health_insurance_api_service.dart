@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../health_insurance_plan.dart';
@@ -58,8 +57,7 @@ class HealthInsuranceApiService {
   /// GET `/api/insurance/health/partners`
   Future<List<HealthInsurancePlan>> getPartners({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/partners');
-    debugPrint('HealthInsuranceApi GET $uri');
-
+    
     final res = await _http.get(uri, headers: _headers(idToken));
 
     if (res.statusCode < 200 || res.statusCode >= 300) {
@@ -92,8 +90,7 @@ class HealthInsuranceApiService {
           ),
         );
       } catch (e, st) {
-        debugPrint('HealthInsuranceApi skip bad partner row: $e\n$st');
-      }
+              }
     }
     return plans;
   }
@@ -101,8 +98,7 @@ class HealthInsuranceApiService {
   /// GET `/api/insurance/health/config`
   Future<Map<String, dynamic>> getConfig({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/config');
-    debugPrint('HealthInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load health config', res.statusCode, res.body);
     }
@@ -117,11 +113,9 @@ class HealthInsuranceApiService {
   /// GET `/api/insurance/health/price-promise`
   Future<HealthPricePromise?> getPricePromise({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/price-promise');
-    debugPrint('HealthInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
-      debugPrint('HealthInsuranceApi price-promise failed ${res.statusCode}');
-      return null;
+            return null;
     }
     final decoded = _decodeMap(res.body);
     if (decoded['success'] == false) return null;
@@ -142,8 +136,7 @@ class HealthInsuranceApiService {
   }) async {
     final clean = pincode.trim();
     final uri = Uri.parse('$_baseUrl/api/insurance/health/pincode/$clean');
-    debugPrint('HealthInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       return HealthPincodeResult.invalid('Could not validate pincode');
     }
@@ -167,8 +160,7 @@ class HealthInsuranceApiService {
     final clean = pincode.trim();
     final uri = Uri.parse('$_baseUrl/api/insurance/health/network-hospitals')
         .replace(queryParameters: {'pincode': clean});
-    debugPrint('HealthInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load network hospitals', res.statusCode, res.body);
     }
@@ -191,8 +183,7 @@ class HealthInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/selection');
-    debugPrint('HealthInsuranceApi POST $uri');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -211,8 +202,7 @@ class HealthInsuranceApiService {
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/plans')
         .replace(queryParameters: query);
-    debugPrint('HealthInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load plans', res.statusCode, res.body);
     }
@@ -227,8 +217,7 @@ class HealthInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/plans');
-    debugPrint('HealthInsuranceApi POST $uri body=$body');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -248,8 +237,7 @@ class HealthInsuranceApiService {
   }) async {
     final uri =
         Uri.parse('$_baseUrl/api/insurance/health/plans/${Uri.encodeComponent(planId)}');
-    debugPrint('HealthInsuranceApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load plan details', res.statusCode, res.body);
     }
@@ -267,8 +255,7 @@ class HealthInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/plans/compare');
-    debugPrint('HealthInsuranceApi POST $uri');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -292,8 +279,7 @@ class HealthInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/callback');
-    debugPrint('HealthInsuranceApi POST $uri');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -355,8 +341,7 @@ class HealthInsuranceApiService {
         final p = _parsePlanRow(rows[i], i);
         if (p != null) plans.add(p);
       } catch (e, st) {
-        debugPrint('HealthInsuranceApi skip plan row: $e\n$st');
-      }
+              }
     }
     return plans;
   }

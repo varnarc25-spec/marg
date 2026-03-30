@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../models/car_payment_history_item.dart';
@@ -28,8 +27,7 @@ class CarInsuranceHistoryApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/insurance/car/history?limit=$limit&offset=$offset',
     );
-    debugPrint('CarInsuranceHistoryApi GET $uri');
-
+    
     final res = await _http.get(
       uri,
       headers: {

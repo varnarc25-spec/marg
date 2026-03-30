@@ -57,8 +57,7 @@ List<T>? mappedCatalogItemsByCategorySlug<T>(
     catalog,
     categorySlugs: {categorySlug},
   );
-  print(categorySlug + 'items : ${items.length}');
-  if (items.isEmpty) return null;
+    if (items.isEmpty) return null;
   return items.map(itemMapper).toList();
 }
 
@@ -71,7 +70,6 @@ List<T>? mappedCatalogItemsByCategory<T>(
   if (catalog.categories.isEmpty) return null;
 
   final items = catalogItemsByCategory(catalog, category: {category});
-  print(category + ' : items : ${items.length}');
-  if (items.isEmpty) return null;
+    if (items.isEmpty) return null;
   return items.map(itemMapper).toList();
 }

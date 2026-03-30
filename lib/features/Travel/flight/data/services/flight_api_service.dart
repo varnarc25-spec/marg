@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/flight_result_model.dart';
@@ -53,14 +52,10 @@ class FlightApiService {
 
     final uri = Uri.parse('$_baseUrl/${pathSegments.join('/')}');
 
-    debugPrint('FlightApi │ GET $uri');
-
+    
     final res = await _http.get(uri);
     if (res.statusCode < 200 || res.statusCode >= 300) {
-      debugPrint(
-        'FlightApi │ Error status=${res.statusCode} body=${res.body}',
-      );
-      throw Exception('Failed to fetch flights (${res.statusCode})');
+            throw Exception('Failed to fetch flights (${res.statusCode})');
     }
 
     final dynamic raw = jsonDecode(res.body);

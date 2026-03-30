@@ -30,6 +30,14 @@ String? _resolvedIconUrl(Map<String, dynamic> json) {
   return raw;
 }
 
+int _intField(Map<String, dynamic> json, String key, [int fallback = 0]) {
+  final v = json[key];
+  if (v == null) return fallback;
+  if (v is int) return v;
+  if (v is num) return v.toInt();
+  return int.tryParse(v.toString()) ?? fallback;
+}
+
 class ServiceItemModel {
   const ServiceItemModel({
     required this.name,
@@ -38,6 +46,7 @@ class ServiceItemModel {
     required this.flowType,
     this.badge,
     this.iconUrl,
+    this.displayOrder = 0,
   });
 
   final String name;
@@ -46,6 +55,7 @@ class ServiceItemModel {
   final String flowType;
   final String? badge;
   final String? iconUrl;
+  final int displayOrder;
 
   factory ServiceItemModel.fromJson(Map<String, dynamic> json) {
     final fromIconName = _stringField(json, 'icon_name').trim();
@@ -57,6 +67,7 @@ class ServiceItemModel {
       flowType: _stringField(json, 'flow_type'),
       badge: _nullableString(json, 'badge_text') ?? _nullableString(json, 'badge'),
       iconUrl: _resolvedIconUrl(json),
+      displayOrder: _intField(json, 'display_order'),
     );
   }
 
@@ -68,6 +79,7 @@ class ServiceItemModel {
       'flow_type': flowType,
       'badge': badge,
       'icon_url': iconUrl,
+      'display_order': displayOrder,
     };
   }
 
@@ -79,6 +91,7 @@ class ServiceItemModel {
       flowType: flowType,
       badge: badge,
       iconUrl: iconUrl,
+      displayOrder: displayOrder,
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../models/dth_operator.dart';
@@ -63,8 +62,7 @@ class DthApiService {
   /// GET `/api/recharges/dth/operators`
   Future<List<DthOperator>> getOperators({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/operators');
-    debugPrint('DthApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw Exception('Failed to load operators (${res.statusCode})');
     }
@@ -88,8 +86,7 @@ class DthApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/plans');
-    debugPrint('DthApi POST $uri');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -116,8 +113,7 @@ class DthApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/initiate');
-    debugPrint('DthApi POST $uri');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -138,8 +134,7 @@ class DthApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/recharges/dth/status/${Uri.encodeComponent(id)}',
     );
-    debugPrint('DthApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw Exception('Status failed (${res.statusCode})');
     }
@@ -154,8 +149,7 @@ class DthApiService {
   /// GET `/api/recharges/dth/history`
   Future<List<DthRechargeHistoryItem>> getHistory({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/history');
-    debugPrint('DthApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw Exception('Failed to load history (${res.statusCode})');
     }
@@ -177,8 +171,7 @@ class DthApiService {
   /// GET `/api/recharges/dth/saved-accounts`
   Future<List<DthSavedAccount>> getSavedAccounts({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/saved-accounts');
-    debugPrint('DthApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw Exception('Failed to load saved accounts (${res.statusCode})');
     }
@@ -201,8 +194,7 @@ class DthApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/saved-accounts');
-    debugPrint('DthApi POST $uri');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -228,8 +220,7 @@ class DthApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/recharges/dth/saved-accounts/${Uri.encodeComponent(id)}',
     );
-    debugPrint('DthApi PUT $uri');
-    final res = await _http.put(
+        final res = await _http.put(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -251,8 +242,7 @@ class DthApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/recharges/dth/saved-accounts/${Uri.encodeComponent(id)}',
     );
-    debugPrint('DthApi DELETE $uri');
-    final res = await _http.delete(uri, headers: _headers(idToken));
+        final res = await _http.delete(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw Exception('Delete failed (${res.statusCode})');
     }

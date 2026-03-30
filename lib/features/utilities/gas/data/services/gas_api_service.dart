@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../gas_api_exceptions.dart';
@@ -93,8 +92,7 @@ class GasApiService {
 
   Future<List<GasBiller>> getBillers({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/billers');
-    debugPrint('GasApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <GasBiller>[];
@@ -109,32 +107,28 @@ class GasApiService {
 
   Future<GasBill> fetchBill(Map<String, dynamic> body, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/fetch-bill');
-    debugPrint('GasApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return GasBill.fromApiJson(_dataMap(decoded));
   }
 
   Future<Map<String, dynamic>> pay(Map<String, dynamic> body, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/pay');
-    debugPrint('GasApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
 
   Future<Map<String, dynamic>> getPaymentStatus(String id, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/status/${Uri.encodeComponent(id)}');
-    debugPrint('GasApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
 
   Future<List<GasHistoryItem>> getHistory({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/history');
-    debugPrint('GasApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <GasHistoryItem>[];
@@ -149,8 +143,7 @@ class GasApiService {
 
   Future<List<GasSavedAccount>> getAccounts({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-    debugPrint('GasApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <GasSavedAccount>[];
@@ -165,8 +158,7 @@ class GasApiService {
 
   Future<GasSavedAccount> createAccount(Map<String, dynamic> body, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-    debugPrint('GasApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return GasSavedAccount.fromApiJson(_dataMap(decoded));
   }
@@ -177,16 +169,14 @@ class GasApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}');
-    debugPrint('GasApi PUT $uri');
-    final res = await _http.put(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.put(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return GasSavedAccount.fromApiJson(_dataMap(decoded));
   }
 
   Future<void> deleteAccount(String id, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}');
-    debugPrint('GasApi DELETE $uri');
-    final res = await _http.delete(uri, headers: _headers(idToken));
+        final res = await _http.delete(uri, headers: _headers(idToken));
     if (res.body.isEmpty) {
       if (res.statusCode < 200 || res.statusCode >= 300) {
         throw GasApiException();

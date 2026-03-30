@@ -50,22 +50,19 @@ class _StockDetailPageState extends State<StockDetailPage> {
                         IconButton(
                           icon: const Icon(Icons.bookmark_border),
                           onPressed: () {
-                            print("Bookmark tapped");
-                          },
+                                                      },
                         ),
 
                         IconButton(
                           icon: const Icon(Icons.link),
                           onPressed: () {
-                            print("Link tapped");
-                          },
+                                                      },
                         ),
 
                         IconButton(
                           icon: const Icon(Icons.share),
                           onPressed: () {
-                            print("Share tapped");
-                          },
+                                                      },
                         ),
                       ],
                     ),
@@ -304,8 +301,7 @@ class _StockDetailPageState extends State<StockDetailPage> {
 
                     ElevatedButton(
                       onPressed: () {
-                        print("Add alert tapped");
-                      },
+                                              },
                       child: const Text("Add Alert"),
                     ),
                   ],

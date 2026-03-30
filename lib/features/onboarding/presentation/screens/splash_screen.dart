@@ -121,14 +121,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         }
       }
     } catch (e, stackTrace) {
-      debugPrint('❌ Navigation error: $e');
-      debugPrint('Stack trace: $stackTrace');
       targetScreen = const LoginScreen();
       navigationReason = 'Error occurred, fallback to login';
     }
 
     if (!mounted) return;
-    debugPrint('➡️ $navigationReason');
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => targetScreen ?? const LoginScreen()),
     );

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import 'car_insurance_plan.dart';
@@ -49,8 +48,7 @@ class CarInsuranceService {
     }
 
     final uri = Uri.parse('$_baseUrl/api/insurance/car/billers');
-    debugPrint('CarInsuranceApi GET $uri');
-    final res = await _http.get(
+        final res = await _http.get(
       uri,
       headers: const {'Content-Type': 'application/json'},
     );

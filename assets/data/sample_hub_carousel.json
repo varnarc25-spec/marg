@@ -1,0 +1,23 @@
+{
+  "slides": [
+    {
+      "title": "Special offers this week",
+      "subtitle": "Limited time deals",
+      "section": "recharges-bills",
+      "category": "",
+      "icon": "https://cdn-icons-png.flaticon.com/512/2331/2331966.png",
+      "gradientColors": ["#1565C0", "#1976D2", "#1E88E5"]
+    },
+    {
+      "title": "Save more on recharges",
+      "section": "recharges-bills",
+      "image": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
+      "gradientColors": ["#2E7D32", "#388E3C", "#43A047"]
+    },
+    {
+      "title": "Exclusive deals for you",
+      "section": "recharges-bills",
+      "gradientColors": ["#6A1B9A", "#7B1FA2", "#8E24AA"]
+    }
+  ]
+}

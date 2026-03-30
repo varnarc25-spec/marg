@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../models/bike_biller_model.dart';
@@ -62,8 +61,7 @@ class BikeInsuranceApiService {
   /// GET `/api/insurance/bike/billers`
   Future<List<BikeBiller>> fetchBillers() async {
     final uri = Uri.parse('$_baseUrl/api/insurance/bike/billers');
-    debugPrint('BikeInsuranceApi GET $uri');
-
+    
     final res = await _http.get(
       uri,
       headers: const {'Content-Type': 'application/json'},
@@ -97,8 +95,7 @@ class BikeInsuranceApiService {
         final b = BikeBiller.fromJson(raw);
         if (b.name.isNotEmpty) out.add(b);
       } catch (e, st) {
-        debugPrint('BikeInsuranceApi skip bad biller row: $e\n$st');
-      }
+              }
     }
     return out;
   }
@@ -266,8 +263,7 @@ class BikeInsuranceApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/insurance/bike/history?limit=$limit&offset=$offset',
     );
-    debugPrint('BikeInsuranceApi GET $uri');
-
+    
     final res = await _http.get(
       uri,
       headers: {
@@ -291,10 +287,7 @@ class BikeInsuranceApiService {
         throw Exception(message ?? 'Failed to load payment history');
       }
     } else if (decoded is! List) {
-      debugPrint(
-        'BikeInsuranceApi history unexpected JSON root: ${decoded.runtimeType}',
-      );
-      throw Exception('Invalid payment history response');
+            throw Exception('Invalid payment history response');
     }
 
     return _parsePaymentHistoryResponse(decoded);
@@ -316,8 +309,7 @@ class BikeInsuranceApiService {
 
     for (final uri in candidates) {
       try {
-        debugPrint('BikeInsuranceApi GET $uri');
-        final res = await _http.get(
+                final res = await _http.get(
           uri,
           headers: const {'Content-Type': 'application/json'},
         );
@@ -340,8 +332,7 @@ class BikeInsuranceApiService {
         final model = _parseVehiclePayload(data, normalizedRegistration);
         if (model != null) return model;
       } catch (e, st) {
-        debugPrint('BikeInsuranceApi vehicle try failed: $e\n$st');
-      }
+              }
     }
     return null;
   }
@@ -429,8 +420,7 @@ class BikeInsuranceApiService {
     {required String idToken}
   ) async {
     try {
-      debugPrint('BikeInsuranceApi POST $uri payload=$payload');
-      final headers = <String, String>{
+            final headers = <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $idToken',
       };
@@ -440,12 +430,10 @@ class BikeInsuranceApiService {
         body: jsonEncode(payload),
       );
 
-      debugPrint('BikeInsuranceApi POST statusCode=${res.statusCode}');
-      final body = res.body;
+            final body = res.body;
       final bodyTrunc =
           body.length > 1000 ? '${body.substring(0, 1000)}...' : body;
-      debugPrint('BikeInsuranceApi POST body=${bodyTrunc}');
-
+      
       if (res.statusCode < 200 || res.statusCode >= 300) {
         throw Exception(_extractServerMessage(body) ??
             'Request failed with status ${res.statusCode}');
@@ -462,8 +450,7 @@ class BikeInsuranceApiService {
       }
       return decoded;
     } catch (e, st) {
-      debugPrint('BikeInsuranceApi POST failed: $e\n$st');
-      // Re-throw so UI can show the real message.
+            // Re-throw so UI can show the real message.
       if (e is Exception) throw e;
       throw Exception('Request failed: ${e.toString()}');
     }
@@ -578,8 +565,7 @@ class BikeInsuranceApiService {
       try {
         out.add(BikePaymentHistoryItem.fromJson(row));
       } catch (e, st) {
-        debugPrint('BikeInsuranceApi skip bad history row: $e\n$st');
-      }
+              }
     }
     return out;
   }

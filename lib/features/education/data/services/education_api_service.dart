@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../education_api_exceptions.dart';
@@ -89,8 +88,7 @@ class EducationApiService {
 
   Future<List<EducationBiller>> getBillers({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/billers');
-    debugPrint('EducationApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     return raw
@@ -101,24 +99,21 @@ class EducationApiService {
 
   Future<EducationBill> fetchBill(Map<String, dynamic> body, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/fetch-bill');
-    debugPrint('EducationApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return EducationBill.fromApiJson(_dataMap(decoded));
   }
 
   Future<Map<String, dynamic>> pay(Map<String, dynamic> body, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/pay');
-    debugPrint('EducationApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
 
   Future<List<EducationHistoryItem>> getHistory({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/history');
-    debugPrint('EducationApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     return raw
@@ -129,8 +124,7 @@ class EducationApiService {
 
   Future<List<EducationSavedAccount>> getAccounts({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-    debugPrint('EducationApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     return raw
@@ -144,16 +138,14 @@ class EducationApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-    debugPrint('EducationApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return EducationSavedAccount.fromApiJson(_dataMap(decoded));
   }
 
   Future<void> deleteAccount(String id, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}');
-    debugPrint('EducationApi DELETE $uri');
-    final res = await _http.delete(uri, headers: _headers(idToken));
+        final res = await _http.delete(uri, headers: _headers(idToken));
     if (res.body.isEmpty) {
       if (res.statusCode < 200 || res.statusCode >= 300) throw EducationApiException();
       return;

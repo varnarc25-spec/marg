@@ -21,7 +21,13 @@ class SectionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final itemCount = section.items.length;
-    debugPrint('Section: ${section.title}, itemCount: $itemCount');
+    for (var i = 0; i < itemCount; i++) {
+      final item = section.items[i];
+      debugPrint(
+        '[section:${section.slug}] #$i name="${item.name}" display_order=${item.displayOrder}',
+      );
+    }
+
     final visibleItemCount = itemCount > 4 ? 4 : itemCount;
     final showViewAll = section.viewAll || itemCount > 4;
 

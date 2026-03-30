@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../models/bike_saved_account_model.dart';
@@ -24,8 +23,7 @@ class BikeAccountsApiService {
     required String idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/bike/accounts');
-    debugPrint('BikeAccountsApi GET $uri');
-
+    
     final res = await _http.get(
       uri,
       headers: {
@@ -65,8 +63,7 @@ class BikeAccountsApiService {
     required Map<String, dynamic> payload,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/bike/accounts');
-    debugPrint('BikeAccountsApi POST $uri payload=$payload');
-
+    
     final res = await _http.post(
       uri,
       headers: {
@@ -101,8 +98,7 @@ class BikeAccountsApiService {
     required Map<String, dynamic> payload,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/bike/accounts/$id');
-    debugPrint('BikeAccountsApi PUT $uri payload=$payload');
-
+    
     final res = await _http.put(
       uri,
       headers: {
@@ -135,8 +131,7 @@ class BikeAccountsApiService {
     required String id,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/bike/accounts/$id');
-    debugPrint('BikeAccountsApi DELETE $uri');
-
+    
     final res = await _http.delete(
       uri,
       headers: {

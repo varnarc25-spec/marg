@@ -34,8 +34,7 @@ class MockKycService {
 
     // Generate mock OTP
     final otp = (100000 + DateTime.now().millisecondsSinceEpoch % 900000).toString();
-    print('🆔 Mock Aadhaar OTP: $otp');
-
+    
     return otp;
   }
 

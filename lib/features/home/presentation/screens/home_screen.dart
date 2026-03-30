@@ -5,7 +5,6 @@ import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../widgets/home_widgets.dart';
 import '../../../../shared/widgets/marg_header.dart';
-import 'hub_detail_screen.dart';
 import 'gold_silver_all_services_screen.dart';
 import 'wealth_home_screen.dart';
 import 'ai_assistant_screen.dart';
@@ -210,13 +209,12 @@ class HomeScreen extends ConsumerWidget {
                     title: l10n.homeHubRechargesBills,
                     showViewAll: true,
                     onViewAllTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => HubDetailScreen(
-                            title: l10n.homeHubRechargesBills,
-                            items: rechargesItems,
-                          ),
-                        ),
+                      pushHubDetailScreen(
+                        context,
+                        title: l10n.homeHubRechargesBills,
+                        items: rechargesItems,
+                        adsSectionSlug: 'recharges-bills',
+                        menuSectionSlug: 'recharges-bills',
                       );
                     },
                   ),

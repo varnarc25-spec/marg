@@ -8,11 +8,22 @@ const Color _sheetPurple = Color(0xFF6C63FF);
 
 String _extensionFromBytes(List<int> bytes) {
   if (bytes.length >= 12) {
-    if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) return 'png';
+    if (bytes[0] == 0x89 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x4E &&
+        bytes[3] == 0x47)
+      return 'png';
     if (bytes[0] == 0xFF && bytes[1] == 0xD8) return 'jpg';
     if (bytes.length >= 12 &&
-        bytes[0] == 0x52 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x46 &&
-        bytes[8] == 0x57 && bytes[9] == 0x45 && bytes[10] == 0x42 && bytes[11] == 0x50) return 'webp';
+        bytes[0] == 0x52 &&
+        bytes[1] == 0x49 &&
+        bytes[2] == 0x46 &&
+        bytes[3] == 0x46 &&
+        bytes[8] == 0x57 &&
+        bytes[9] == 0x45 &&
+        bytes[10] == 0x42 &&
+        bytes[11] == 0x50)
+      return 'webp';
   }
   return 'jpg';
 }
@@ -54,34 +65,43 @@ Future<ExtractedIdData?> _showUnsupportedSheet(BuildContext context) async {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
               const SizedBox(height: 24),
-              Icon(Icons.phone_android_rounded, size: 48, color: _sheetPurple.withValues(alpha: 0.8)),
+              Icon(
+                Icons.phone_android_rounded,
+                size: 48,
+                color: _sheetPurple.withValues(alpha: 0.8),
+              ),
               const SizedBox(height: 16),
               Text(
                 'Scan ID card',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
                 'ID card scanning is available only on the Android and iOS app, or when the API is configured. Please use the mobile app or enter your details manually.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  style: FilledButton.styleFrom(backgroundColor: _sheetPurple, padding: const EdgeInsets.symmetric(vertical: 14)),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _sheetPurple,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
                   child: const Text('OK'),
                 ),
               ),
@@ -163,12 +183,11 @@ class _ScanIdCardSheetWebState extends State<_ScanIdCardSheetWeb> {
         Navigator.of(context).pop(result);
       } else {
         setState(() {
-          _error = 'Could not read details from this image. Try a clearer photo of PAN or Aadhaar.';
+          _error =
+              'Could not read details from this image. Try a clearer photo of PAN or Aadhaar.';
         });
       }
     } catch (e, stack) {
-      debugPrint('ScanIdCardSheetWeb: $e');
-      debugPrint(stack.toString());
       if (mounted) {
         setState(() {
           _loading = false;
@@ -198,7 +217,9 @@ class _ScanIdCardSheetWebState extends State<_ScanIdCardSheetWeb> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -206,43 +227,57 @@ class _ScanIdCardSheetWebState extends State<_ScanIdCardSheetWeb> {
               Text(
                 'Scan ID card',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 6),
               Text(
                 'Upload a photo of your PAN or Aadhaar card to auto-fill details.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 6),
               Text(
                 'JPG, PNG or WebP work best.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-                    ),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                ),
               ),
               if (_error != null) ...[
                 const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.errorContainer.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error, size: 22),
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: Theme.of(context).colorScheme.error,
+                        size: 22,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           _error!,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onErrorContainer,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onErrorContainer,
                               ),
                         ),
                       ),

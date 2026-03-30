@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../fastag_api_exceptions.dart';
@@ -95,8 +94,7 @@ class FastagApiService {
   /// GET `/vehicles` — list user vehicles.
   Future<List<VehicleModel>> listVehicles({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/vehicles');
-    debugPrint('FastagApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <VehicleModel>[];
@@ -115,8 +113,7 @@ class FastagApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/vehicles');
-    debugPrint('FastagApi POST $uri');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -131,8 +128,7 @@ class FastagApiService {
     final uri = Uri.parse(
       '$_baseUrl$_prefix/vehicles/${Uri.encodeComponent(id)}',
     );
-    debugPrint('FastagApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     return VehicleModel.fromApiJson(_dataMap(decoded));
   }
@@ -146,8 +142,7 @@ class FastagApiService {
     final uri = Uri.parse(
       '$_baseUrl$_prefix/vehicles/${Uri.encodeComponent(id)}',
     );
-    debugPrint('FastagApi PUT $uri');
-    final res = await _http.put(
+        final res = await _http.put(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -161,8 +156,7 @@ class FastagApiService {
     final uri = Uri.parse(
       '$_baseUrl$_prefix/vehicles/${Uri.encodeComponent(id)}',
     );
-    debugPrint('FastagApi DELETE $uri');
-    final res = await _http.delete(uri, headers: _headers(idToken));
+        final res = await _http.delete(uri, headers: _headers(idToken));
     if (res.body.isEmpty) {
       if (res.statusCode < 200 || res.statusCode >= 300) {
         throw FastagApiException();
@@ -178,8 +172,7 @@ class FastagApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/recharge');
-    debugPrint('FastagApi POST $uri');
-    final res = await _http.post(
+        final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -196,8 +189,7 @@ class FastagApiService {
     final uri = Uri.parse(
       '$_baseUrl$_prefix/recharge/status/${Uri.encodeComponent(id)}',
     );
-    debugPrint('FastagApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
@@ -207,8 +199,7 @@ class FastagApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/recharge/history');
-    debugPrint('FastagApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <FastagRechargeHistoryItem>[];
@@ -233,8 +224,7 @@ class FastagApiService {
     final uri = Uri.parse(
       '$_baseUrl$_prefix/toll-history/${Uri.encodeComponent(vehicleId)}',
     );
-    debugPrint('FastagApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <FastagTollTransaction>[];
@@ -257,8 +247,7 @@ class FastagApiService {
     final uri = Uri.parse(
       '$_baseUrl$_prefix/auto-recharge/${Uri.encodeComponent(vehicleId)}',
     );
-    debugPrint('FastagApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     return FastagAutoRechargeRule.fromApiJson(_dataMap(decoded));
   }
@@ -272,8 +261,7 @@ class FastagApiService {
     final uri = Uri.parse(
       '$_baseUrl$_prefix/auto-recharge/${Uri.encodeComponent(vehicleId)}',
     );
-    debugPrint('FastagApi PUT $uri');
-    final res = await _http.put(
+        final res = await _http.put(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),

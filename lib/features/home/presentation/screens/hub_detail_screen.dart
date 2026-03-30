@@ -1,167 +1,201 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/models/hub_carousel_slide.dart';
+import '../../../../shared/models/hub_menu_item.dart';
+import '../../../../shared/models/services_catalog.dart';
+import '../../../../shared/widgets/hub_banner_carousel.dart';
+import '../../services_catalog_helpers.dart';
+import '../utils/recharges_bills_hub.dart'
+    show hubAdsSlidesForSectionProvider, hubMenuItemsBySectionProvider;
 import '../widgets/home_icon_grid_widget.dart';
 
-/// Detail screen for a hub with more than 4 items: carousel banner at top, then full grid.
-class HubDetailScreen extends StatefulWidget {
+/// Detail screen for a hub: carousel from [GET /api/hub-ads-slides] when [adsSectionSlug] is set,
+/// menu from [GET /api/services/menu-items] when [menuSectionSlug] is set (grouped by category),
+/// with fallback to [items].
+class HubDetailScreen extends ConsumerWidget {
   const HubDetailScreen({
     super.key,
     required this.title,
     required this.items,
+    this.adsSectionSlug,
+    this.menuSectionSlug,
+    this.carouselSlides = const [],
   });
 
   final String title;
   final List<HomeIconGridItem> items;
 
+  /// Home / hub section slug; triggers [hubAdsSlidesForSectionProvider] (API + slug aliases).
+  final String? adsSectionSlug;
+
+  /// Same slug family as ads; loads [hubMenuItemsBySectionProvider] and shows items by category.
+  final String? menuSectionSlug;
+
+  /// Static slides when [adsSectionSlug] is null (e.g. tests).
+  final List<HubCarouselSlide> carouselSlides;
+
   @override
-  State<HubDetailScreen> createState() => _HubDetailScreenState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ads = adsSectionSlug?.trim();
+    if (ads != null && ads.isNotEmpty) {
+      final asyncSlides = ref.watch(hubAdsSlidesForSectionProvider(ads));
+      return asyncSlides.when(
+        data: (slides) => _HubDetailScaffold(
+          title: title,
+          items: items,
+          slides: slides,
+          menuSectionSlug: menuSectionSlug,
+        ),
+        loading: () => _HubDetailScaffold(
+          title: title,
+          items: items,
+          slides: const [],
+          loadingCarousel: true,
+          menuSectionSlug: menuSectionSlug,
+        ),
+        error: (_, __) => _HubDetailScaffold(
+          title: title,
+          items: items,
+          slides: HubCarouselSample.slides,
+          menuSectionSlug: menuSectionSlug,
+        ),
+      );
+    }
+
+    return _HubDetailScaffold(
+      title: title,
+      items: items,
+      slides: carouselSlides,
+      menuSectionSlug: menuSectionSlug,
+    );
+  }
 }
 
-class _HubDetailScreenState extends State<HubDetailScreen> {
-  late PageController _bannerController;
-  static const int _bannerCount = 3;
+class _HubDetailScaffold extends ConsumerWidget {
+  const _HubDetailScaffold({
+    required this.title,
+    required this.items,
+    required this.slides,
+    this.loadingCarousel = false,
+    this.menuSectionSlug,
+  });
 
-  @override
-  void initState() {
-    super.initState();
-    _bannerController = PageController(viewportFraction: 0.92);
+  final String title;
+  final List<HomeIconGridItem> items;
+  final List<HubCarouselSlide> slides;
+  final bool loadingCarousel;
+  final String? menuSectionSlug;
+
+  List<Widget> _menuWidgets(BuildContext context, List<HubMenuItem> apiItems) {
+    if (apiItems.isEmpty) {
+      return [HomeIconGrid(items: items, columns: 4)];
+    }
+    final groups = groupHubMenuItemsByCategory(apiItems);
+    final theme = Theme.of(context);
+    final titleStyle = theme.textTheme.titleMedium?.copyWith(
+      fontWeight: FontWeight.w600,
+      color: AppColors.textPrimary,
+    );
+    final orderStyle = theme.textTheme.titleSmall?.copyWith(
+      fontWeight: FontWeight.w500,
+      color: AppColors.textSecondary,
+    );
+    final out = <Widget>[];
+    for (var i = 0; i < groups.length; i++) {
+      final g = groups[i];
+      final orderLabel =
+          g.categoryDisplayOrder >= HubMenuItem.unorderedCategorySortKey
+              ? '—'
+              : '${g.categoryDisplayOrder}';
+      out.add(
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, i == 0 ? 8 : 20, 16, 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Expanded(
+                child: Text(g.title, style: titleStyle),
+              ),
+              Text(orderLabel, style: orderStyle),
+            ],
+          ),
+        ),
+      );
+      out.add(
+        HomeIconGrid(
+          columns: 4,
+          items: g.items
+              .map(
+                (m) => HomeIconGridItem(
+                  iconForCatalogItem(
+                    CatalogItem(
+                      id: 0,
+                      name: m.name,
+                      slug: m.slug,
+                      iconName: m.iconName,
+                    ),
+                  ),
+                  m.name,
+                  onTap: () => navigateToServiceBySlug(context, m.slug),
+                ),
+              )
+              .toList(),
+        ),
+      );
+    }
+    return out;
   }
 
   @override
-  void dispose() {
-    _bannerController.dispose();
-    super.dispose();
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final showCarousel = loadingCarousel || slides.isNotEmpty;
+    final menuKey = menuSectionSlug?.trim();
 
-  @override
-  Widget build(BuildContext context) {
+    final List<Widget> menuSection;
+    if (menuKey != null && menuKey.isNotEmpty) {
+      final asyncMenu = ref.watch(hubMenuItemsBySectionProvider(menuKey));
+      menuSection = asyncMenu.when(
+        data: (list) => _menuWidgets(context, list),
+        loading: () => [
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 48),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        ],
+        error: (_, __) => [HomeIconGrid(items: items, columns: 4)],
+      );
+    } else {
+      menuSection = [HomeIconGrid(items: items, columns: 4)];
+    }
+
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
         backgroundColor: AppColors.surfaceLight,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
         children: [
           const SizedBox(height: 12),
-          _BannerCarousel(controller: _bannerController),
-          const SizedBox(height: 16),
-          _DotIndicator(controller: _bannerController, itemCount: _bannerCount),
-          const SizedBox(height: 24),
-          HomeIconGrid(items: widget.items, columns: 4),
+          if (loadingCarousel)
+            const SizedBox(
+              height: 160,
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (showCarousel)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: HubBannerCarousel(slides: slides),
+            ),
+          ...menuSection,
         ],
       ),
-    );
-  }
-}
-
-class _BannerCarousel extends StatelessWidget {
-  final PageController controller;
-
-  const _BannerCarousel({required this.controller});
-
-  static final List<MapEntry<List<Color>, String>> _banners = [
-    (MapEntry([
-      Color(0xFF1565C0),
-      Color(0xFF1976D2),
-      Color(0xFF1E88E5),
-    ], 'Special offers this week')),
-    (MapEntry([
-      Color(0xFF2E7D32),
-      Color(0xFF388E3C),
-      Color(0xFF43A047),
-    ], 'Save more on recharges')),
-    (MapEntry([
-      Color(0xFF6A1B9A),
-      Color(0xFF7B1FA2),
-      Color(0xFF8E24AA),
-    ], 'Exclusive deals for you')),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 160,
-      child: PageView.builder(
-        controller: controller,
-        itemCount: _banners.length,
-        itemBuilder: (context, index) {
-          final entry = _banners[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: entry.key,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.15),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Text(
-                    entry.value,
-                    style: GoogleFonts.mulish(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _DotIndicator extends StatelessWidget {
-  final PageController controller;
-  final int itemCount;
-
-  const _DotIndicator({required this.controller, required this.itemCount});
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, _) {
-        final page = controller.hasClients ? controller.page ?? 0 : 0.0;
-        final current = page.round().clamp(0, itemCount - 1);
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(itemCount, (i) {
-            final isActive = i == current;
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              width: isActive ? 24 : 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: isActive
-                    ? AppColors.primaryBlue
-                    : AppColors.textSecondary.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(4),
-              ),
-            );
-          }),
-        );
-      },
     );
   }
 }

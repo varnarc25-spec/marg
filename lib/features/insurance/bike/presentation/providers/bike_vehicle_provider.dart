@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/bike_insurance_plan.dart';
@@ -74,8 +73,7 @@ class BikeVehicleNotifier extends StateNotifier<BikeVehicleState> {
       } catch (e) {
         // Network / parse issues should not block plan list if billers loaded.
         vehicleFromApi = null;
-        debugPrint('BikeVehicleNotifier vehicle lookup skipped: $e');
-      }
+              }
 
       final vehicle =
           vehicleFromApi ?? BikeVehicleModel.registrationOnly(normalized);

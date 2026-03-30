@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../broadband_api_exceptions.dart';
@@ -93,8 +92,7 @@ class BroadbandApiService {
 
   Future<List<BroadbandBiller>> getBillers({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/billers');
-    debugPrint('BroadbandApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <BroadbandBiller>[];
@@ -112,8 +110,7 @@ class BroadbandApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/fetch-bill');
-    debugPrint('BroadbandApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return BroadbandBill.fromApiJson(_dataMap(decoded));
   }
@@ -123,8 +120,7 @@ class BroadbandApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/pay');
-    debugPrint('BroadbandApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
@@ -134,16 +130,14 @@ class BroadbandApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/status/${Uri.encodeComponent(id)}');
-    debugPrint('BroadbandApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
 
   Future<List<BroadbandHistoryItem>> getHistory({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/history');
-    debugPrint('BroadbandApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <BroadbandHistoryItem>[];
@@ -158,8 +152,7 @@ class BroadbandApiService {
 
   Future<List<BroadbandSavedAccount>> getAccounts({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-    debugPrint('BroadbandApi GET $uri');
-    final res = await _http.get(uri, headers: _headers(idToken));
+        final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <BroadbandSavedAccount>[];
@@ -177,8 +170,7 @@ class BroadbandApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-    debugPrint('BroadbandApi POST $uri');
-    final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return BroadbandSavedAccount.fromApiJson(_dataMap(decoded));
   }
@@ -189,16 +181,14 @@ class BroadbandApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}');
-    debugPrint('BroadbandApi PUT $uri');
-    final res = await _http.put(uri, headers: _headers(idToken), body: jsonEncode(body));
+        final res = await _http.put(uri, headers: _headers(idToken), body: jsonEncode(body));
     final decoded = _readJsonResponse(res);
     return BroadbandSavedAccount.fromApiJson(_dataMap(decoded));
   }
 
   Future<void> deleteAccount(String id, {String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}');
-    debugPrint('BroadbandApi DELETE $uri');
-    final res = await _http.delete(uri, headers: _headers(idToken));
+        final res = await _http.delete(uri, headers: _headers(idToken));
     if (res.body.isEmpty) {
       if (res.statusCode < 200 || res.statusCode >= 300) {
         throw BroadbandApiException();

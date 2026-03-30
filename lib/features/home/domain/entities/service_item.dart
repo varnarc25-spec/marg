@@ -9,6 +9,7 @@ class ServiceItem {
     required this.flowType,
     this.badge,
     this.iconUrl,
+    this.displayOrder = 0,
   });
 
   final String name;
@@ -17,4 +18,7 @@ class ServiceItem {
   final String flowType;
   final String? badge;
   final String? iconUrl;
+
+  /// From API `display_order` (sort key within a home section).
+  final int displayOrder;
 }
