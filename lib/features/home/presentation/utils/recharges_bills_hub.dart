@@ -6,6 +6,7 @@ import '../../../../core/utils/services_catalog_utils.dart';
 import '../../../../shared/models/hub_carousel_slide.dart';
 import '../../../../shared/models/hub_menu_item.dart';
 import '../../../../shared/models/services_catalog.dart';
+import '../../../../core/services/marg_api_service.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../../../credit_card/presentation/routes/credit_card_routes.dart';
 import '../../../education/presentation/routes/education_routes.dart';
@@ -50,19 +51,63 @@ List<String> hubAdsSectionQueryKeys(String homeSectionSlug) {
   return keys.toList();
 }
 
-/// Loads hub promo slides from the API (tries [hubAdsSectionQueryKeys]); falls back to [HubCarouselSample].
+/// Targeting for [hubAdsSlidesProvider]: section slug from home/hub, optional category / menu item.
+typedef HubAdsQuery = ({
+  String section,
+  String? category,
+  String? menuItem,
+});
+
+bool _hubAdsHasNarrowTarget(String? category, String? menuItem) {
+  final c = category?.trim();
+  final m = menuItem?.trim();
+  return (c != null && c.isNotEmpty) || (m != null && m.isNotEmpty);
+}
+
+/// Loads hub promo slides (tries [hubAdsSectionQueryKeys] for section aliases).
+/// Uses [HubCarouselSample] only for wide hub queries with no slides; category/item queries return [] if empty.
+Future<List<HubCarouselSlide>> fetchHubAdsSlidesForKeys(
+  MargApiService api,
+  String homeSectionSlug, {
+  String? category,
+  String? menuItem,
+}) async {
+  final candidates = hubAdsSectionQueryKeys(homeSectionSlug);
+  if (candidates.isEmpty) return const <HubCarouselSlide>[];
+  final narrow = _hubAdsHasNarrowTarget(category, menuItem);
+  for (final section in candidates) {
+    final slides = await api.getHubAdsSlides(
+      section: section,
+      category: category,
+      menuItem: menuItem,
+    );
+    if (slides.isNotEmpty) {
+      return slides;
+    }
+  }
+  if (narrow) {
+    return const <HubCarouselSlide>[];
+  }
+  return HubCarouselSample.slides;
+}
+
+/// Loads hub promo slides with optional [HubAdsQuery.category] / [HubAdsQuery.menuItem] for category/item screens.
+final hubAdsSlidesProvider = FutureProvider.autoDispose
+    .family<List<HubCarouselSlide>, HubAdsQuery>((ref, key) async {
+      final api = ref.watch(margApiServiceProvider);
+      return fetchHubAdsSlidesForKeys(
+        api,
+        key.section,
+        category: key.category,
+        menuItem: key.menuItem,
+      );
+    });
+
+/// Hub overview: section-wide slides only (no category / menu item filter).
 final hubAdsSlidesForSectionProvider = FutureProvider.autoDispose
     .family<List<HubCarouselSlide>, String>((ref, homeSectionSlug) async {
-      final candidates = hubAdsSectionQueryKeys(homeSectionSlug);
-      if (candidates.isEmpty) return const <HubCarouselSlide>[];
       final api = ref.watch(margApiServiceProvider);
-      for (final section in candidates) {
-        final slides = await api.getHubAdsSlides(section: section);
-        if (slides.isNotEmpty) {
-          return slides;
-        }
-      }
-      return HubCarouselSample.slides;
+      return fetchHubAdsSlidesForKeys(api, homeSectionSlug);
     });
 
 /// Loads [GET /api/services/menu-items] using [hubAdsSectionQueryKeys] until a non-empty list is returned.
@@ -241,12 +286,14 @@ List<HomeIconGridItem> resolveRechargesBillsHubItems(
 }
 
 /// Pushes [HubDetailScreen] ([hub_detail_screen.dart]): carousel loads via
-/// [hubAdsSlidesForSectionProvider] when [adsSectionSlug] is set.
+/// [hubAdsSlidesProvider] when [adsSectionSlug] is set.
 void pushHubDetailScreen(
   BuildContext context, {
   required String title,
   required List<HomeIconGridItem> items,
   String? adsSectionSlug,
+  String? adsCategorySlug,
+  String? adsMenuItemSlug,
 
   /// When set, loads menu items from [hubMenuItemsBySectionProvider] and shows them grouped by category.
   String? menuSectionSlug,
@@ -259,6 +306,8 @@ void pushHubDetailScreen(
         title: title,
         items: items,
         adsSectionSlug: adsSectionSlug,
+        adsCategorySlug: adsCategorySlug,
+        adsMenuItemSlug: adsMenuItemSlug,
         menuSectionSlug: menuSectionSlug,
         carouselSlides: carouselSlides,
       ),

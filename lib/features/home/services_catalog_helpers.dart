@@ -23,7 +23,7 @@ void navigateToServiceBySlug(BuildContext context, String slug) {
 Widget? _slugToRoute(String slug) {
   switch (slug) {
     case 'mobile-recharge':
-      return MobileRechargeRoutes.entryPage();
+      return MobileRechargeRoutes.entryPage(menuItemSlug: slug);
     case 'dth':
       return DthRechargeRoutes.entryPage();
     case 'fastag-recharge':

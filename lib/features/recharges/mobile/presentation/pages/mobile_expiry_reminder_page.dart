@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../../core/theme/app_theme.dart';
 import 'mobile_operator_selection_page.dart';
+import '../widgets/reminder_permission_card.dart';
 
 /// Expiry reminder UI: numbers with upcoming expiry (mock).
 /// TODO: Integrate with backend for real expiry data.
 class MobileExpiryReminderPage extends ConsumerWidget {
-  const MobileExpiryReminderPage({super.key});
+  const MobileExpiryReminderPage({
+    super.key,
+    this.menuItemSlug = 'mobile-recharge',
+  });
+
+  final String menuItemSlug;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,6 +32,11 @@ class MobileExpiryReminderPage extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          ReminderPermissionCard(
+            menuItemSlug: menuItemSlug,
+            channel: 'local_notifications',
+          ),
+          const SizedBox(height: 12),
           const Text(
             'Recharge before expiry to avoid service interruption.',
             style: TextStyle(color: AppColors.textSecondary),

@@ -25,8 +25,10 @@ class MobileRechargeRoutes {
   static Widget paymentConfirmationPage() => const MobilePaymentConfirmationPage();
   static Widget successPage() => const MobileSuccessPage();
   static Widget recentHistoryPage() => const MobileRecentHistoryPage();
-  static Widget expiryReminderPage() => const MobileExpiryReminderPage();
+  static Widget expiryReminderPage({String menuItemSlug = 'mobile-recharge'}) =>
+      MobileExpiryReminderPage(menuItemSlug: menuItemSlug);
 
   /// Entry: first screen when user opens Mobile Recharge from home.
-  static Widget entryPage() => const MobileRechargeHomePage();
+  static Widget entryPage({String menuItemSlug = 'mobile-recharge'}) =>
+      MobileRechargeHomePage(menuItemSlug: menuItemSlug);
 }

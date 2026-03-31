@@ -8,7 +8,7 @@ import '../../../../shared/models/services_catalog.dart';
 import '../../../../shared/widgets/hub_banner_carousel.dart';
 import '../../services_catalog_helpers.dart';
 import '../utils/recharges_bills_hub.dart'
-    show hubAdsSlidesForSectionProvider, hubMenuItemsBySectionProvider;
+    show hubAdsSlidesProvider, hubMenuItemsBySectionProvider;
 import '../widgets/home_icon_grid_widget.dart';
 
 /// Detail screen for a hub: carousel from [GET /api/hub-ads-slides] when [adsSectionSlug] is set,
@@ -20,6 +20,8 @@ class HubDetailScreen extends ConsumerWidget {
     required this.title,
     required this.items,
     this.adsSectionSlug,
+    this.adsCategorySlug,
+    this.adsMenuItemSlug,
     this.menuSectionSlug,
     this.carouselSlides = const [],
   });
@@ -27,8 +29,14 @@ class HubDetailScreen extends ConsumerWidget {
   final String title;
   final List<HomeIconGridItem> items;
 
-  /// Home / hub section slug; triggers [hubAdsSlidesForSectionProvider] (API + slug aliases).
+  /// Home / hub section slug; triggers [hubAdsSlidesProvider] (API + slug aliases).
   final String? adsSectionSlug;
+
+  /// Optional category slug for category-level carousel rows.
+  final String? adsCategorySlug;
+
+  /// Optional menu item / service slug for item-level carousel rows.
+  final String? adsMenuItemSlug;
 
   /// Same slug family as ads; loads [hubMenuItemsBySectionProvider] and shows items by category.
   final String? menuSectionSlug;
@@ -40,7 +48,17 @@ class HubDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ads = adsSectionSlug?.trim();
     if (ads != null && ads.isNotEmpty) {
-      final asyncSlides = ref.watch(hubAdsSlidesForSectionProvider(ads));
+      final cat = adsCategorySlug?.trim();
+      final item = adsMenuItemSlug?.trim();
+      final asyncSlides = ref.watch(
+        hubAdsSlidesProvider(
+          (
+            section: ads,
+            category: (cat == null || cat.isEmpty) ? null : cat,
+            menuItem: (item == null || item.isEmpty) ? null : item,
+          ),
+        ),
+      );
       return asyncSlides.when(
         data: (slides) => _HubDetailScaffold(
           title: title,

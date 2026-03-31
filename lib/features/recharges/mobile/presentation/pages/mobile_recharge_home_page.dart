@@ -8,14 +8,21 @@ import 'contact_picker_page.dart';
 import 'mobile_operator_selection_page.dart';
 import 'mobile_plan_list_page.dart';
 import 'mobile_recent_history_page.dart';
+import '../../../../../../shared/widgets/hub_ads_slides_carousel.dart';
+import '../widgets/reminder_permission_card.dart';
 
 /// Purple accent for Mobile Recharge screen (PhonePe-style).
 const Color _mobileRechargePurple = Color(0xFF6B2D91);
-const Color _bannerBlue = Color(0xFF1A237E);
 
 /// Mobile Recharge home: banner, search, validity reminder, quick top-up, recents.
 class MobileRechargeHomePage extends ConsumerStatefulWidget {
-  const MobileRechargeHomePage({super.key});
+  const MobileRechargeHomePage({
+    super.key,
+    this.menuItemSlug = 'mobile-recharge',
+  });
+
+  /// Service/menu item slug used for server-driven reminder targeting.
+  final String menuItemSlug;
 
   @override
   ConsumerState<MobileRechargeHomePage> createState() =>
@@ -25,19 +32,10 @@ class MobileRechargeHomePage extends ConsumerStatefulWidget {
 class _MobileRechargeHomePageState
     extends ConsumerState<MobileRechargeHomePage> {
   final _searchController = TextEditingController();
-  final _bannerPageController = PageController(viewportFraction: 0.92);
-  static const _bannerTitles = [
-    (
-      'Catch Every T20 World Cup Action Live from your home!',
-      'Explore High-Speed Packs.',
-    ),
-    ('Recharge & get cashback up to ₹50', 'On your next recharge.'),
-  ];
 
   @override
   void dispose() {
     _searchController.dispose();
-    _bannerPageController.dispose();
     super.dispose();
   }
 
@@ -69,19 +67,10 @@ class _MobileRechargeHomePageState
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
           const SizedBox(height: 8),
-          _PromoBanner(
-            pageController: _bannerPageController,
-            titles: _bannerTitles,
-            onRechargeNow: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const MobileOperatorSelectionPage(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          _DotIndicator(
-            controller: _bannerPageController,
-            count: _bannerTitles.length,
+          HubAdsSlidesCarousel(
+            section: 'recharge-bill-payment',
+            category: 'recharges',
+            menuItem: widget.menuItemSlug,
           ),
           const SizedBox(height: 20),
           _SearchBar(
@@ -120,7 +109,10 @@ class _MobileRechargeHomePageState
             },
           ),
           const SizedBox(height: 20),
-          _ValidityReminderCard(),
+          ReminderPermissionCard(
+            menuItemSlug: widget.menuItemSlug,
+            channel: 'local_notifications',
+          ),
           const SizedBox(height: 24),
           const Text(
             'Quick Data Top-up',
@@ -145,161 +137,6 @@ class _MobileRechargeHomePageState
           const SizedBox(height: 16),
         ],
       ),
-    );
-  }
-}
-
-class _PromoBanner extends StatelessWidget {
-  final PageController pageController;
-  final List<(String, String)> titles;
-  final VoidCallback onRechargeNow;
-
-  const _PromoBanner({
-    required this.pageController,
-    required this.titles,
-    required this.onRechargeNow,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 168,
-      child: PageView.builder(
-        controller: pageController,
-        itemCount: titles.length,
-        itemBuilder: (context, index) {
-          final t = titles[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Container(
-              decoration: BoxDecoration(
-                color: _bannerBlue,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          t.$1,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            height: 1.25,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (t.$2.isNotEmpty)
-                          Text(
-                            t.$2,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.white70,
-                            ),
-                          ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: Material(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            child: InkWell(
-                              onTap: onRechargeNow,
-                              borderRadius: BorderRadius.circular(8),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 10,
-                                ),
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        'Recharge Now ',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: _bannerBlue,
-                                        ),
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_rounded,
-                                        size: 18,
-                                        color: _bannerBlue,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    right: 12,
-                    top: 12,
-                    child: Icon(
-                      Icons.sports_cricket_rounded,
-                      size: 48,
-                      color: Colors.white.withValues(alpha: 0.3),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _DotIndicator extends StatelessWidget {
-  final PageController controller;
-  final int count;
-
-  const _DotIndicator({required this.controller, required this.count});
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, _) {
-        final page = controller.hasClients
-            ? (controller.page ?? 0).round().clamp(0, count - 1)
-            : 0;
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(count, (i) {
-            final active = i == page;
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              width: active ? 20 : 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: active
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(4),
-              ),
-            );
-          }),
-        );
-      },
     );
   }
 }
@@ -408,79 +245,6 @@ class _SearchBar extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _ValidityReminderCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFEEEEEE)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Be reminded before your plan validity expires',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Allow access to your text messages to fetch your bills and remind on time',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Material(
-                    color: _mobileRechargePurple,
-                    borderRadius: BorderRadius.circular(8),
-                    child: InkWell(
-                      onTap: () {},
-                      borderRadius: BorderRadius.circular(8),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        child: Text(
-                          'Allow',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Icon(
-            Icons.phone_android_rounded,
-            size: 56,
-            color: _mobileRechargePurple.withValues(alpha: 0.2),
-          ),
-        ],
-      ),
     );
   }
 }

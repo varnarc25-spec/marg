@@ -8,6 +8,7 @@ import '../../shared/models/services_catalog.dart';
 import '../../shared/models/hub_menu_item.dart';
 import '../../features/home/data/models/app_banner_model.dart';
 import '../../shared/models/hub_carousel_slide.dart';
+import '../../shared/models/reminder_policy.dart';
 
 /// Client for marg_api: user register and onboarding.
 /// Set [baseUrl] to your API base (e.g. http://localhost:3000 or https://api.example.com).
@@ -321,16 +322,21 @@ class MargApiService {
   }
 
   /// GET /api/hub-ads-slides — hub carousel slides for [section] (e.g. recharges-bills).
-  /// Optional [category] narrows to that category; empty category in DB matches all.
+  /// Optional [category] for category-level carousels; [menuItem] for item-level slides.
   /// Returns empty on error; caller may fall back to local samples.
   Future<List<HubCarouselSlide>> getHubAdsSlides({
     required String section,
     String? category,
+    String? menuItem,
   }) async {
     final qp = <String, String>{'section': section};
     final c = category?.trim();
     if (c != null && c.isNotEmpty) {
       qp['category'] = c;
+    }
+    final m = menuItem?.trim();
+    if (m != null && m.isNotEmpty) {
+      qp['menu_item'] = m;
     }
     final uri = Uri.parse('$_baseUrl/api/hub-ads-slides').replace(
       queryParameters: qp,
@@ -366,6 +372,81 @@ class MargApiService {
     } catch (_) {
       return const <HubCarouselSlide>[];
     }
+  }
+
+  /// GET /api/reminders/policy?menu_item_slug=...&channel=...
+  ///
+  /// Returns `null` on error (network/server/parsing/auth).
+  Future<ReminderPolicyDecision?> getReminderPolicyDecision({
+    required String idToken,
+    required String menuItemSlug,
+    required String channel,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/api/reminders/policy').replace(
+      queryParameters: <String, String>{
+        'menu_item_slug': menuItemSlug,
+        'channel': channel,
+      },
+    );
+
+    try {
+      final res = await _http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $idToken',
+        },
+      );
+      if (res.statusCode < 200 || res.statusCode >= 300) return null;
+
+      final decoded = jsonDecode(res.body);
+      if (decoded is! Map) return null;
+      final map = Map<String, dynamic>.from(decoded);
+      final data = map['data'];
+      if (data is! Map<String, dynamic>) return null;
+      return ReminderPolicyDecision.fromJson(Map<String, dynamic>.from(data));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// POST /api/reminders/consent
+  ///
+  /// Body:
+  /// `{ menu_item_slug, channel, consent: true|false, policy_version? }`
+  ///
+  /// Throws on non-2xx so callers can show UX feedback.
+  Future<void> postReminderConsent({
+    required String idToken,
+    required String menuItemSlug,
+    required String channel,
+    required bool consent,
+    int? policyVersion,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/api/reminders/consent');
+    final payload = <String, dynamic>{
+      'menu_item_slug': menuItemSlug,
+      'channel': channel,
+      'consent': consent,
+      if (policyVersion != null) 'policy_version': policyVersion,
+    };
+
+    final res = await _http.post(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+      body: jsonEncode(payload),
+    );
+
+    if (res.statusCode >= 200 && res.statusCode < 300) return;
+    final decoded = jsonDecode(res.body) as Map<String, dynamic>?;
+    final message = decoded?['message'] ??
+        decoded?['error']?['message'] ??
+        decoded?['error'] ??
+        'Consent failed (${res.statusCode})';
+    throw Exception(message is String ? message : 'Consent failed');
   }
 
   /// GET /api/services/catalog — services catalog for home (suggested + categories).
