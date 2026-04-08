@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/l10n/app_localizations.dart';
+import 'app_logo.dart';
 
 /// App bar–style header with Marg logo and app name.
 /// Use [leading] for sub-pages (e.g. back icon).
 class MargHeader extends StatelessWidget {
   final AppLocalizations l10n;
+  /// From remote app settings; when null, [l10n.appName] is used.
+  final String? brandName;
+  /// From remote app settings — network or SVG URL for header logo.
+  final String? logoUrl;
   final Widget? leading;
   final VoidCallback? onHome1Tap;
   final VoidCallback? onAiTap;
@@ -15,6 +20,8 @@ class MargHeader extends StatelessWidget {
   const MargHeader({
     super.key,
     required this.l10n,
+    this.brandName,
+    this.logoUrl,
     this.leading,
     this.onHome1Tap,
     this.onAiTap,
@@ -42,13 +49,15 @@ class MargHeader extends StatelessWidget {
             leading!,
             const SizedBox(width: 8),
           ],
-          Icon(Icons.eco_rounded, size: 28, color: AppColors.primaryBlue),
+          AppLogo(size: 28, networkUrl: logoUrl),
           const SizedBox(width: 8),
           Text(
-            l10n.appName,
+            (brandName != null && brandName!.trim().isNotEmpty)
+                ? brandName!.trim()
+                : l10n.appName,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryBlue,
+                  color: AppColors.appLogo,
                 ),
           ),
           const Spacer(),

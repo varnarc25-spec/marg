@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
+import 'core/navigation/root_navigator_key.dart';
 import 'shared/providers/app_providers.dart';
 import 'features/onboarding/presentation/screens/app_splash_screen.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
@@ -57,9 +58,13 @@ class MargApp extends ConsumerWidget {
     final isDarkMode = ref.watch(themeModeProvider);
     final languageCode = ref.watch(languageProvider);
     final locale = _localeFromCode(languageCode);
+    final remoteTitle = ref.watch(appRemoteSettingsProvider).valueOrNull?.displayAppName;
 
     return MaterialApp(
-      title: 'Marg - Trading App',
+      navigatorKey: rootNavigatorKey,
+      title: (remoteTitle != null && remoteTitle.isNotEmpty)
+          ? remoteTitle
+          : 'Marg - Trading App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,

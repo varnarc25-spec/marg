@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/widgets/marg_header.dart';
+import '../../../../shared/providers/app_providers.dart';
 import '../../widgets/invest_card.dart';
 import '../../../../shared/widgets/live_buy_price_card.dart';
 import '../../../../shared/widgets/price_chart_card.dart';
@@ -119,6 +120,7 @@ class _BuyMetalPageState extends ConsumerState<BuyMetalPage> {
     final amountText = _amountController.text.trim();
     final hasAmount = amountText.isNotEmpty;
     final l10n = ProviderScope.containerOf(context).read(l10nProvider);
+    final remoteBrand = ref.watch(appRemoteSettingsProvider).valueOrNull;
     final isGold = c.appBarTitle.toLowerCase().contains('gold');
 
     return Scaffold(
@@ -128,6 +130,8 @@ class _BuyMetalPageState extends ConsumerState<BuyMetalPage> {
           children: [
             MargHeader(
               l10n: l10n,
+              brandName: remoteBrand?.displayAppName,
+              logoUrl: remoteBrand?.logoUrl,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back_rounded),
                 onPressed: () => Navigator.of(context).pop(),

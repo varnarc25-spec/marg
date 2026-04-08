@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../widgets/home_widgets.dart';
 import '../../../../shared/widgets/marg_header.dart';
+import '../../../../shared/widgets/app_logo.dart';
 import 'gold_silver_all_services_screen.dart';
 import 'wealth_home_screen.dart';
 import 'ai_assistant_screen.dart';
@@ -126,6 +127,7 @@ class HomeScreen extends ConsumerWidget {
     final l10n = ref.watch(l10nProvider);
     final catalogAsync = ref.watch(servicesCatalogProvider);
     final rechargesItems = watchRechargesBillsHubItems(context, ref);
+    final remoteBrand = ref.watch(appRemoteSettingsProvider).valueOrNull;
 
     final List<HomeIconGridItem>? digigoldItems = catalogAsync
         .whenOrNull<List<HomeIconGridItem>>(
@@ -193,6 +195,8 @@ class HomeScreen extends ConsumerWidget {
           children: [
             MargHeader(
               l10n: l10n,
+              brandName: remoteBrand?.displayAppName,
+              logoUrl: remoteBrand?.logoUrl,
               onAiTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const AiAssistantScreen()),
@@ -344,13 +348,13 @@ Widget _buildMargHeader(BuildContext context, AppLocalizations l10n) {
     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     child: Row(
       children: [
-        Icon(Icons.eco_rounded, size: 28, color: AppColors.primaryBlue),
+        const AppLogo(size: 28),
         const SizedBox(width: 8),
         Text(
           l10n.appName,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppColors.primaryBlue,
+            color: AppColors.appLogo,
           ),
         ),
         const Spacer(),

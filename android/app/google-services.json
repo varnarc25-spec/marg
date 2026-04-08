@@ -1,26 +1,43 @@
 {
   "project_info": {
-    "project_number": "644002148390",
-    "project_id": "androidproject-46413",
-    "storage_bucket": "androidproject-46413.firebasestorage.app"
+    "project_number": "548031081093",
+    "project_id": "marg-af127",
+    "storage_bucket": "marg-af127.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:644002148390:android:c364821927af563c7976e7",
+        "mobilesdk_app_id": "1:548031081093:android:55cdd809bba5f24f0417ec",
         "android_client_info": {
           "package_name": "com.varnarc.marg"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "548031081093-mk7c7a0ngsko6q235qgq9f0u5h99kt1s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAl4VHcK4F0quIft1oeGhfda4irypg6eTY"
+          "current_key": "AIzaSyAVHvxg4KXUWQd8um7V25q30PhejSAETU0"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "548031081093-mk7c7a0ngsko6q235qgq9f0u5h99kt1s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "548031081093-gij9mff5acid6oh8o717pcevheifoalr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.varnarc.marg"
+              }
+            }
+          ]
         }
       }
     }

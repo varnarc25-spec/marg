@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
@@ -22,6 +23,7 @@ import '../../data/models/user_session.dart';
 import '../../core/services/firebase_auth_service.dart';
 import '../../core/services/mock_kyc_service.dart';
 import '../../core/services/mock_mpin_service.dart';
+import '../models/app_remote_settings.dart';
 
 /// Repository Provider
 final mockDataRepositoryProvider = Provider<MockDataRepository>((ref) {
@@ -526,5 +528,66 @@ class UserSessionNotifier extends StateNotifier<UserSession?> {
     await prefs.remove('user_session_mpin_hash');
 
     state = null;
+  }
+}
+
+// --- Remote app settings (GET /api/app-settings, cached in SharedPreferences) ---
+
+const _appRemoteSettingsPrefsKey = 'app_remote_settings_v1';
+
+final appRemoteSettingsProvider =
+    AsyncNotifierProvider<AppRemoteSettingsNotifier, AppRemoteSettings>(
+  AppRemoteSettingsNotifier.new,
+);
+
+class AppRemoteSettingsNotifier extends AsyncNotifier<AppRemoteSettings> {
+  @override
+  Future<AppRemoteSettings> build() async {
+    final prefs = await SharedPreferences.getInstance();
+    final cached = AppRemoteSettings.tryDecodeCached(
+      prefs.getString(_appRemoteSettingsPrefsKey),
+    );
+
+    final api = ref.read(margApiServiceProvider);
+    try {
+      final map = await api.getAppSettings();
+      if (map != null && map.isNotEmpty) {
+        final model = AppRemoteSettings.fromJson(map);
+        await prefs.setString(
+          _appRemoteSettingsPrefsKey,
+          jsonEncode(model.toJson()),
+        );
+        return model;
+      }
+    } catch (_) {
+      if (cached != null) return cached;
+      return AppRemoteSettings.fallback();
+    }
+
+    return cached ?? AppRemoteSettings.fallback();
+  }
+
+  Future<void> refresh() async {
+    final previous = state.valueOrNull;
+    try {
+      final api = ref.read(margApiServiceProvider);
+      final map = await api.getAppSettings();
+      if (map == null || map.isEmpty) {
+        throw Exception('Empty app settings response');
+      }
+      final model = AppRemoteSettings.fromJson(map);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        _appRemoteSettingsPrefsKey,
+        jsonEncode(model.toJson()),
+      );
+      state = AsyncData(model);
+    } catch (_) {
+      if (previous != null) {
+        state = AsyncData(previous);
+      } else {
+        state = AsyncData(AppRemoteSettings.fallback());
+      }
+    }
   }
 }

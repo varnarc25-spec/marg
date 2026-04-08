@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/app_logo.dart';
 import '../../../../core/services/firebase_auth_service.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../../../accounts/presentation/screens/my_account_screen.dart';
@@ -26,7 +27,7 @@ class WealthHomeScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context, l10n),
+            _buildHeader(context, ref, l10n),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -59,7 +60,12 @@ class WealthHomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
+  Widget _buildHeader(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    final remoteBrand = ref.watch(appRemoteSettingsProvider).valueOrNull;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -85,10 +91,14 @@ class WealthHomeScreen extends ConsumerWidget {
             constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
           ),
           const SizedBox(width: 4),
-          Icon(Icons.eco_rounded, size: 28, color: _wealthPurple),
+          AppLogo(
+            size: 28,
+            color: _wealthPurple,
+            networkUrl: remoteBrand?.logoUrl,
+          ),
           const SizedBox(width: 8),
           Text(
-            l10n.appName,
+            remoteBrand?.displayAppName ?? l10n.appName,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: _wealthPurple,

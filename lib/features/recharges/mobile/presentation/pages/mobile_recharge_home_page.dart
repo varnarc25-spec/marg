@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../../core/theme/app_theme.dart';
+import '../../../../../../shared/providers/app_providers.dart';
+import '../utils/mobile_recharge_phone_utils.dart';
 import '../../data/models/mobile_operator.dart';
 import '../../data/models/mobile_recharge_history_item.dart';
 import '../providers/mobile_recharge_provider.dart';
@@ -32,9 +34,47 @@ class MobileRechargeHomePage extends ConsumerStatefulWidget {
 class _MobileRechargeHomePageState
     extends ConsumerState<MobileRechargeHomePage> {
   final _searchController = TextEditingController();
+  String? _lastDetectOperatorDigits;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchPhoneChanged);
+  }
+
+  void _onSearchPhoneChanged() {
+    final ten = tenDigitMobileFromInput(_searchController.text);
+    if (ten == null) {
+      _lastDetectOperatorDigits = null;
+      return;
+    }
+    if (ten == _lastDetectOperatorDigits) return;
+    _lastDetectOperatorDigits = ten;
+    _fetchDetectOperator(ten);
+  }
+
+  Future<void> _fetchDetectOperator(String tenDigits) async {
+    final auth = ref.read(firebaseAuthServiceProvider);
+    final token = await auth.getIdToken();
+    if (token == null || token.isEmpty) {
+      debugPrint('detect-operator: skipped (not signed in)');
+      return;
+    }
+    final api = ref.read(margApiServiceProvider);
+    try {
+      final json = await api.detectMobileOperator(
+        idToken: token,
+        mobileNumber: tenDigits,
+      );
+      debugPrint('detect-operator: $json');
+    } catch (e, st) {
+      debugPrint('detect-operator error: $e\n$st');
+    }
+  }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchPhoneChanged);
     _searchController.dispose();
     super.dispose();
   }
@@ -82,16 +122,26 @@ class _MobileRechargeHomePageState
                       builder: (_) => const ContactPickerPage(),
                     ),
                   );
-              if (result != null && mounted) {
+              if (result == null) return;
+              if (!context.mounted) return;
+              final digits =
+                  result.number.replaceAll(RegExp(r'\D'), '');
+              final ten = digits.length > 10
+                  ? digits.substring(digits.length - 10)
+                  : digits;
+              if (ten.length == 10) {
+                _lastDetectOperatorDigits = null;
+                _searchController.text = ten;
+              } else {
                 _searchController.text = result.number;
-                ref.read(mobileRechargeNumberProvider.notifier).state =
-                    result.number;
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const MobileOperatorSelectionPage(),
-                  ),
-                );
               }
+              ref.read(mobileRechargeNumberProvider.notifier).state =
+                  ten.length == 10 ? ten : result.number;
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const MobileOperatorSelectionPage(),
+                ),
+              );
             },
             onSearchSubmit: (query) {
               final digits = query.replaceAll(RegExp(r'\D'), '');

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/navigation/root_navigator_key.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../../data/datasources/languages_asset_datasource.dart';
 import '../../data/models/language_option.dart';
+import '../../../auth/presentation/screens/login_screen.dart';
 import '../../../home/presentation/screens/homescreen1.dart';
-import 'user_goal_selection_screen.dart';
 
 /// Language Selection Screen
 /// Grid of pastel language buttons with native script and English name; green checkmark for selected.
@@ -61,18 +62,34 @@ class _LanguageSelectionScreenState
 
   void _onLanguageSelected(String code) {
     setState(() => _selectedCode = code);
+    // Replace before updating locale: [setLanguage] rebuilds [MaterialApp] and
+    // can reset the stack if the new route is not committed first.
+    final auth = ref.read(firebaseAuthServiceProvider);
+    final next =
+        auth.isLoggedIn() ? const HomeScreen() : const LoginScreen();
+    final route = MaterialPageRoute<void>(builder: (_) => next);
+    final nav = rootNavigatorKey.currentState;
+    if (nav != null) {
+      nav.pushReplacement(route);
+    } else {
+      Navigator.of(context).pushReplacement(route);
+    }
     ref.read(languageProvider.notifier).setLanguage(code);
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const UserGoalSelectionScreen()));
   }
 
   Future<void> _onSkip() async {
     await ref.read(onboardingCompleteProvider.notifier).completeOnboarding();
     if (!mounted) return;
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
+    final auth = ref.read(firebaseAuthServiceProvider);
+    final next =
+        auth.isLoggedIn() ? const HomeScreen() : const LoginScreen();
+    final nav = rootNavigatorKey.currentState;
+    final route = MaterialPageRoute<void>(builder: (_) => next);
+    if (nav != null) {
+      nav.pushReplacement(route);
+    } else {
+      Navigator.of(context).pushReplacement(route);
+    }
   }
 
   @override

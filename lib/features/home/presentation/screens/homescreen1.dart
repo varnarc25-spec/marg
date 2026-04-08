@@ -25,12 +25,14 @@ class HomeScreen extends ConsumerWidget {
   Future<void> _refresh(WidgetRef ref) async {
     ref.invalidate(homeBannersProvider);
     await ref.read(homeSectionsProvider.notifier).refresh();
+    await ref.read(appRemoteSettingsProvider.notifier).refresh();
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = ref.watch(l10nProvider);
     final sectionsAsync = ref.watch(homeSectionsProvider);
+    final remoteBrand = ref.watch(appRemoteSettingsProvider).valueOrNull;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -39,6 +41,8 @@ class HomeScreen extends ConsumerWidget {
           children: [
             MargHeader(
               l10n: l10n,
+              brandName: remoteBrand?.displayAppName,
+              logoUrl: remoteBrand?.logoUrl,
               onHome1Tap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -52,7 +56,7 @@ class HomeScreen extends ConsumerWidget {
                 );
               },
             ),
-            const HomeHeader(),
+            // const HomeHeader(),
             // const HomeInsuranceBanner(),
             Expanded(
               child: RefreshIndicator(

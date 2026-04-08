@@ -12,6 +12,9 @@ class AppColors {
   static const Color primaryBlueDark = Color(0xFF1565C0);
   static const Color primaryBlueLight = Color(0xFF64B5F6);
 
+  /// Tint for the app logo SVG ([AppLogo]). Defaults to primary blue; change here to recolor globally.
+  static const Color appLogo = primaryBlue;
+
   // Accent Colors
   static const Color accentGreen = Color(0xFF00C853); // Profit
   static const Color accentRed = Color(0xFFE53935); // Loss

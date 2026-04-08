@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../../core/theme/app_theme.dart';
+import '../../../../../../shared/providers/app_providers.dart';
 import '../providers/mobile_recharge_provider.dart';
+import '../utils/mobile_recharge_phone_utils.dart';
 import '../widgets/family_numbers_section.dart';
 import 'mobile_plan_list_page.dart';
 
@@ -17,10 +19,12 @@ class _MobileNumberInputPageState extends ConsumerState<MobileNumberInputPage> {
   final _controller = TextEditingController();
   final _focus = FocusNode();
   bool _prefilled = false;
+  String? _lastDetectOperatorDigits;
 
   @override
   void initState() {
     super.initState();
+    _controller.addListener(_onNumberChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_prefilled || !mounted) return;
       final number = ref.read(mobileRechargeNumberProvider);
@@ -31,8 +35,39 @@ class _MobileNumberInputPageState extends ConsumerState<MobileNumberInputPage> {
     });
   }
 
+  void _onNumberChanged() {
+    final ten = tenDigitMobileFromInput(_controller.text);
+    if (ten == null) {
+      _lastDetectOperatorDigits = null;
+      return;
+    }
+    if (ten == _lastDetectOperatorDigits) return;
+    _lastDetectOperatorDigits = ten;
+    _fetchDetectOperator(ten);
+  }
+
+  Future<void> _fetchDetectOperator(String tenDigits) async {
+    final auth = ref.read(firebaseAuthServiceProvider);
+    final token = await auth.getIdToken();
+    if (token == null || token.isEmpty) {
+      debugPrint('detect-operator: skipped (not signed in)');
+      return;
+    }
+    final api = ref.read(margApiServiceProvider);
+    try {
+      final json = await api.detectMobileOperator(
+        idToken: token,
+        mobileNumber: tenDigits,
+      );
+      debugPrint('detect-operator: $json');
+    } catch (e, st) {
+      debugPrint('detect-operator error: $e\n$st');
+    }
+  }
+
   @override
   void dispose() {
+    _controller.removeListener(_onNumberChanged);
     _controller.dispose();
     _focus.dispose();
     super.dispose();

@@ -271,20 +271,28 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
-                        Text(
-                          '25,693.70',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                        Flexible(
+                          child: Text(
+                            '25,693.70',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          '+50.90 (+0.19%)',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: _positiveGreen,
-                                fontWeight: FontWeight.w600,
-                              ),
+                        Flexible(
+                          child: Text(
+                            '+50.90 (+0.19%)',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: _positiveGreen,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),
@@ -311,20 +319,28 @@ class _MyAccountScreenState extends ConsumerState<MyAccountScreen> {
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
-                        Text(
-                          '60,120.55',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                        Flexible(
+                          child: Text(
+                            '60,120.55',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          '+56.90 (+0.09%)',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: _positiveGreen,
-                                fontWeight: FontWeight.w600,
-                              ),
+                        Flexible(
+                          child: Text(
+                            '+56.90 (+0.09%)',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: _positiveGreen,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),

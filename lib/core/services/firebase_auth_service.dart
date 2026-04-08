@@ -350,6 +350,27 @@ class FirebaseAuthService {
     }
   }
 
+  /// Prints the current user's ID JWT to the debug console (for curl/Postman against marg_api).
+  /// No-op in profile/release builds.
+  Future<void> debugLogIdTokenToConsole({bool forceRefresh = true}) async {
+    if (!kDebugMode) return;
+    try {
+      final token = await getIdToken(forceRefresh: forceRefresh);
+      if (token == null || token.isEmpty) {
+        debugPrint('[Firebase ID token] none (not signed in)');
+        return;
+      }
+      debugPrint('');
+      debugPrint(
+        '[Firebase ID token] Authorization: Bearer <paste below>',
+      );
+      debugPrint(token);
+      debugPrint('');
+    } catch (e) {
+      debugPrint('[Firebase ID token] error: $e');
+    }
+  }
+
   String _getErrorMessage(FirebaseAuthException e) {
     switch (e.code) {
       case 'weak-password':

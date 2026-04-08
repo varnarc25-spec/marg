@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/app_logo.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../shared/providers/app_providers.dart';
 import '../../../../data/models/user_session.dart';
@@ -163,11 +164,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                   ],
                 ),
-                child: const Icon(
-                  Icons.trending_up,
-                  size: 40,
-                  color: AppColors.primaryBlue,
-                ),
+                child: const AppLogo(size: 40),
               ),
               const SizedBox(height: 8),
               Text(

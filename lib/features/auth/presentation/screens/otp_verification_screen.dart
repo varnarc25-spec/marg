@@ -129,6 +129,11 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
         }
       } catch (_) {}
 
+      await ref.read(firebaseAuthServiceProvider).debugLogIdTokenToConsole(
+            forceRefresh: true,
+          );
+      if (!mounted) return;
+
       // Navigate to home or profile
       final onboardingComplete = ref.read(onboardingCompleteProvider);
       if (onboardingComplete) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../../core/theme/app_theme.dart';
+import '../../../../../shared/widgets/app_logo.dart';
 import '../../../../../core/l10n/app_localizations.dart';
 import '../../../../../shared/providers/app_providers.dart';
 import '../../../accounts/presentation/screens/my_account_screen.dart';
@@ -153,6 +154,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ref.invalidate(userProfileProvider);
 
       if (!mounted) return;
+      await authService.debugLogIdTokenToConsole(forceRefresh: true);
+      if (!mounted) return;
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop(true);
         if (mounted) setState(() => _isLoading = false);
@@ -221,6 +224,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       ref.invalidate(userProfileProvider);
 
+      if (!mounted) return;
+      await authService.debugLogIdTokenToConsole(forceRefresh: true);
       if (!mounted) return;
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop(true);
@@ -349,13 +354,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryBlue,
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: const Icon(
-                    Icons.trending_up,
-                    size: 50,
                     color: Colors.white,
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: AppLogo(
+                    size: 50,
+                    networkUrl:
+                        ref.watch(appRemoteSettingsProvider).valueOrNull?.logoUrl,
                   ),
                 ),
               ),

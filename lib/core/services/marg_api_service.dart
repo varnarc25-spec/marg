@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../config/api_config.dart';
 import '../../features/gold_silver/models/augmont_rates_models.dart';
 import '../../shared/models/faq_item.dart';
 import '../../shared/models/trend_item.dart';
@@ -11,15 +12,13 @@ import '../../shared/models/hub_carousel_slide.dart';
 import '../../shared/models/reminder_policy.dart';
 
 /// Client for marg_api: user register and onboarding.
-/// Set [baseUrl] to your API base (e.g. http://localhost:3000 or https://api.example.com).
+/// Defaults to [ApiConfig.baseUrl] (local vs server is controlled in [ApiConfig]).
 class MargApiService {
   MargApiService({
     String? baseUrl,
     http.Client? httpClient,
-  })  : _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), ''),
+  })  : _baseUrl = (baseUrl ?? ApiConfig.baseUrl).replaceAll(RegExp(r'/$'), ''),
         _http = httpClient ?? http.Client();
-
-  static const String _defaultBaseUrl = 'http://localhost:3000';
 
   final String _baseUrl;
   final http.Client _http;
@@ -106,6 +105,26 @@ class MargApiService {
     final data = jsonDecode(res.body) as Map<String, dynamic>?;
     if (res.statusCode >= 200 && res.statusCode < 300) {
       final d = data?['data'];
+      return d is Map<String, dynamic> ? d : null;
+    }
+    return null;
+  }
+
+  /// Public singleton app config: `GET /api/app-settings` (no auth).
+  Future<Map<String, dynamic>?> getAppSettings() async {
+    final res = await _http.get(
+      Uri.parse('$_baseUrl/api/app-settings'),
+      headers: const {'Accept': 'application/json'},
+    );
+    Object? decoded;
+    try {
+      decoded = jsonDecode(res.body);
+    } catch (_) {
+      decoded = null;
+    }
+    final dataMap = decoded is Map<String, dynamic> ? decoded : null;
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      final d = dataMap?['data'];
       return d is Map<String, dynamic> ? d : null;
     }
     return null;
@@ -372,6 +391,40 @@ class MargApiService {
     } catch (_) {
       return const <HubCarouselSlide>[];
     }
+  }
+
+  /// POST /api/recharges/mobile/detect-operator
+  ///
+  /// [mobileNumber] must be exactly 10 digits. Requires Firebase [idToken].
+  Future<Map<String, dynamic>> detectMobileOperator({
+    required String idToken,
+    required String mobileNumber,
+  }) async {
+    final res = await _http.post(
+      Uri.parse('$_baseUrl/api/recharges/mobile/detect-operator'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+      body: jsonEncode({'mobileNumber': mobileNumber}),
+    );
+    Object? decoded;
+    try {
+      decoded = jsonDecode(res.body);
+    } catch (_) {
+      decoded = res.body;
+    }
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      if (decoded is Map<String, dynamic>) return decoded;
+      if (decoded is Map) return Map<String, dynamic>.from(decoded);
+      return <String, dynamic>{'raw': decoded};
+    }
+    final map = decoded is Map ? Map<String, dynamic>.from(decoded) : null;
+    final err = map?['error'];
+    final msg = map?['message'] ??
+        (err is Map ? err['message'] : err) ??
+        res.body;
+    throw Exception(msg is String ? msg : 'detect-operator failed (${res.statusCode})');
   }
 
   /// GET /api/reminders/policy?menu_item_slug=...&channel=...
