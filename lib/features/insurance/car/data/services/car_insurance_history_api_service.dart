@@ -6,14 +6,12 @@ import '../models/car_payment_history_item.dart';
 
 /// Client for car insurance payment history.
 class CarInsuranceHistoryApiService {
-  CarInsuranceHistoryApiService({
-    http.Client? httpClient,
-    String? baseUrl,
-  })  : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+  CarInsuranceHistoryApiService({http.Client? httpClient, String? baseUrl})
+    : _http = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
 
   static const String _defaultBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
 
   final http.Client _http;
   final String _baseUrl;
@@ -27,7 +25,7 @@ class CarInsuranceHistoryApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/insurance/car/history?limit=$limit&offset=$offset',
     );
-    
+
     final res = await _http.get(
       uri,
       headers: {
@@ -47,9 +45,7 @@ class CarInsuranceHistoryApiService {
 
     if (decoded['success'] == false) {
       final err = decoded['error'];
-      final message = err is Map
-          ? err['message']?.toString()
-          : err?.toString();
+      final message = err is Map ? err['message']?.toString() : err?.toString();
       throw Exception(message ?? 'Failed to load car payment history');
     }
 
@@ -83,4 +79,3 @@ class CarInsuranceHistoryApiService {
     return const [];
   }
 }
-

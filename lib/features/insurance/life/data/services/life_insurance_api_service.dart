@@ -11,14 +11,12 @@ import '../models/life_promo_model.dart';
 
 /// Marg Life Insurance API (`/api/insurance/life/*`).
 class LifeInsuranceApiService {
-  LifeInsuranceApiService({
-    http.Client? httpClient,
-    String? baseUrl,
-  })  : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+  LifeInsuranceApiService({http.Client? httpClient, String? baseUrl})
+    : _http = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
 
   static const String _defaultBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
 
   final http.Client _http;
   final String _baseUrl;
@@ -65,7 +63,8 @@ class LifeInsuranceApiService {
       return out;
     }
     if (data is Map<String, dynamic>) {
-      final nested = data['items'] ??
+      final nested =
+          data['items'] ??
           data['partners'] ??
           data['plans'] ??
           data['records'] ??
@@ -76,7 +75,8 @@ class LifeInsuranceApiService {
       if (nested is List) data = nested;
     }
     if (data is! List) {
-      data = decoded['items'] ??
+      data =
+          decoded['items'] ??
           decoded['partners'] ??
           decoded['plans'] ??
           decoded['results'] ??
@@ -98,9 +98,13 @@ class LifeInsuranceApiService {
   /// GET `/api/insurance/life/partners`
   Future<List<LifePartner>> getPartners({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/partners');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
-      throw _httpException('Failed to load life partners', res.statusCode, res.body);
+      throw _httpException(
+        'Failed to load life partners',
+        res.statusCode,
+        res.body,
+      );
     }
     final decoded = _decodeMap(res.body);
     _ensureSuccess(decoded);
@@ -118,7 +122,7 @@ class LifeInsuranceApiService {
   /// GET `/api/insurance/life/promos`
   Future<List<LifePromoBanner>> getPromos({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/promos');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load promos', res.statusCode, res.body);
     }
@@ -131,7 +135,7 @@ class LifeInsuranceApiService {
   /// GET `/api/insurance/life/benefits`
   Future<List<LifeBenefitItem>> getBenefits({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/benefits');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load benefits', res.statusCode, res.body);
     }
@@ -151,7 +155,7 @@ class LifeInsuranceApiService {
   /// GET `/api/insurance/life/config`
   Future<Map<String, dynamic>> getConfig({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/config');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load config', res.statusCode, res.body);
     }
@@ -169,7 +173,7 @@ class LifeInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/calculate-cover');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -196,14 +200,8 @@ class LifeInsuranceApiService {
       return (v / 100000).round().clamp(1, 9999);
     }
 
-    final minL = rupeesToLakhs(
-      _numFrom(map['minSumAssured']),
-      fallback: 25,
-    );
-    var maxL = rupeesToLakhs(
-      _numFrom(map['maxSumAssured']),
-      fallback: 300,
-    );
+    final minL = rupeesToLakhs(_numFrom(map['minSumAssured']), fallback: 25);
+    var maxL = rupeesToLakhs(_numFrom(map['maxSumAssured']), fallback: 300);
     num? idealRupees = _numFrom(map['idealRecommendedCover']);
     if (idealRupees == null || idealRupees == 0) {
       idealRupees = _numFrom(map['defaultSumAssured']);
@@ -241,7 +239,7 @@ class LifeInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/recommendation');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -262,9 +260,10 @@ class LifeInsuranceApiService {
     Map<String, String> query, {
     String? idToken,
   }) async {
-    final uri = Uri.parse('$_baseUrl/api/insurance/life/plans')
-        .replace(queryParameters: query);
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final uri = Uri.parse(
+      '$_baseUrl/api/insurance/life/plans',
+    ).replace(queryParameters: query);
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load plans', res.statusCode, res.body);
     }
@@ -279,7 +278,7 @@ class LifeInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/plans');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -299,35 +298,38 @@ class LifeInsuranceApiService {
       try {
         final p = _parsePlanRow(rows[i], i);
         if (p != null) out.add(p);
-      } catch (e, st) {
-              }
+      } catch (e, st) {}
     }
     return out;
   }
 
   LifeTermPlan? _parsePlanRow(Map<String, dynamic> json, int index) {
-    final name = (json['insurerName'] ??
-            json['insurer'] ??
-            json['companyName'] ??
-            json['name'] ??
-            json['planName'] ??
-            '')
-        .toString()
-        .trim();
+    final name =
+        (json['insurerName'] ??
+                json['insurer'] ??
+                json['companyName'] ??
+                json['name'] ??
+                json['planName'] ??
+                '')
+            .toString()
+            .trim();
     if (name.isEmpty) return null;
 
-    final id = (json['id'] ?? json['planId'] ?? json['_id'] ?? 'life_plan_$index')
-        .toString();
+    final id =
+        (json['id'] ?? json['planId'] ?? json['_id'] ?? 'life_plan_$index')
+            .toString();
 
     int? lakhs;
-    final sa = json['sumAssuredLakhs'] ?? json['sumAssured'] ?? json['coverLakhs'];
+    final sa =
+        json['sumAssuredLakhs'] ?? json['sumAssured'] ?? json['coverLakhs'];
     if (sa is num) {
       lakhs = sa > 1000 ? (sa / 100000).round() : sa.round();
     }
 
     int? monthly;
     final pm = json['premiumMonthly'] ?? json['monthlyPremium'];
-    final pa = json['premiumAnnual'] ?? json['annualPremium'] ?? json['premium'];
+    final pa =
+        json['premiumAnnual'] ?? json['annualPremium'] ?? json['premium'];
     if (pm is num) {
       monthly = pm.round();
     } else if (pa is num) {
@@ -362,7 +364,7 @@ class LifeInsuranceApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/insurance/life/plans/${Uri.encodeComponent(planId)}',
     );
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Plan details failed', res.statusCode, res.body);
     }
@@ -380,7 +382,7 @@ class LifeInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/plans/compare');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -402,7 +404,7 @@ class LifeInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/life/callback');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),

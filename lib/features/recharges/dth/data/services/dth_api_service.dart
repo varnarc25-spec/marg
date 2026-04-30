@@ -10,11 +10,11 @@ import '../models/dth_saved_account.dart';
 /// Marg DTH recharge API (`/api/recharges/dth/*`).
 class DthApiService {
   DthApiService({http.Client? httpClient, String? baseUrl})
-      : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+    : _http = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
 
   static const String _defaultBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
 
   final http.Client _http;
   final String _baseUrl;
@@ -47,7 +47,13 @@ class DthApiService {
     final data = decoded['data'];
     if (data is List) return data;
     if (data is Map) {
-      for (final key in ['items', 'accounts', 'records', 'operators', 'plans']) {
+      for (final key in [
+        'items',
+        'accounts',
+        'records',
+        'operators',
+        'plans',
+      ]) {
         final nested = data[key];
         if (nested is List) return nested;
       }
@@ -62,7 +68,7 @@ class DthApiService {
   /// GET `/api/recharges/dth/operators`
   Future<List<DthOperator>> getOperators({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/operators');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw Exception('Failed to load operators (${res.statusCode})');
     }
@@ -86,7 +92,7 @@ class DthApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/plans');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -113,7 +119,7 @@ class DthApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/initiate');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -134,7 +140,7 @@ class DthApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/recharges/dth/status/${Uri.encodeComponent(id)}',
     );
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw Exception('Status failed (${res.statusCode})');
     }
@@ -149,7 +155,7 @@ class DthApiService {
   /// GET `/api/recharges/dth/history`
   Future<List<DthRechargeHistoryItem>> getHistory({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/history');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw Exception('Failed to load history (${res.statusCode})');
     }
@@ -171,7 +177,7 @@ class DthApiService {
   /// GET `/api/recharges/dth/saved-accounts`
   Future<List<DthSavedAccount>> getSavedAccounts({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/saved-accounts');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw Exception('Failed to load saved accounts (${res.statusCode})');
     }
@@ -194,7 +200,7 @@ class DthApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/recharges/dth/saved-accounts');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -220,7 +226,7 @@ class DthApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/recharges/dth/saved-accounts/${Uri.encodeComponent(id)}',
     );
-        final res = await _http.put(
+    final res = await _http.put(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -242,7 +248,7 @@ class DthApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/recharges/dth/saved-accounts/${Uri.encodeComponent(id)}',
     );
-        final res = await _http.delete(uri, headers: _headers(idToken));
+    final res = await _http.delete(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw Exception('Delete failed (${res.statusCode})');
     }

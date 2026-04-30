@@ -13,7 +13,7 @@ class ApiConfig {
 
   /// Optional: allow overriding the base URL via `--dart-define`.
   /// Example:
-  // flutter run --dart-define=MARG_API_BASE_URL=https://margapi-548031081093.asia-south1.run.app
+  // flutter run --dart-define=MARG_API_BASE_URL=https://marg-api-548031081093.asia-south1.run.app
 
   static const String overrideBaseUrl = String.fromEnvironment(
     'MARG_API_BASE_URL',
@@ -24,7 +24,7 @@ class ApiConfig {
 
   // Production/server URL you shared.
   static const String _serverBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
 
   /// Resolved base URL that the app should use.
   static String get baseUrl {

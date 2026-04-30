@@ -6,14 +6,12 @@ import '../models/bike_saved_account_model.dart';
 
 /// Client for bike insurance saved payment accounts.
 class BikeAccountsApiService {
-  BikeAccountsApiService({
-    http.Client? httpClient,
-    String? baseUrl,
-  })  : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+  BikeAccountsApiService({http.Client? httpClient, String? baseUrl})
+    : _http = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
 
   static const String _defaultBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
 
   final http.Client _http;
   final String _baseUrl;
@@ -23,7 +21,7 @@ class BikeAccountsApiService {
     required String idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/bike/accounts');
-    
+
     final res = await _http.get(
       uri,
       headers: {
@@ -63,7 +61,7 @@ class BikeAccountsApiService {
     required Map<String, dynamic> payload,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/bike/accounts');
-    
+
     final res = await _http.post(
       uri,
       headers: {
@@ -98,7 +96,7 @@ class BikeAccountsApiService {
     required Map<String, dynamic> payload,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/bike/accounts/$id');
-    
+
     final res = await _http.put(
       uri,
       headers: {
@@ -131,7 +129,7 @@ class BikeAccountsApiService {
     required String id,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/bike/accounts/$id');
-    
+
     final res = await _http.delete(
       uri,
       headers: {
@@ -146,7 +144,9 @@ class BikeAccountsApiService {
   Map<String, dynamic> _decodeAndValidate(http.Response res) {
     final body = res.body;
     if (res.statusCode < 200 || res.statusCode >= 300) {
-      throw Exception('Request failed (${res.statusCode}): ${body.isEmpty ? '<empty>' : body}');
+      throw Exception(
+        'Request failed (${res.statusCode}): ${body.isEmpty ? '<empty>' : body}',
+      );
     }
     final decoded = jsonDecode(body);
     if (decoded is! Map<String, dynamic>) {
@@ -157,9 +157,10 @@ class BikeAccountsApiService {
     if (success == false) {
       final err = decoded['error'];
       final message = err is Map ? err['message']?.toString() : err?.toString();
-      throw Exception(message ?? decoded['message']?.toString() ?? 'Request failed');
+      throw Exception(
+        message ?? decoded['message']?.toString() ?? 'Request failed',
+      );
     }
     return decoded;
   }
 }
-

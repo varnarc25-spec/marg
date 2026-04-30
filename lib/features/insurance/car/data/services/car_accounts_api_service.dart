@@ -6,14 +6,12 @@ import '../models/car_saved_account_model.dart';
 
 /// Client for car insurance saved payment accounts.
 class CarAccountsApiService {
-  CarAccountsApiService({
-    http.Client? httpClient,
-    String? baseUrl,
-  })  : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+  CarAccountsApiService({http.Client? httpClient, String? baseUrl})
+    : _http = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
 
   static const String _defaultBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
 
   final http.Client _http;
   final String _baseUrl;
@@ -23,7 +21,7 @@ class CarAccountsApiService {
     required String idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/car/accounts');
-    
+
     final res = await _http.get(
       uri,
       headers: {
@@ -52,8 +50,7 @@ class CarAccountsApiService {
     // Only treat explicit `success: false` as failure.
     if (decoded['success'] == false) {
       final err = decoded['error'];
-      final message =
-          err is Map ? err['message']?.toString() : err?.toString();
+      final message = err is Map ? err['message']?.toString() : err?.toString();
       throw Exception(message ?? 'Failed to load car accounts');
     }
 
@@ -93,7 +90,7 @@ class CarAccountsApiService {
     required Map<String, dynamic> payload,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/car/accounts');
-    
+
     final res = await _http.post(
       uri,
       headers: {
@@ -128,7 +125,7 @@ class CarAccountsApiService {
     required Map<String, dynamic> payload,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/car/accounts/$id');
-    
+
     final res = await _http.put(
       uri,
       headers: {
@@ -161,7 +158,7 @@ class CarAccountsApiService {
     required String id,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/car/accounts/$id');
-    
+
     final res = await _http.delete(
       uri,
       headers: {
@@ -200,8 +197,7 @@ class CarAccountsApiService {
     final success = decoded['success'] as bool?;
     if (success == false) {
       final err = decoded['error'];
-      final message =
-          err is Map ? err['message']?.toString() : err?.toString();
+      final message = err is Map ? err['message']?.toString() : err?.toString();
       throw Exception(
         message ?? decoded['message']?.toString() ?? 'Request failed',
       );
@@ -209,4 +205,3 @@ class CarAccountsApiService {
     return decoded;
   }
 }
-

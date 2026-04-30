@@ -11,14 +11,12 @@ import '../models/health_price_promise_model.dart';
 
 /// Marg Health Insurance API (`/api/insurance/health/*`).
 class HealthInsuranceApiService {
-  HealthInsuranceApiService({
-    http.Client? httpClient,
-    String? baseUrl,
-  })  : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+  HealthInsuranceApiService({http.Client? httpClient, String? baseUrl})
+    : _http = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
 
   static const String _defaultBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
 
   final http.Client _http;
   final String _baseUrl;
@@ -32,7 +30,9 @@ class HealthInsuranceApiService {
   }
 
   Exception _httpException(String label, int code, String body) {
-    return Exception('$label ($code)${body.isNotEmpty ? ': ${body.length > 200 ? '${body.substring(0, 200)}…' : body}' : ''}');
+    return Exception(
+      '$label ($code)${body.isNotEmpty ? ': ${body.length > 200 ? '${body.substring(0, 200)}…' : body}' : ''}',
+    );
   }
 
   Map<String, dynamic> _decodeMap(String body) {
@@ -45,9 +45,7 @@ class HealthInsuranceApiService {
   void _ensureSuccess(Map<String, dynamic> decoded) {
     if (decoded['success'] == false) {
       final err = decoded['error'];
-      final msg = err is Map
-          ? err['message']?.toString()
-          : err?.toString();
+      final msg = err is Map ? err['message']?.toString() : err?.toString();
       throw Exception(
         msg ?? decoded['message']?.toString() ?? 'Request failed',
       );
@@ -57,11 +55,15 @@ class HealthInsuranceApiService {
   /// GET `/api/insurance/health/partners`
   Future<List<HealthInsurancePlan>> getPartners({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/partners');
-    
+
     final res = await _http.get(uri, headers: _headers(idToken));
 
     if (res.statusCode < 200 || res.statusCode >= 300) {
-      throw _httpException('Failed to load health partners', res.statusCode, res.body);
+      throw _httpException(
+        'Failed to load health partners',
+        res.statusCode,
+        res.body,
+      );
     }
 
     final decoded = _decodeMap(res.body);
@@ -89,8 +91,7 @@ class HealthInsuranceApiService {
             claimSettlementRateLabel: null,
           ),
         );
-      } catch (e, st) {
-              }
+      } catch (e, st) {}
     }
     return plans;
   }
@@ -98,9 +99,13 @@ class HealthInsuranceApiService {
   /// GET `/api/insurance/health/config`
   Future<Map<String, dynamic>> getConfig({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/config');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
-      throw _httpException('Failed to load health config', res.statusCode, res.body);
+      throw _httpException(
+        'Failed to load health config',
+        res.statusCode,
+        res.body,
+      );
     }
     final decoded = _decodeMap(res.body);
     _ensureSuccess(decoded);
@@ -113,9 +118,9 @@ class HealthInsuranceApiService {
   /// GET `/api/insurance/health/price-promise`
   Future<HealthPricePromise?> getPricePromise({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/price-promise');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
-            return null;
+      return null;
     }
     final decoded = _decodeMap(res.body);
     if (decoded['success'] == false) return null;
@@ -136,7 +141,7 @@ class HealthInsuranceApiService {
   }) async {
     final clean = pincode.trim();
     final uri = Uri.parse('$_baseUrl/api/insurance/health/pincode/$clean');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       return HealthPincodeResult.invalid('Could not validate pincode');
     }
@@ -158,11 +163,16 @@ class HealthInsuranceApiService {
     String? idToken,
   }) async {
     final clean = pincode.trim();
-    final uri = Uri.parse('$_baseUrl/api/insurance/health/network-hospitals')
-        .replace(queryParameters: {'pincode': clean});
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final uri = Uri.parse(
+      '$_baseUrl/api/insurance/health/network-hospitals',
+    ).replace(queryParameters: {'pincode': clean});
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
-      throw _httpException('Failed to load network hospitals', res.statusCode, res.body);
+      throw _httpException(
+        'Failed to load network hospitals',
+        res.statusCode,
+        res.body,
+      );
     }
     final decoded = _decodeMap(res.body);
     _ensureSuccess(decoded);
@@ -183,7 +193,7 @@ class HealthInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/selection');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -200,9 +210,10 @@ class HealthInsuranceApiService {
     Map<String, String> query, {
     String? idToken,
   }) async {
-    final uri = Uri.parse('$_baseUrl/api/insurance/health/plans')
-        .replace(queryParameters: query);
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final uri = Uri.parse(
+      '$_baseUrl/api/insurance/health/plans',
+    ).replace(queryParameters: query);
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw _httpException('Failed to load plans', res.statusCode, res.body);
     }
@@ -217,7 +228,7 @@ class HealthInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/plans');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -235,11 +246,16 @@ class HealthInsuranceApiService {
     String planId, {
     String? idToken,
   }) async {
-    final uri =
-        Uri.parse('$_baseUrl/api/insurance/health/plans/${Uri.encodeComponent(planId)}');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final uri = Uri.parse(
+      '$_baseUrl/api/insurance/health/plans/${Uri.encodeComponent(planId)}',
+    );
+    final res = await _http.get(uri, headers: _headers(idToken));
     if (res.statusCode < 200 || res.statusCode >= 300) {
-      throw _httpException('Failed to load plan details', res.statusCode, res.body);
+      throw _httpException(
+        'Failed to load plan details',
+        res.statusCode,
+        res.body,
+      );
     }
     final decoded = _decodeMap(res.body);
     _ensureSuccess(decoded);
@@ -255,7 +271,7 @@ class HealthInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/plans/compare');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -279,7 +295,7 @@ class HealthInsuranceApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl/api/insurance/health/callback');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -306,7 +322,8 @@ class HealthInsuranceApiService {
   List<Map<String, dynamic>> _extractObjectList(Map<String, dynamic> decoded) {
     dynamic data = decoded['data'];
     if (data is Map<String, dynamic>) {
-      final nested = data['items'] ??
+      final nested =
+          data['items'] ??
           data['partners'] ??
           data['plans'] ??
           data['records'] ??
@@ -315,7 +332,8 @@ class HealthInsuranceApiService {
       if (nested is List) data = nested;
     }
     if (data is! List) {
-      data = decoded['partners'] ??
+      data =
+          decoded['partners'] ??
           decoded['items'] ??
           decoded['plans'] ??
           decoded['results'];
@@ -340,21 +358,21 @@ class HealthInsuranceApiService {
       try {
         final p = _parsePlanRow(rows[i], i);
         if (p != null) plans.add(p);
-      } catch (e, st) {
-              }
+      } catch (e, st) {}
     }
     return plans;
   }
 
   HealthInsurancePlan? _parsePlanRow(Map<String, dynamic> json, int index) {
-    final name = (json['insurerName'] ??
-            json['insurer'] ??
-            json['companyName'] ??
-            json['name'] ??
-            json['planName'] ??
-            '')
-        .toString()
-        .trim();
+    final name =
+        (json['insurerName'] ??
+                json['insurer'] ??
+                json['companyName'] ??
+                json['name'] ??
+                json['planName'] ??
+                '')
+            .toString()
+            .trim();
     if (name.isEmpty) return null;
 
     final id = (json['id'] ?? json['planId'] ?? json['_id'] ?? 'plan_$index')
@@ -374,10 +392,12 @@ class HealthInsuranceApiService {
     }
 
     int? monthly;
-    final pm = json['premiumMonthly'] ??
+    final pm =
+        json['premiumMonthly'] ??
         json['monthlyPremium'] ??
         json['monthly_premium'];
-    final pa = json['premiumAnnual'] ?? json['annualPremium'] ?? json['premium'];
+    final pa =
+        json['premiumAnnual'] ?? json['annualPremium'] ?? json['premium'];
     if (pm is num) {
       monthly = pm.round();
     } else if (pa is num) {
@@ -391,7 +411,10 @@ class HealthInsuranceApiService {
 
     final highlights = <String>[];
     final rawHighlights =
-        json['highlights'] ?? json['benefits'] ?? json['features'] ?? json['bullets'];
+        json['highlights'] ??
+        json['benefits'] ??
+        json['features'] ??
+        json['bullets'];
     if (rawHighlights is List) {
       for (final e in rawHighlights) {
         final s = e.toString().trim();
@@ -406,7 +429,8 @@ class HealthInsuranceApiService {
     }
 
     int? hospitalCount;
-    final hc = json['hospitalCount'] ??
+    final hc =
+        json['hospitalCount'] ??
         json['networkHospitalCount'] ??
         json['cashlessHospitals'] ??
         json['networkHospitals'];
@@ -417,7 +441,8 @@ class HealthInsuranceApiService {
     }
 
     String? csrLabel;
-    final csr = json['claimSettlementRate'] ??
+    final csr =
+        json['claimSettlementRate'] ??
         json['settlementRate'] ??
         json['claimSettlement'];
     if (csr != null) {

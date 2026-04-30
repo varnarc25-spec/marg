@@ -11,11 +11,11 @@ import '../models/broadband_saved_account.dart';
 /// Marg Broadband/Landline API (`/api/utilities/broadband-landline/*`).
 class BroadbandApiService {
   BroadbandApiService({http.Client? httpClient, String? baseUrl})
-      : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+    : _http = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
 
   static const String _defaultBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
 
   final http.Client _http;
   final String _baseUrl;
@@ -26,7 +26,8 @@ class BroadbandApiService {
     return {
       'Content-Type': 'application/json',
       'accept': '*/*',
-      if (idToken != null && idToken.isNotEmpty) 'Authorization': 'Bearer $idToken',
+      if (idToken != null && idToken.isNotEmpty)
+        'Authorization': 'Bearer $idToken',
     };
   }
 
@@ -78,7 +79,13 @@ class BroadbandApiService {
     final data = decoded['data'];
     if (data is List) return data;
     if (data is Map) {
-      for (final key in ['items', 'billers', 'accounts', 'records', 'history']) {
+      for (final key in [
+        'items',
+        'billers',
+        'accounts',
+        'records',
+        'history',
+      ]) {
         final nested = data[key];
         if (nested is List) return nested;
       }
@@ -92,7 +99,7 @@ class BroadbandApiService {
 
   Future<List<BroadbandBiller>> getBillers({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/billers');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <BroadbandBiller>[];
@@ -110,7 +117,11 @@ class BroadbandApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/fetch-bill');
-        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+    final res = await _http.post(
+      uri,
+      headers: _headers(idToken),
+      body: jsonEncode(body),
+    );
     final decoded = _readJsonResponse(res);
     return BroadbandBill.fromApiJson(_dataMap(decoded));
   }
@@ -120,7 +131,11 @@ class BroadbandApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/pay');
-        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+    final res = await _http.post(
+      uri,
+      headers: _headers(idToken),
+      body: jsonEncode(body),
+    );
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
@@ -129,15 +144,17 @@ class BroadbandApiService {
     String id, {
     String? idToken,
   }) async {
-    final uri = Uri.parse('$_baseUrl$_prefix/status/${Uri.encodeComponent(id)}');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final uri = Uri.parse(
+      '$_baseUrl$_prefix/status/${Uri.encodeComponent(id)}',
+    );
+    final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
 
   Future<List<BroadbandHistoryItem>> getHistory({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/history');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <BroadbandHistoryItem>[];
@@ -152,14 +169,16 @@ class BroadbandApiService {
 
   Future<List<BroadbandSavedAccount>> getAccounts({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <BroadbandSavedAccount>[];
     for (final e in raw) {
       if (e is! Map) continue;
       try {
-        out.add(BroadbandSavedAccount.fromApiJson(Map<String, dynamic>.from(e)));
+        out.add(
+          BroadbandSavedAccount.fromApiJson(Map<String, dynamic>.from(e)),
+        );
       } catch (_) {}
     }
     return out;
@@ -170,7 +189,11 @@ class BroadbandApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+    final res = await _http.post(
+      uri,
+      headers: _headers(idToken),
+      body: jsonEncode(body),
+    );
     final decoded = _readJsonResponse(res);
     return BroadbandSavedAccount.fromApiJson(_dataMap(decoded));
   }
@@ -180,15 +203,23 @@ class BroadbandApiService {
     Map<String, dynamic> body, {
     String? idToken,
   }) async {
-    final uri = Uri.parse('$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}');
-        final res = await _http.put(uri, headers: _headers(idToken), body: jsonEncode(body));
+    final uri = Uri.parse(
+      '$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}',
+    );
+    final res = await _http.put(
+      uri,
+      headers: _headers(idToken),
+      body: jsonEncode(body),
+    );
     final decoded = _readJsonResponse(res);
     return BroadbandSavedAccount.fromApiJson(_dataMap(decoded));
   }
 
   Future<void> deleteAccount(String id, {String? idToken}) async {
-    final uri = Uri.parse('$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}');
-        final res = await _http.delete(uri, headers: _headers(idToken));
+    final uri = Uri.parse(
+      '$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}',
+    );
+    final res = await _http.delete(uri, headers: _headers(idToken));
     if (res.body.isEmpty) {
       if (res.statusCode < 200 || res.statusCode >= 300) {
         throw BroadbandApiException();

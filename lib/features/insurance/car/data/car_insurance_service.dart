@@ -8,20 +8,21 @@ import 'car_vehicle_model.dart';
 /// API-backed service for car insurance plans.
 /// Uses `/api/insurance/car/billers` and derives plan cards from insurer list.
 class CarInsuranceService {
-  CarInsuranceService({
-    http.Client? httpClient,
-    String? baseUrl,
-  })  : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+  CarInsuranceService({http.Client? httpClient, String? baseUrl})
+    : _http = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
 
   static const String _defaultBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
 
   final http.Client _http;
   final String _baseUrl;
 
   String _normalize(String vehicleNumber) {
-    return vehicleNumber.trim().toUpperCase().replaceAll(RegExp(r'[\s\-]+'), '');
+    return vehicleNumber.trim().toUpperCase().replaceAll(
+      RegExp(r'[\s\-]+'),
+      '',
+    );
   }
 
   /// Car details are not yet backed by API routes in this module.
@@ -48,7 +49,7 @@ class CarInsuranceService {
     }
 
     final uri = Uri.parse('$_baseUrl/api/insurance/car/billers');
-        final res = await _http.get(
+    final res = await _http.get(
       uri,
       headers: const {'Content-Type': 'application/json'},
     );
@@ -65,7 +66,9 @@ class CarInsuranceService {
     if (decoded['success'] == false) {
       final err = decoded['error'];
       final msg = err is Map ? err['message']?.toString() : err?.toString();
-      throw Exception(msg ?? decoded['message']?.toString() ?? 'Request failed');
+      throw Exception(
+        msg ?? decoded['message']?.toString() ?? 'Request failed',
+      );
     }
 
     dynamic data = decoded['data'];

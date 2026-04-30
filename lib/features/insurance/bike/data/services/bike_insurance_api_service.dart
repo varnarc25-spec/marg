@@ -38,30 +38,28 @@ class BikePayResult {
 
 /// Marg API client for bike insurance (billers list + optional vehicle lookup).
 class BikeInsuranceApiService {
-  BikeInsuranceApiService({
-    http.Client? httpClient,
-    String? baseUrl,
-  })  : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+  BikeInsuranceApiService({http.Client? httpClient, String? baseUrl})
+    : _http = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
 
   static const String _defaultBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
 
   final http.Client _http;
   final String _baseUrl;
 
   /// Normalizes registration: uppercase, no spaces or hyphens.
   static String normalizePlate(String vehicleNumber) {
-    return vehicleNumber
-        .trim()
-        .toUpperCase()
-        .replaceAll(RegExp(r'[\s\-]+'), '');
+    return vehicleNumber.trim().toUpperCase().replaceAll(
+      RegExp(r'[\s\-]+'),
+      '',
+    );
   }
 
   /// GET `/api/insurance/bike/billers`
   Future<List<BikeBiller>> fetchBillers() async {
     final uri = Uri.parse('$_baseUrl/api/insurance/bike/billers');
-    
+
     final res = await _http.get(
       uri,
       headers: const {'Content-Type': 'application/json'},
@@ -80,9 +78,7 @@ class BikeInsuranceApiService {
     // when returning `{ "data": [...] }`, which previously broke Find Plans.
     if (decoded['success'] == false) {
       final err = decoded['error'];
-      final msg = err is Map
-          ? err['message']?.toString()
-          : err?.toString();
+      final msg = err is Map ? err['message']?.toString() : err?.toString();
       throw Exception(
         msg ?? decoded['message']?.toString() ?? 'Request failed',
       );
@@ -94,8 +90,7 @@ class BikeInsuranceApiService {
       try {
         final b = BikeBiller.fromJson(raw);
         if (b.name.isNotEmpty) out.add(b);
-      } catch (e, st) {
-              }
+      } catch (e, st) {}
     }
     return out;
   }
@@ -131,7 +126,8 @@ class BikeInsuranceApiService {
       } catch (e) {
         lastError = e;
         final msg = e.toString().toLowerCase();
-        final looksNotFound = msg.contains('404') ||
+        final looksNotFound =
+            msg.contains('404') ||
             msg.contains('not found') ||
             msg.contains('route') ||
             msg.contains('no route');
@@ -145,26 +141,21 @@ class BikeInsuranceApiService {
       }
     }
     if (response == null) {
-      throw Exception(lastError?.toString().replaceFirst('Exception: ', '') ??
-          'Unable to fetch bill right now');
+      throw Exception(
+        lastError?.toString().replaceFirst('Exception: ', '') ??
+            'Unable to fetch bill right now',
+      );
     }
 
     final data = _extractDataMap(response);
-    final billId = _pickFirstString(data, [
-      'billId',
-      'bill_id',
-      'id',
-      'referenceId',
-    ]) ??
+    final billId =
+        _pickFirstString(data, ['billId', 'bill_id', 'id', 'referenceId']) ??
         'BILL-${DateTime.now().millisecondsSinceEpoch}';
 
-    final amountValue = _pickFirstInt(data, ['amount', 'payableAmount']) ?? amount;
+    final amountValue =
+        _pickFirstInt(data, ['amount', 'payableAmount']) ?? amount;
 
-    return BikeBillResult(
-      billId: billId,
-      amount: amountValue,
-      raw: response,
-    );
+    return BikeBillResult(billId: billId, amount: amountValue, raw: response);
   }
 
   /// POST `/api/insurance/bike/pay`
@@ -228,11 +219,11 @@ class BikeInsuranceApiService {
       'insurerCode': insurerCode,
     }..removeWhere((k, v) => v == null);
 
-    final response =
-        await _postJsonOrNull(uri, payload, idToken: idToken);
+    final response = await _postJsonOrNull(uri, payload, idToken: idToken);
 
     final data = _extractDataMap(response);
-    final txnId = _pickFirstString(data, [
+    final txnId =
+        _pickFirstString(data, [
           'transactionId',
           'transaction_id',
           'txnId',
@@ -240,8 +231,10 @@ class BikeInsuranceApiService {
           'id',
         ]) ??
         'TXN-${DateTime.now().millisecondsSinceEpoch}';
-    final status = _pickFirstString(data, ['status', 'paymentStatus']) ?? 'Success';
-    final paidAmount = _pickFirstInt(data, ['amount', 'paidAmount']) ?? bill.amount;
+    final status =
+        _pickFirstString(data, ['status', 'paymentStatus']) ?? 'Success';
+    final paidAmount =
+        _pickFirstInt(data, ['amount', 'paidAmount']) ?? bill.amount;
     final method = _pickFirstString(data, ['paymentMethod', 'method', 'mode']);
 
     return BikePayResult(
@@ -263,7 +256,7 @@ class BikeInsuranceApiService {
     final uri = Uri.parse(
       '$_baseUrl/api/insurance/bike/history?limit=$limit&offset=$offset',
     );
-    
+
     final res = await _http.get(
       uri,
       headers: {
@@ -287,7 +280,7 @@ class BikeInsuranceApiService {
         throw Exception(message ?? 'Failed to load payment history');
       }
     } else if (decoded is! List) {
-            throw Exception('Invalid payment history response');
+      throw Exception('Invalid payment history response');
     }
 
     return _parsePaymentHistoryResponse(decoded);
@@ -301,15 +294,13 @@ class BikeInsuranceApiService {
     final reg = Uri.encodeComponent(normalizedRegistration);
     final candidates = <Uri>[
       Uri.parse('$_baseUrl/api/insurance/bike/vehicle?registration=$reg'),
-      Uri.parse(
-        '$_baseUrl/api/insurance/bike/vehicle/$normalizedRegistration',
-      ),
+      Uri.parse('$_baseUrl/api/insurance/bike/vehicle/$normalizedRegistration'),
       Uri.parse('$_baseUrl/api/insurance/bike/lookup?registration=$reg'),
     ];
 
     for (final uri in candidates) {
       try {
-                final res = await _http.get(
+        final res = await _http.get(
           uri,
           headers: const {'Content-Type': 'application/json'},
         );
@@ -331,8 +322,7 @@ class BikeInsuranceApiService {
 
         final model = _parseVehiclePayload(data, normalizedRegistration);
         if (model != null) return model;
-      } catch (e, st) {
-              }
+      } catch (e, st) {}
     }
     return null;
   }
@@ -416,11 +406,11 @@ class BikeInsuranceApiService {
 
   Future<Map<String, dynamic>> _postJsonOrNull(
     Uri uri,
-    Map<String, dynamic> payload,
-    {required String idToken}
-  ) async {
+    Map<String, dynamic> payload, {
+    required String idToken,
+  }) async {
     try {
-            final headers = <String, String>{
+      final headers = <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $idToken',
       };
@@ -430,13 +420,16 @@ class BikeInsuranceApiService {
         body: jsonEncode(payload),
       );
 
-            final body = res.body;
-      final bodyTrunc =
-          body.length > 1000 ? '${body.substring(0, 1000)}...' : body;
-      
+      final body = res.body;
+      final bodyTrunc = body.length > 1000
+          ? '${body.substring(0, 1000)}...'
+          : body;
+
       if (res.statusCode < 200 || res.statusCode >= 300) {
-        throw Exception(_extractServerMessage(body) ??
-            'Request failed with status ${res.statusCode}');
+        throw Exception(
+          _extractServerMessage(body) ??
+              'Request failed with status ${res.statusCode}',
+        );
       }
 
       final decoded = jsonDecode(body);
@@ -444,13 +437,15 @@ class BikeInsuranceApiService {
         throw Exception('Invalid server response format');
       }
       if (decoded['success'] == false) {
-        throw Exception(_extractServerMessage(body) ??
-            decoded['message']?.toString() ??
-            'Request failed');
+        throw Exception(
+          _extractServerMessage(body) ??
+              decoded['message']?.toString() ??
+              'Request failed',
+        );
       }
       return decoded;
     } catch (e, st) {
-            // Re-throw so UI can show the real message.
+      // Re-throw so UI can show the real message.
       if (e is Exception) throw e;
       throw Exception('Request failed: ${e.toString()}');
     }
@@ -475,10 +470,13 @@ class BikeInsuranceApiService {
   }
 
   /// Billers list may be under `data`, `data.items`, or top-level keys.
-  List<Map<String, dynamic>> _extractBillerRowMaps(Map<String, dynamic> decoded) {
+  List<Map<String, dynamic>> _extractBillerRowMaps(
+    Map<String, dynamic> decoded,
+  ) {
     dynamic data = decoded['data'];
     if (data is Map<String, dynamic>) {
-      final nested = data['items'] ??
+      final nested =
+          data['items'] ??
           data['billers'] ??
           data['insurers'] ??
           data['records'] ??
@@ -486,7 +484,8 @@ class BikeInsuranceApiService {
       if (nested is List) data = nested;
     }
     if (data is! List) {
-      data = decoded['billers'] ??
+      data =
+          decoded['billers'] ??
           decoded['items'] ??
           decoded['insurers'] ??
           decoded['records'];
@@ -564,8 +563,7 @@ class BikeInsuranceApiService {
     for (final row in rows) {
       try {
         out.add(BikePaymentHistoryItem.fromJson(row));
-      } catch (e, st) {
-              }
+      } catch (e, st) {}
     }
     return out;
   }

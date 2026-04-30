@@ -10,11 +10,11 @@ import '../models/education_saved_account.dart';
 
 class EducationApiService {
   EducationApiService({http.Client? httpClient, String? baseUrl})
-      : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+    : _http = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
 
   static const String _defaultBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
   static const String _prefix = '/api/utilities/education-fee';
 
   final http.Client _http;
@@ -24,7 +24,8 @@ class EducationApiService {
     return {
       'Content-Type': 'application/json',
       'accept': '*/*',
-      if (idToken != null && idToken.isNotEmpty) 'Authorization': 'Bearer $idToken',
+      if (idToken != null && idToken.isNotEmpty)
+        'Authorization': 'Bearer $idToken',
     };
   }
 
@@ -74,7 +75,13 @@ class EducationApiService {
     final data = decoded['data'];
     if (data is List) return data;
     if (data is Map) {
-      for (final key in ['items', 'billers', 'accounts', 'records', 'history']) {
+      for (final key in [
+        'items',
+        'billers',
+        'accounts',
+        'records',
+        'history',
+      ]) {
         final nested = data[key];
         if (nested is List) return nested;
       }
@@ -88,7 +95,7 @@ class EducationApiService {
 
   Future<List<EducationBiller>> getBillers({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/billers');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     return raw
@@ -97,39 +104,58 @@ class EducationApiService {
         .toList();
   }
 
-  Future<EducationBill> fetchBill(Map<String, dynamic> body, {String? idToken}) async {
+  Future<EducationBill> fetchBill(
+    Map<String, dynamic> body, {
+    String? idToken,
+  }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/fetch-bill');
-        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+    final res = await _http.post(
+      uri,
+      headers: _headers(idToken),
+      body: jsonEncode(body),
+    );
     final decoded = _readJsonResponse(res);
     return EducationBill.fromApiJson(_dataMap(decoded));
   }
 
-  Future<Map<String, dynamic>> pay(Map<String, dynamic> body, {String? idToken}) async {
+  Future<Map<String, dynamic>> pay(
+    Map<String, dynamic> body, {
+    String? idToken,
+  }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/pay');
-        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+    final res = await _http.post(
+      uri,
+      headers: _headers(idToken),
+      body: jsonEncode(body),
+    );
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
 
   Future<List<EducationHistoryItem>> getHistory({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/history');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     return raw
         .whereType<Map>()
-        .map((e) => EducationHistoryItem.fromApiJson(Map<String, dynamic>.from(e)))
+        .map(
+          (e) => EducationHistoryItem.fromApiJson(Map<String, dynamic>.from(e)),
+        )
         .toList();
   }
 
   Future<List<EducationSavedAccount>> getAccounts({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     return raw
         .whereType<Map>()
-        .map((e) => EducationSavedAccount.fromApiJson(Map<String, dynamic>.from(e)))
+        .map(
+          (e) =>
+              EducationSavedAccount.fromApiJson(Map<String, dynamic>.from(e)),
+        )
         .toList();
   }
 
@@ -138,16 +164,23 @@ class EducationApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-        final res = await _http.post(uri, headers: _headers(idToken), body: jsonEncode(body));
+    final res = await _http.post(
+      uri,
+      headers: _headers(idToken),
+      body: jsonEncode(body),
+    );
     final decoded = _readJsonResponse(res);
     return EducationSavedAccount.fromApiJson(_dataMap(decoded));
   }
 
   Future<void> deleteAccount(String id, {String? idToken}) async {
-    final uri = Uri.parse('$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}');
-        final res = await _http.delete(uri, headers: _headers(idToken));
+    final uri = Uri.parse(
+      '$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}',
+    );
+    final res = await _http.delete(uri, headers: _headers(idToken));
     if (res.body.isEmpty) {
-      if (res.statusCode < 200 || res.statusCode >= 300) throw EducationApiException();
+      if (res.statusCode < 200 || res.statusCode >= 300)
+        throw EducationApiException();
       return;
     }
     _readJsonResponse(res);

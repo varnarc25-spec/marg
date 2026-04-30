@@ -11,11 +11,11 @@ import '../models/electricity_saved_account.dart';
 /// Marg Electricity API (`/api/utilities/electricity/*`).
 class ElectricityApiService {
   ElectricityApiService({http.Client? httpClient, String? baseUrl})
-      : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
+    : _http = httpClient ?? http.Client(),
+      _baseUrl = (baseUrl ?? _defaultBaseUrl).replaceAll(RegExp(r'/$'), '');
 
   static const String _defaultBaseUrl =
-      'https://margapi-548031081093.asia-south1.run.app';
+      'https://marg-api-548031081093.asia-south1.run.app';
 
   final http.Client _http;
   final String _baseUrl;
@@ -41,9 +41,7 @@ class ElectricityApiService {
   void _ensureSuccess(Map<String, dynamic> decoded) {
     if (decoded['success'] == false) {
       final msg = decoded['message'] ?? decoded['error'];
-      throw ElectricityApiException(
-        msg?.toString() ?? 'Request failed',
-      );
+      throw ElectricityApiException(msg?.toString() ?? 'Request failed');
     }
   }
 
@@ -81,7 +79,13 @@ class ElectricityApiService {
     final data = decoded['data'];
     if (data is List) return data;
     if (data is Map) {
-      for (final key in ['items', 'billers', 'accounts', 'records', 'history']) {
+      for (final key in [
+        'items',
+        'billers',
+        'accounts',
+        'records',
+        'history',
+      ]) {
         final nested = data[key];
         if (nested is List) return nested;
       }
@@ -96,7 +100,7 @@ class ElectricityApiService {
   /// GET `/billers`
   Future<List<ElectricityBiller>> getBillers({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/billers');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <ElectricityBiller>[];
@@ -115,7 +119,7 @@ class ElectricityApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/fetch-bill');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -130,7 +134,7 @@ class ElectricityApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/pay');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -147,7 +151,7 @@ class ElectricityApiService {
     final uri = Uri.parse(
       '$_baseUrl$_prefix/status/${Uri.encodeComponent(id)}',
     );
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     return _dataMap(decoded);
   }
@@ -155,7 +159,7 @@ class ElectricityApiService {
   /// GET `/history`
   Future<List<ElectricityHistoryItem>> getHistory({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/history');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <ElectricityHistoryItem>[];
@@ -173,7 +177,7 @@ class ElectricityApiService {
   /// GET `/accounts`
   Future<List<ElectricitySavedAccount>> getAccounts({String? idToken}) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-        final res = await _http.get(uri, headers: _headers(idToken));
+    final res = await _http.get(uri, headers: _headers(idToken));
     final decoded = _readJsonResponse(res);
     final raw = _dataList(decoded);
     final out = <ElectricitySavedAccount>[];
@@ -194,7 +198,7 @@ class ElectricityApiService {
     String? idToken,
   }) async {
     final uri = Uri.parse('$_baseUrl$_prefix/accounts');
-        final res = await _http.post(
+    final res = await _http.post(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -212,7 +216,7 @@ class ElectricityApiService {
     final uri = Uri.parse(
       '$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}',
     );
-        final res = await _http.put(
+    final res = await _http.put(
       uri,
       headers: _headers(idToken),
       body: jsonEncode(body),
@@ -226,7 +230,7 @@ class ElectricityApiService {
     final uri = Uri.parse(
       '$_baseUrl$_prefix/accounts/${Uri.encodeComponent(id)}',
     );
-        final res = await _http.delete(uri, headers: _headers(idToken));
+    final res = await _http.delete(uri, headers: _headers(idToken));
     if (res.body.isEmpty) {
       if (res.statusCode < 200 || res.statusCode >= 300) {
         throw ElectricityApiException();
